@@ -1,0 +1,120 @@
+<html>
+
+<head>
+  <title> 第18章 数学库 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第18章 数学库</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在这一章中（下面关于标准库的几章中同样）我的主要目的不是对每一个函数给出完整地说明，而是告诉你标准库能够提供什么功能。为了能够清楚地说明问题，我可能会忽略一些小的选项或者行为。主要的思想是激发你的好奇心，这些好奇之处可能在参考手册中找到答案。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>数学库由算术函数的标准集合组成，比如三角函数库（</span><span
+lang=EN-US>sin, cos, tan, asin, acos, etc.</span><span style='font-family:宋体'>），幂指函数（</span><span
+lang=EN-US>exp, log, log10</span><span style='font-family:宋体'>），舍入函数（</span><span
+lang=EN-US>floor, ceil</span><span style='font-family:宋体'>）、</span><span
+lang=EN-US>max</span><span style='font-family:宋体'>、</span><span lang=EN-US>min</span><span
+style='font-family:宋体'>，加上一个变量</span><span lang=EN-US>pi</span><span
+style='font-family:宋体'>。数学库也定义了一个幂操作符（</span><span lang=EN-US>^</span><span
+style='font-family:宋体'>）。</span><span lang=EN-US> </span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>所有的三角函数都在弧度单位下工作。（</span><span
+lang=EN-US>Lua4.0</span><span style='font-family:宋体'>以前在度数下工作。）你可以使用</span><span
+lang=EN-US>deg</span><span style='font-family:宋体'>和</span><span lang=EN-US>rad</span><span
+style='font-family:宋体'>函数在度和弧度之间转换。如果你想在</span><span lang=EN-US>degree</span><span
+style='font-family:宋体'>情况下使用三角函数，你可以重定义三角函数：</span></p>
+
+<div style='border:RGB(253,189,221) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,251,226)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> sin, asin, ... =
+math.sin, math.asin, ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> deg, rad =
+math.deg, math.rad</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,221,232)'><span
+lang=EN-US>math.sin = <span style='color:blue'>function</span> (x) <span
+style='color:blue'>return</span> sin(rad(x)) <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>math.asin = <span style='color:blue'>function</span> (x) <span
+style='color:blue'>return</span> deg(asin(x)) <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,232,225)'><span
+lang=EN-US>...</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>math.random</span><span
+style='font-family:宋体'>用来产生伪随机数，有三种调用方式：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第一：不带参数，将产生</span><span
+lang=EN-US> [0,1)</span><span style='font-family:宋体'>范围内的随机数</span><span
+lang=EN-US>.</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二：带一个参数</span><span
+lang=EN-US>n</span><span style='font-family:宋体'>，将产生</span><span lang=EN-US>1
+&lt;= x &lt;= n</span><span style='font-family:宋体'>范围内的随机数</span><span
+lang=EN-US>x.</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第三：带两个参数</span><span
+lang=EN-US>a</span><span style='font-family:宋体'>和</span><span lang=EN-US>b,</span><span
+style='font-family:宋体'>将产生</span><span lang=EN-US>a &lt;= x &lt;= b</span><span
+style='font-family:宋体'>范围内的随机数</span><span lang=EN-US>x.</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>你可以使用</span><span
+lang=EN-US>randomseed</span><span style='font-family:宋体'>设置随机数发生器的种子，只能接受一个数字参数。通常在程序开始时，使用固定的种子初始化随机数发生器，意味着每次运行程序，将产生相同的随机数序列。为了调试方便，这很有好处，但是在游戏中就意味着每次运行都拥有相同的关卡。解决这个问题的一个通常的技巧是使用当前系统时间作为种子：</span></p>
+
+<div style='border:RGB(253,189,221) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,249,231)'><span
+lang=EN-US>math.randomseed(os.time())</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>（</span><span
+lang=EN-US>os.time</span><span style='font-family:宋体'>函数返回一个表示当前系统时间的数字，通常是自新纪元以来的一个整数。）</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section28 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

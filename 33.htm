@@ -1,0 +1,160 @@
+<html>
+
+<head>
+  <title>4.2 局部变量与代码块（block） - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;4.2 局部变量与代码块（block）</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>使用</span><span
+lang=EN-US>local</span><span style='font-family:宋体'>创建一个局部变量，与全局变量不同，局部变量只在被声明的那个代码块内有效。代码块：指一个控制结构内，一个函数体，或者一个</span><span
+lang=EN-US>chunk</span><span style='font-family:宋体'>（变量被声明的那个文件或者文本串）。</span></p>
+
+<div style='border:RGB(33,179,166) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,253,250)'><span
+lang=EN-US>x = 10</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> i = 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- local to the chunk</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,222,242)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>while</span><span lang=EN-US> i&lt;=x <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,244,231)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> x = i*2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- local to the while body</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(x)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 2, 4, 6, 8, ...</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,232,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; i = i + 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,252,252)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> i &gt; 20 <span
+style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,229,237)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- local to the &quot;then&quot; body</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; x = 20</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,242,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(x + 2)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>else</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,249,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(x)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 10&nbsp; (the global one)</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,220,233)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(x)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 10&nbsp; (the global one)</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>注意，如果在交互模式下上面的例子可能不能输出期望的结果，因为第二句</span><span
+lang=EN-US>local i=1</span><span style='font-family:宋体'>是一个完整的</span><span
+lang=EN-US>chunk</span><span style='font-family:宋体'>，在交互模式下执行完这一句后，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>将开始一个新的</span><span
+lang=EN-US>chunk</span><span style='font-family:宋体'>，这样第二句的</span><span
+lang=EN-US>i</span><span style='font-family:宋体'>已经超出了他的有效范围。可以将这段代码放在</span><span
+lang=EN-US>do..end</span><span style='font-family:宋体'>（相当于</span><span
+lang=EN-US>c/c++</span><span style='font-family:宋体'>的</span><span lang=EN-US>{}</span><span
+style='font-family:宋体'>）块中。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>应该尽可能的使用局部变量，有两个好处：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>1. </span><span
+style='font-family:宋体'>避免命名冲突</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>2. </span><span
+style='font-family:宋体'>访问局部变量的速度比全局变量更快</span><span lang=EN-US>.</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们给</span><span
+lang=EN-US>block</span><span style='font-family:宋体'>划定一个明确的界限：</span><span
+lang=EN-US>do..end</span><span style='font-family:宋体'>内的部分。当你想更好的控制局部变量的作用范围的时候这是很有用的。</span></p>
+
+<div style='border:RGB(33,179,166) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(226,245,253);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>do</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,245,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> a2 = 2*a</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> d =
+sqrt(b^2 - 4*a*c)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,234,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; x1 = (-b + d)/a2</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; x2 = (-b - d)/a2</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,224,221)'><span
+lang=EN-US style='color:blue'>end</span><span lang=EN-US> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- scope of 'a2' and 'd' ends here</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,236,233)'><span
+lang=EN-US>print(x1, x2)</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

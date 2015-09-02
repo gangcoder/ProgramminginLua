@@ -1,0 +1,126 @@
+<html>
+
+<head>
+  <title>21.2.1 I/O优化的一个小技巧 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;21.2.1 I/O优化的一个小技巧</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>由于通常</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中读取整个文件要比一行一行的读取一个文件快的多。尽管我们有时候针对较大的文件（几十，几百兆），不可能把一次把它们读取出来。要处理这样的文件我们仍然可以一段一段（例如</span><span
+lang=EN-US>8kb</span><span style='font-family:宋体'>一段）的读取它们。同时为了避免切割文件中的行，还要在每段后加上一行：</span></p>
+
+<div style='border:RGB(170,106,8) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,249,235)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> lines, rest =
+f:read(BUFSIZE, <span style='color:red'>&quot;*line&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>以上代码中的</span><span
+lang=EN-US>rest</span><span style='font-family:宋体'>就保存了任何可能被段划分切断的行。然后再将段（</span><span
+lang=EN-US>chunk</span><span style='font-family:宋体'>）和行接起来。这样每个段就是以一个完整的行结尾的了。以下代码就较为典型的使用了这一技巧。该段程序实现对输入文件的字符，单词，行数的计数。</span></p>
+
+<div style='border:RGB(170,106,8) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,227,240)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> BUFSIZE = 2^13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- 8K</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> f =
+io.input(arg[1])&nbsp; <span style='color:green'>-- open input file</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,225,234)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> cc, lc, wc = 0, 0,
+0&nbsp; <span style='color:green'>-- char, line, and word counts</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,239,224)'><span
+lang=EN-US style='color:blue'>while</span><span lang=EN-US> <span
+style='color:blue'>true</span> <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> lines, rest
+= f:read(BUFSIZE, <span style='color:red'>&quot;*line&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,228,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> <span
+style='color:blue'>not</span> lines <span style='color:blue'>then</span> <span
+style='color:blue'>break</span> <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> rest <span
+style='color:blue'>then</span> lines = lines .. rest .. '\n' <span
+style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,221,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; cc = cc + string.len(lines)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>-- count words in the
+chunk</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,222,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> _,t =
+string.gsub(lines, <span style='color:red'>&quot;%S+&quot;</span>, <span
+style='color:red'>&quot;&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; wc = wc + t</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,234,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>-- count newlines in
+the chunk</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; _,t = string.gsub(lines, <span style='color:red'>&quot;\n&quot;</span>,
+<span style='color:red'>&quot;\n&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,242,233)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lc = lc + t</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,245,247)'><span
+lang=EN-US style='color:blue'>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(lc, wc, cc)</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

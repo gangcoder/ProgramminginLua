@@ -1,0 +1,121 @@
+<html>
+
+<head>
+  <title> 第24章 C API纵览 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第24章 C API纵览</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>是一个嵌入式的语言，意味着</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>不仅可以是一个独立运行的程序包也可以是一个用来嵌入其他应用的程序库。你可能觉得奇怪：如果</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>不只是独立的程序，为什么到目前为止贯穿整本书我们都是在使用</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>独立程序呢？这个问题的答案在于</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>解释器（可执行的</span><span
+lang=EN-US>lua</span><span style='font-family:宋体'>）。</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>解释器是一个使用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>标准库实现的独立的解释器，她是一个很小的应用（总共不超过</span><span lang=EN-US>500</span><span
+style='font-family:宋体'>行的代码）。解释器负责程序和使用者的接口：从使用者那里获取文件或者字符串，并传给</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>标准库，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>标准库负责最终的代码运行。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>可以作为程序库用来扩展应用的功能，也就是</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>可以作为扩展性语言的原因所在。同时，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>程序中可以注册有其他语言实现的函数，这些函数可能由</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>语言</span><span lang=EN-US>(</span><span
+style='font-family:宋体'>或其他语言</span><span lang=EN-US>)</span><span
+style='font-family:宋体'>实现，可以增加一些不容易由</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>实现的功能。这使得</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>是可扩展的。与上面两种观点</span><span lang=EN-US>(Lua</span><span
+style='font-family:宋体'>作为扩展性语言和可扩展的语言</span><span lang=EN-US>)</span><span
+style='font-family:宋体'>对应的</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中间有两种交互方式。第一种，</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>作为应用程序语言，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>作为一个库使用；第二种，反过来，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>作为程序语言，</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>作为库使用。这两种方式，</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>语言都使用相同的</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>与</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>通信，因此</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>交互这部分称为</span><span lang=EN-US>C API</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>C API</span><span
+style='font-family:宋体'>是一个</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>代码与</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>进行交互的函数集。他有以下部分组成：读写</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>全局变量的函数，调用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>函数的函数，运行</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>代码片断的函数，注册</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数然后可以在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中被调用的函数，等等。（本书中，术语函数实际上指函数或者宏，</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>有些函数为了方便以宏的方式实现）</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>C API</span><span
+style='font-family:宋体'>遵循</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>语言的语法形式，这</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>有所不同。当使用</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>进行程序设计的时候，我们必须注意，类型检查，错误处理，内存分配都很多问题。</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>中的大部分函数并不检查他们参数的正确性；你需要在调用函数之前负责确保参数是有效的。如果你传递了错误的参数，可能得到</span><span
+lang=EN-US> \&quot;segmentation fault\&quot; </span><span style='font-family:
+宋体'>这样或者类似的错误信息，而没有很明确的错误信息可以获得。另外，</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>重点放在了灵活性和简洁性方面，有时候以牺牲方便实用为代价的。一般的任务可能需要涉及很多个</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>调用，这可能令人烦恼，但是他给你提供了对细节的全部控制的能力，比如错误处理，缓冲大小，和类似的问题。如本章的标题所示，这一章的目标是对当你从</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>调用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>时将涉及到哪些内容的预览。如果不能理解某些细节不要着急，后面我们会一一详细介绍。不过，在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>参考手册中有对指定函数的详细描述。另外，在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>发布版中你可以看到</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>的应用的例子，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>独立的解释器（</span><span
+lang=EN-US>lua.c</span><span style='font-family:宋体'>）提供了应用代码的例子，而标准库（</span><span
+lang=EN-US>lmathlib.c</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>lstrlib.c</span><span style='font-family:宋体'>等等）提供了程序库代码的例子。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>从现在开始，你戴上了</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>程序员的帽子，当我们谈到“你</span><span
+lang=EN-US>/</span><span style='font-family:宋体'>你们”，我们意思是指当你使用</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>编程的时候。在</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>之间通信关键内容在于一个虚拟的栈。几乎所有的</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>调用都是对栈上的值进行操作，所有</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>与</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>之间的数据交换也都通过这个栈来完成。另外，你也可以使用栈来保存临时变量。栈的使用解决了</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>和</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>之间两个不协调的问题：第一，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>会自动进行垃圾收集，而</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>要求显示的分配存储单元，两者引起的矛盾。第二，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中的动态类型和</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>中的静态类型不一致引起的混乱。我们将在</span><span lang=EN-US>24.2</span><span
+style='font-family:宋体'>节详细地介绍栈的相关内容。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

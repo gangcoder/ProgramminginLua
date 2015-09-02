@@ -1,0 +1,283 @@
+<html>
+
+<head>
+  <title>9.3 用作迭代器的协同 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;9.3 用作迭代器的协同</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们可以将循环的迭代器看作生产者</span><span
+lang=EN-US>-</span><span style='font-family:宋体'>消费者模式的特殊的例子。迭代函数产生值给循环体消费。所以可以使用协同来实现迭代器。协同的一个关键特征是它可以不断颠倒调用者与被调用者之间的关系，这样我们毫无顾虑的使用它实现一个迭代器，而不用保存迭代函数返回的状态。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们来完成一个打印一个数组元素的所有的排列来阐明这种应用。直接写这样一个迭代函数来完成这个任务并不容易，但是写一个生成所有排列的递归函数并不难。思路是这样的：将数组中的每一个元素放到最后，依次递归生成所有剩余元素的排列。代码如下：</span></p>
+
+<div style='border:RGB(118,67,127) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,253,220)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> permgen (a, n)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> n == 0 <span
+style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,234,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printResult(a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,224,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span>
+i=1,n <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,230,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- put i-th element as the last one</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a[n],
+a[i] = a[i], a[n]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,224,255)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- generate all permutations of the other elements</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,254,226)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; permgen(a,
+n - 1)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,236,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- restore i-th element</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a[n],
+a[i] = a[i], a[n]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,228,227)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,234,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,223,237)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> printResult (a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,226,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> i,v <span
+style='color:blue'>in</span> ipairs(a) <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; io.write(v, <span
+style='color:red'>&quot; &quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,251,250)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; io.write(<span style='color:red'>&quot;\n&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,227,228)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,234,247)'><span
+lang=EN-US>permgen ({1,2,3,4}, 4)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有了上面的生成器后，下面我们将这个例子修改一下使其转换成一个迭代函数：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>1. </span><span
+style='font-family:宋体'>第一步</span><span lang=EN-US>printResult </span><span
+style='font-family:宋体'>改为</span><span lang=EN-US> yield</span></p>
+
+<div style='border:RGB(118,67,127) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,234,225)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> permgen (a, n)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> n == 0 <span
+style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,237,245)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; coroutine.yield(a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,234,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>2. </span><span
+style='font-family:宋体'>第二步，我们定义一个迭代工厂，修改生成器在生成器内创建迭代函数，并使生成器运行在一个协同程序内。迭代函数负责请求协同产生下一个可能的排列。</span></p>
+
+<div style='border:RGB(118,67,127) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,252,234)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> perm (a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> n =
+table.getn(a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,248,241)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> co =
+coroutine.create(<span style='color:blue'>function</span> () permgen(a, n) <span
+style='color:blue'>end</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> <span
+style='color:blue'>function</span> ()&nbsp;&nbsp; <span style='color:green'>--
+iterator</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,250,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+code, res = coroutine.resume(co)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+res</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,234,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这样我们就可以使用</span><span
+lang=EN-US>for</span><span style='font-family:宋体'>循环来打印出一个数组的所有排列情况了：</span></p>
+
+<div style='border:RGB(118,67,127) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(246,223,231);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> p <span
+style='color:blue'>in</span> perm{<span style='color:red'>&quot;a&quot;</span>,
+<span style='color:red'>&quot;b&quot;</span>, <span style='color:red'>&quot;c&quot;</span>}
+<span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,238,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; printResult(p)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,228,230)'><span
+lang=EN-US style='color:green'>--&gt; b c a</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>--&gt; c b a</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,224,221)'><span
+lang=EN-US style='color:green'>--&gt; c a b</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>--&gt; a c b</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,220,253)'><span
+lang=EN-US style='color:green'>--&gt; b a c</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>--&gt; a b c</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>perm</span><span
+style='font-family:宋体'>函数使用了</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中常用的模式：将一个对协同的</span><span lang=EN-US>resume</span><span
+style='font-family:宋体'>的调用封装在一个函数内部，这种方式在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>非常常见，所以</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>专门为此专门提供了一个函数</span><span lang=EN-US>coroutine.wrap</span><span
+style='font-family:宋体'>。与</span><span lang=EN-US>create</span><span
+style='font-family:宋体'>相同的是，</span><span lang=EN-US>wrap</span><span
+style='font-family:宋体'>创建一个协同程序；不同的是</span><span lang=EN-US>wrap</span><span
+style='font-family:宋体'>不返回协同本身，而是返回一个函数，当这个函数被调用时将</span><span lang=EN-US>resume</span><span
+style='font-family:宋体'>协同。</span><span lang=EN-US>wrap</span><span
+style='font-family:宋体'>中</span><span lang=EN-US>resume</span><span
+style='font-family:宋体'>协同的时候不会返回错误代码作为第一个返回结果，一旦有错误发生，将抛出错误。我们可以使用</span><span
+lang=EN-US>wrap</span><span style='font-family:宋体'>重写</span><span lang=EN-US>perm</span><span
+style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(118,67,127) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(232,227,243);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> perm (a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,236,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> n =
+table.getn(a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+coroutine.wrap(<span style='color:blue'>function</span> () permgen(a, n) <span
+style='color:blue'>end</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,254,229)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一般情况下，</span><span
+lang=EN-US>coroutine.wrap</span><span style='font-family:宋体'>比</span><span
+lang=EN-US>coroutine.create</span><span style='font-family:宋体'>使用起来简单直观，前者更确切的提供了我们所需要的：一个可以</span><span
+lang=EN-US>resume</span><span style='font-family:宋体'>协同的函数，然而缺少灵活性，没有办法知道</span><span
+lang=EN-US>wrap</span><span style='font-family:宋体'>所创建的协同的状态，也没有办法检查错误的发生。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

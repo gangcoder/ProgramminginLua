@@ -1,0 +1,216 @@
+<html>
+
+<head>
+  <title> A. 终端机控制符 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;A. 终端机控制符</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在几十年前，流行的是各种终端机（</span><span
+lang=EN-US>terminal</span><span style='font-family:宋体'>），它们都遵守</span><span
+lang=EN-US>ANSI X3.64</span><span style='font-family:宋体'>控制字符序列标准（还有一些公司比如</span><span
+lang=EN-US>IBM</span><span style='font-family:宋体'>、</span><span lang=EN-US>DEC</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>HP</span><span
+style='font-family:宋体'>制定了自己的扩展标准），这些控制字符序列能帮助终端对显示的内容作一些处理，比如光标定位，字符色彩，背景色，窗口等等。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>随着</span><span
+lang=EN-US>PC</span><span style='font-family:宋体'>的流行，终端机被淘汰，但是原先的终端显示方式以及这些控制字符序列都被保留。人们开发出了虚拟的终端仿真程序来获得和从前一样的终端体验。自然，各种原先的终端机都有被仿真，较为流行的比如有</span><span
+lang=EN-US>DEC-VT100</span><span style='font-family:宋体'>，简称</span><span
+lang=EN-US>VT100</span><span style='font-family:宋体'>。在</span><span lang=EN-US>linux</span><span
+style='font-family:宋体'>下可以用：</span></p>
+
+<div style='border:RGB(134,30,250) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,230,220)'><span
+lang=EN-US>echo $TERM</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>来查看当前终端类型，也可以在</span><span
+lang=EN-US>/etc/termcap</span><span style='font-family:宋体'>或者</span><span
+lang=EN-US>/etc/terminfo/</span><span style='font-family:宋体'>中查到完整的终端类型。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Windows</span><span
+style='font-family:宋体'>终端窗口的很多显示功能，都是通过</span><span lang=EN-US>win32 API</span><span
+style='font-family:宋体'>来实现的。对于古老的</span><span lang=EN-US>DOS</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>Win95/98</span><span
+style='font-family:宋体'>，可通过加载</span><span lang=EN-US>ansi.sys</span><span
+style='font-family:宋体'>来支持终端机控制符。下面是各版本</span><span lang=EN-US>Windows</span><span
+style='font-family:宋体'>对其的支持：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>WIN95</span><span
+style='font-family:宋体'>：使用</span><span lang=EN-US>ANSI terminal control</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>config.sys </span><span
+style='font-family:宋体'>中加入</span><span lang=EN-US>device=ansi.sys</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>WIN98</span><span
+style='font-family:宋体'>：使用</span><span lang=EN-US>ANSI terminal control</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>WINNT</span><span
+style='font-family:宋体'>：使用</span><span lang=EN-US>console mode API</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>WIN2K</span><span
+style='font-family:宋体'>：使用</span><span lang=EN-US>console mode API</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>所以，对于目前的</span><span
+lang=EN-US>Win2k/XP/2003</span><span style='font-family:宋体'>的用户，不能使用终端机控制符。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>注：在</span><span
+lang=EN-US>google</span><span style='font-family:宋体'>上查</span><span lang=EN-US>ansi.sys</span><span
+style='font-family:宋体'>，可找到许多相关的资料。</span></p>
+
+</div>
+
+<div><br clear=all>
+
+<hr align=left size=1 width="33%">
+
+<div id=ftn1>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref1"
+name="_ftn1" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[1]</span></span></span></span></a><span lang=EN-US>
+<a href="http://www.contextfree.net/wangyg/b/tech_his/basic_history.html">http://www.contextfree.net/wangyg/b/tech_his/basic_history.html</a></span><span
+style='font-family:宋体'>，</span><span lang=EN-US>VB</span><span
+style='font-family:宋体'>虽非正统之</span><span lang=EN-US>Basic</span><span
+style='font-family:宋体'>，也不能算纯粹的语言，但其使用广泛，姑且忝列其中吧。</span></p>
+
+</div>
+
+<div id=ftn2>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref2"
+name="_ftn2" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[2]</span></span></span></span></a><span lang=EN-US>
+<a href="http://www.muppetlabs.com/~breadbox/bf/">http://www.muppetlabs.com/~breadbox/bf/</a></span><span
+style='font-family:宋体'>，有趣的</span><span lang=EN-US>Brain Fuck</span><span
+style='font-family:宋体'>语言。</span></p>
+
+</div>
+
+<div id=ftn3>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref3"
+name="_ftn3" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[3]</span></span></span></span></a><span lang=EN-US>
+</span><span style='font-family:宋体'>终端类型、控制符，参见附录</span><span lang=EN-US>A</span><span
+style='font-family:宋体'>。</span></p>
+
+</div>
+
+<div id=ftn4>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref4"
+name="_ftn4" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[4]</span></span></span></span></a><span lang=EN-US>
+</span><span style='font-family:宋体'>译注：</span><span lang=EN-US>POSIX</span><span
+style='font-family:宋体'>是</span><span lang=EN-US>unix</span><span
+style='font-family:宋体'>的工业标准，</span><span lang=EN-US>regexp</span><span
+style='font-family:宋体'>最初来源于</span><span lang=EN-US>unix</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>POSIX</span><span
+style='font-family:宋体'>对</span><span lang=EN-US>regexp</span><span
+style='font-family:宋体'>也作了规范。</span></p>
+
+</div>
+
+<div id=ftn5>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref5"
+name="_ftn5" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[5]</span></span></span></span></a><span
+style='font-family:宋体'>译注：下面译为捕获或者</span><span lang=EN-US>capture</span><span
+style='font-family:宋体'>，模式中捕获的概念指，使用临时变量来保存匹配的子模式，常用于向前引用。</span></p>
+
+</div>
+
+<div id=ftn6>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref6"
+name="_ftn6" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[6]</span></span></span></span></a><span lang=EN-US>
+</span><span style='font-family:宋体'>译注：得到类似于十六进制编辑器的一个界面显示</span></p>
+
+</div>
+
+<div id=ftn7>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref7"
+name="_ftn7" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[7]</span></span></span></span></a><span lang=EN-US>
+</span><span style='font-family:宋体'>译者按：好像是巴西人的烦恼，不甚解。附原文。</span></p>
+
+</div>
+
+<div id=ftn8>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref8"
+name="_ftn8" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[8]</span></span></span></span></a><span lang=EN-US>
+</span><span style='font-family:宋体'>译注：即有多少次</span><span lang=EN-US>push</span><span
+style='font-family:宋体'>就要有多少次</span><span lang=EN-US>pop</span><span
+style='font-family:宋体'>。</span></p>
+
+</div>
+
+<div id=ftn9>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref9"
+name="_ftn9" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[9]</span></span></span></span></a><span lang=EN-US>
+</span><span style='font-family:宋体'>译注：指目录结构，即</span><span lang=EN-US>userdatum</span></p>
+
+</div>
+
+<div id=ftn10>
+
+<p class=MsoFootnoteText style='text-indent:18.0pt'><a href="#_ftnref10"
+name="_ftn10" title=""><span class=MsoFootnoteReference><span lang=EN-US><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:9.0pt;font-family:
+"Times New Roman","serif"'>[10]</span></span></span></span></a><span
+lang=EN-US style='font-family:"Tahoma","sans-serif";color:#555555'> </span><span
+style='font-family:宋体;color:#555555'>译注：估计是</span><span lang=EN-US
+style='font-family:"Tahoma","sans-serif";color:#555555'>lua xml parser</span><span
+style='font-family:宋体;color:#555555'>的简写。</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

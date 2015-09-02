@@ -1,0 +1,187 @@
+<html>
+
+<head>
+  <title>8.5 错误信息和回跟踪（Tracebacks） - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;8.5 错误信息和回跟踪（Tracebacks）</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>虽然你可以使用任何类型的值作为错误信息，通常情况下，我们使用字符串来描述遇到的错误。如果遇到内部错误（比如对一个非</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>的值使用索引下标访问）</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>将自己产生错误信息，否则</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>使用传递给</span><span lang=EN-US>error</span><span
+style='font-family:宋体'>函数的参数作为错误信息。不管在什么情况下，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>都尽可能清楚的描述问题发生的缘由。</span></p>
+
+<div style='border:RGB(224,151,171) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,222,228)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> status, err =
+pcall(<span style='color:blue'>function</span> () a = 'a'+1 <span
+style='color:blue'>end</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(err)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,223,246)'><span
+lang=EN-US style='color:green'>--&gt; stdin:1: attempt to perform arithmetic on
+a string value</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,220,246)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> status, err =
+pcall(<span style='color:blue'>function</span> () error(<span style='color:
+red'>&quot;my error&quot;</span>) <span style='color:blue'>end</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(err)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,235,246)'><span
+lang=EN-US style='color:green'>--&gt; stdin:1: my error</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>例子中错误信息给出了文件名（</span><span
+lang=EN-US>stdin</span><span style='font-family:宋体'>）与行号。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>函数</span><span
+lang=EN-US>error</span><span style='font-family:宋体'>还可以有第二个参数，表示错误发生的层级。比如，你写了一个函数用来检查“</span><span
+lang=EN-US>error</span><span style='font-family:宋体'>是否被正确调用”：</span></p>
+
+<div style='border:RGB(224,151,171) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,246,225)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> foo (str)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> type(str) ~= <span
+style='color:red'>&quot;string&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,252,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error(<span style='color:red'>&quot;string
+expected&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,221,223)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>可有人这样调用此函数：</span></p>
+
+<div style='border:RGB(224,151,171) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(245,240,222);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>foo({x=1})</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>会指出发生错误的是</span><span lang=EN-US>foo</span><span
+style='font-family:宋体'>而不是</span><span lang=EN-US>error</span><span
+style='font-family:宋体'>，实际上，错误是调用</span><span lang=EN-US>error</span><span
+style='font-family:宋体'>时产生的。为了纠正这个问题，修改前面的代码让</span><span lang=EN-US>error</span><span
+style='font-family:宋体'>报告错误发生在第二级（你自己的函数是第一级）如下：</span></p>
+
+<div style='border:RGB(224,151,171) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(231,234,236);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> foo (str)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,244,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> type(str) ~= <span
+style='color:red'>&quot;string&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error(<span style='color:red'>&quot;string
+expected&quot;</span>, 2)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,230,247)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,248,251)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当错误发生的时候，我们常常希望了解详细的信息，而不仅是错误发生的位置。若能了解到“错误发生时的栈信息”就好了，但</span><span
+lang=EN-US>pcall</span><span style='font-family:宋体'>返回错误信息时，已经释放了保存错误发生情况的栈信息。因此，若想得到</span><span
+lang=EN-US>tracebacks</span><span style='font-family:宋体'>，我们必须在</span><span
+lang=EN-US>pcall</span><span style='font-family:宋体'>返回以前获取。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>提供了</span><span lang=EN-US>xpcall</span><span
+style='font-family:宋体'>来实现这个功能，</span><span lang=EN-US>xpcall</span><span
+style='font-family:宋体'>接受两个参数：调用函数、错误处理函数。当错误发生时，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>会在栈释放以前调用错误处理函数，因此可以使用</span><span lang=EN-US>debug</span><span
+style='font-family:宋体'>库收集错误相关信息。有两个常用的</span><span lang=EN-US>debug</span><span
+style='font-family:宋体'>处理函数：</span><span lang=EN-US>debug.debug</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>debug.traceback</span><span
+style='font-family:宋体'>，前者给出</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的提示符，你可以自己动手察看错误发生时的情况；后者通过</span><span lang=EN-US>traceback</span><span
+style='font-family:宋体'>创建更多的错误信息，也是控制台解释器用来构建错误信息的函数。你可以在任何时候调用</span><span
+lang=EN-US>debug.traceback</span><span style='font-family:宋体'>获取当前运行的</span><span
+lang=EN-US>traceback</span><span style='font-family:宋体'>信息：</span></p>
+
+<div style='border:RGB(224,151,171) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,234,234)'><span
+lang=EN-US>print(debug.traceback())</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section16 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

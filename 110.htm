@@ -1,0 +1,92 @@
+<html>
+
+<head>
+  <title>19.2 插入/删除 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;19.2 插入/删除</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>table</span><span
+style='font-family:宋体'>库提供了从一个</span><span lang=EN-US>list</span><span
+style='font-family:宋体'>的任意位置插入和删除元素的函数。</span><span lang=EN-US>table.insert</span><span
+style='font-family:宋体'>函数在</span><span lang=EN-US>array</span><span
+style='font-family:宋体'>指定位置插入一个元素，并将后面所有其他的元素后移。另外，</span><span lang=EN-US>insert</span><span
+style='font-family:宋体'>改变</span><span lang=EN-US>array</span><span
+style='font-family:宋体'>的大小（</span><span lang=EN-US>using setn</span><span
+style='font-family:宋体'>）。例如，如果</span><span lang=EN-US>a</span><span
+style='font-family:宋体'>是一个数组</span><span lang=EN-US>{10,20,30}</span><span
+style='font-family:宋体'>，调用</span><span lang=EN-US>table.insert(a,1,15)</span><span
+style='font-family:宋体'>后，</span><span lang=EN-US>a</span><span
+style='font-family:宋体'>变为</span><span lang=EN-US>{15,10,20,30}</span><span
+style='font-family:宋体'>。经常使用的一个特殊情况是，我们不带位置参数调用</span><span lang=EN-US>insert</span><span
+style='font-family:宋体'>，将会在</span><span lang=EN-US>array</span><span
+style='font-family:宋体'>最后位置插入元素（所以不需要元素移动）。下面的代码逐行独入程序，并将所有行保存在一个</span><span
+lang=EN-US>array</span><span style='font-family:宋体'>内：</span></p>
+
+<div style='border:RGB(134,21,169) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,227,232)'><span
+lang=EN-US>a = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> line <span
+style='color:blue'>in</span> io.lines() <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,241,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; table.insert(a, line)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,248,221)'><span
+lang=EN-US>print(table.getn(a))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; (number of lines read)</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>table.remove</span><span
+style='font-family:宋体'>函数删除数组中指定位置的元素，并返回这个元素，所有后面的元素前移，并且数组的大小改变。不带位置参数调用的时候，他删除</span><span
+lang=EN-US>array</span><span style='font-family:宋体'>的最后一个元素。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>使用这两个函数，很容易实现栈、队列和双端队列。我们可以初始化结构为</span><span
+lang=EN-US>a={}</span><span style='font-family:宋体'>。一个</span><span lang=EN-US>push</span><span
+style='font-family:宋体'>操作等价于</span><span lang=EN-US>table.insert(a,x)</span><span
+style='font-family:宋体'>；一个</span><span lang=EN-US>pop</span><span
+style='font-family:宋体'>操作等价于</span><span lang=EN-US>table.remove(a)</span><span
+style='font-family:宋体'>。要在结构的另一端结尾插入元素我们使用</span><span lang=EN-US>table.insert(a,1,x)</span><span
+style='font-family:宋体'>；删除元素用</span><span lang=EN-US>table.remove(a,1)</span><span
+style='font-family:宋体'>。最后两个操作不是特别有效的，因为他们必须来回移动元素。然而，因为</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>库这些函数使用</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>实现，对于小的数组</span><span
+lang=EN-US>(</span><span style='font-family:宋体'>几百个元素</span><span lang=EN-US>)</span><span
+style='font-family:宋体'>来说效率都不会有什么问题。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

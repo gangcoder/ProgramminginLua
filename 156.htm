@@ -1,0 +1,94 @@
+<html>
+
+<head>
+  <title> 第28章 User-Defined Types in C - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第28章 User-Defined Types in C</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在面的一章，我们讨论了如何使用</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数扩展</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的功能，现在我们讨论如何使用</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>中新创建的类型来扩展</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>。我们从一个小例子开始，本章后续部分将以这个小例子为基础逐步加入</span><span lang=EN-US>metamethods</span><span
+style='font-family:宋体'>等其他内容来介绍如何使用</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>中新类型扩展</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们的例子涉及的类型非常简单，数字数组。这个例子的目的在于将目光集中到</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>问题上，所以不涉及复杂的算法。尽管例子中的类型很简单，但很多应用中都会用到这种类型。一般情况下，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中并不需要外部的数组，因为哈希表很好的实现了数组。但是对于非常大的数组而言，哈希表可能导致内存不足，因为对于每一个元素必须保存一个范性的（</span><span
+lang=EN-US>generic</span><span style='font-family:宋体'>）值，一个链接地址，加上一些以备将来增长的额外空间。在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>中的直接存储数字值不需要额外的空间，将比哈希表的实现方式节省</span><span
+lang=EN-US>50%</span><span style='font-family:宋体'>的内存空间。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们使用下面的结构表示我们的数组：</span></p>
+
+<div style='border:RGB(118,47,244) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,239,221)'><span
+lang=EN-US style='color:blue'>typedef</span><span lang=EN-US> <span
+style='color:blue'>struct</span> NumArray {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span> size;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,229,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>double</span>
+values[1];&nbsp; <span style='color:green'>/* variable part */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>} NumArray;</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们使用大小</span><span
+lang=EN-US>1</span><span style='font-family:宋体'>声明数组的</span><span lang=EN-US>values</span><span
+style='font-family:宋体'>，由于</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>语言不允许大小为</span><span lang=EN-US>0</span><span
+style='font-family:宋体'>的数组，这个</span><span lang=EN-US>1</span><span
+style='font-family:宋体'>只是一个占位符；我们在后面定义数组分配空间的实际大小。对于一个有</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>个元素的数组来说，我们需要</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(241,232,236);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>sizeof</span><span lang=EN-US>(NumArray) + (n-1)*<span
+style='color:blue'>sizeof</span>(<span style='color:blue'>double</span>) bytes</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>（由于原始的结构中已经包含了一个元素的空间，所以我们从</span><span
+lang=EN-US>n</span><span style='font-family:宋体'>中减去</span><span lang=EN-US>1</span><span
+style='font-family:宋体'>）</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

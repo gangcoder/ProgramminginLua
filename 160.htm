@@ -1,0 +1,148 @@
+<html>
+
+<head>
+  <title>28.4 访问数组 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;28.4 访问数组</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>除了上面介绍的使用面向对象的写法来访问数组以外，还可以使用传统的写法来访问数组元素，不是</span><span
+lang=EN-US>a:get(i)</span><span style='font-family:宋体'>，而是</span><span
+lang=EN-US>a[i]</span><span style='font-family:宋体'>。对于我们上面的例子，很容易实现这个，因为我们的</span><span
+lang=EN-US>setarray</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>getarray</span><span style='font-family:宋体'>函数已经依次接受了与他们的元方法对应的参数。一个快速的解决方法是在我们的</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>代码中正确的定义这些元方法：</span></p>
+
+<div style='border:RGB(222,71,209) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,238,238)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> metaarray =
+getmetatable(newarray(1))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>metaarray.__index = array.get</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,244,240)'><span
+lang=EN-US>metaarray.__newindex = array.set</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>（这段代码必须运行在前面的最初的数组实现基础上，不能使用为了面向对象访问的修改的那段代码）</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们要做的只是使用传统的语法：</span></p>
+
+<div style='border:RGB(222,71,209) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,248,231)'><span
+lang=EN-US>a = array.<span style='color:blue'>new</span>(1000)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a[10] = 3.4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- setarray</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,247,244)'><span
+lang=EN-US>print(a[10])&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--
+getarray&nbsp;&nbsp; --&gt; 3.4</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果我们喜欢的话，我们可以在我们的</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>代码中注册这些元方法。我们只需要修改我们的初始化函数：</span></p>
+
+<div style='border:RGB(222,71,209) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,229,237)'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> luaopen_array
+(lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_newmetatable(L, <span style='color:red'>&quot;LuaBook.array&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,220,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_openlib(L, <span style='color:red'>&quot;array&quot;</span>,
+arraylib, 0);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,231,229)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* now the stack has
+the metatable at index 1 and</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 'array' at
+index 2 */</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,221,220)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushstring(L, <span style='color:red'>&quot;__index&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushstring(L, <span style='color:red'>&quot;get&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,230,241)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_gettable(L, 2); <span style='color:green'>/*
+get array.get */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_settable(L, 1); <span style='color:green'>/*
+metatable.__index = array.get */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,247,242)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushstring(L, <span style='color:red'>&quot;__newindex&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,248,226)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushstring(L, <span style='color:red'>&quot;set&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_gettable(L, 2); <span style='color:green'>/*
+get array.set */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,244,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_settable(L, 1); <span style='color:green'>/*
+metatable.__newindex = array.set */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,248,252)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 0;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

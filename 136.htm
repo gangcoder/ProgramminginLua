@@ -1,0 +1,118 @@
+<html>
+
+<head>
+  <title>24.2.1 压入元素 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;24.2.1 压入元素</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>API</span><span
+style='font-family:宋体'>有一系列压栈的函数，它将每种可以用</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>来描述的</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>类型压栈：空值（</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>）用</span><span lang=EN-US>lua_pushnil</span><span
+style='font-family:宋体'>，数值型（</span><span lang=EN-US>double</span><span
+style='font-family:宋体'>）用</span><span lang=EN-US>lua_pushnumber</span><span
+style='font-family:宋体'>，布尔型（在</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>中用整数表示）用</span><span lang=EN-US>lua_pushboolean</span><span
+style='font-family:宋体'>，任意的字符串（</span><span lang=EN-US>char*</span><span
+style='font-family:宋体'>类型，允许包含</span><span lang=EN-US>'\0'</span><span
+style='font-family:宋体'>字符）用</span><span lang=EN-US>lua_pushlstring</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>C</span><span style='font-family:
+宋体'>语言风格（以</span><span lang=EN-US>'\0'</span><span style='font-family:宋体'>结束）的字符串（</span><span
+lang=EN-US>const char*</span><span style='font-family:宋体'>）用</span><span
+lang=EN-US>lua_pushstring</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(86,107,143) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,221,247)'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_pushnil
+(lua_State *L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_pushboolean
+(lua_State *L, <span style='color:blue'>int</span> <span style='color:blue'>bool</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,233,230)'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_pushnumber
+(lua_State *L, <span style='color:blue'>double</span> n);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_pushlstring
+(lua_State *L, <span style='color:blue'>const</span> <span style='color:blue'>char</span>
+*s,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,242,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size_t
+length);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_pushstring
+(lua_State *L, <span style='color:blue'>const</span> <span style='color:blue'>char</span>
+*s);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>同样也有将</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数和</span><span lang=EN-US>userdata</span><span
+style='font-family:宋体'>值压入栈的函数，稍后会讨论到它们。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中的字符串不是以零为结束符的；它们依赖于一个明确的长度，因此可以包含任意的二进制数据。将字符串压入串的正式函数是</span><span
+lang=EN-US>lua_pushlstring</span><span style='font-family:宋体'>，它要求一个明确的长度作为参数。对于以零结束的字符串，你可以用</span><span
+lang=EN-US>lua_pushstring</span><span style='font-family:宋体'>（它用</span><span
+lang=EN-US>strlen</span><span style='font-family:宋体'>来计算字符串长度）。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>从来不保持一个指向外部字符串（或任何其它对象，除了</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数――它总是静态指针）的指针。对于它保持的所有字符串，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>要么做一份内部的拷贝要么重新利用已经存在的字符串。因此，一旦这些函数返回之后你可以自由的修改或是释放你的缓冲区。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>无论你何时压入一个元素到栈上，你有责任确保在栈上有空间来做这件事情。记住，你现在是</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>程序员；</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>不会宠着你。当</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>在起始以及在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>调用</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>的时候，栈上至少有</span><span lang=EN-US>20</span><span
+style='font-family:宋体'>个空闲的记录（</span><span lang=EN-US>lua.h</span><span
+style='font-family:宋体'>中的</span><span lang=EN-US>LUA_MINSTACK</span><span
+style='font-family:宋体'>宏定义了这个常量）。对于多数普通的用法栈是足够的，所以通常我们不必去考虑它。无论如何，有些任务或许需要更多的栈空间（如，调用一个不定参数数目的函数）。在这种情况下，或许你需要调用下面这个函数：</span></p>
+
+<div style='border:RGB(86,107,143) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(246,221,220);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> lua_checkstack
+(lua_State *L, <span style='color:blue'>int</span> sz);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>它检测栈上是否有足够你需要的空间（稍后会有关于它更多的信息）。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

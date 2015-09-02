@@ -1,0 +1,325 @@
+<html>
+
+<head>
+  <title> 第8章 编译・运行・错误信息 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第8章 编译・运行・错误信息</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>虽然我们把</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>当作解释型语言，但是</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>会首先把代码预编译成中间码然后再执行（很多解释型语言都是这么做的）。在解释型语言中存在编译阶段听起来不合适，然而，解释型语言的特征不在于他们是否被编译，而是编译器是语言运行时的一部分，所以，执行编译产生的中间码速度会更快。我们可以说函数</span><span
+lang=EN-US>dofile</span><span style='font-family:宋体'>的存在就是说明可以将</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>作为一种解释型语言被调用。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>前面我们介绍过</span><span
+lang=EN-US>dofile</span><span style='font-family:宋体'>，把它当作</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>运行代码的</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>的一种原始的操作。</span><span lang=EN-US>dofile</span><span
+style='font-family:宋体'>实际上是一个辅助的函数。真正完成功能的函数是</span><span lang=EN-US>loadfile</span><span
+style='font-family:宋体'>；与</span><span lang=EN-US>dofile</span><span
+style='font-family:宋体'>不同的是</span><span lang=EN-US>loadfile</span><span
+style='font-family:宋体'>编译代码成中间码并且返回编译后的</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>作为一个函数，而不执行代码；另外</span><span lang=EN-US>loadfile</span><span
+style='font-family:宋体'>不会抛出错误信息而是返回错误码。我们可以这样定义</span><span lang=EN-US>dofile</span><span
+style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,239,232)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> dofile
+(filename)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> f =
+assert(loadfile(filename))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,228,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> f()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果</span><span
+lang=EN-US>loadfile</span><span style='font-family:宋体'>失败</span><span
+lang=EN-US>assert</span><span style='font-family:宋体'>会抛出错误。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>完成简单的功能</span><span
+lang=EN-US>dofile</span><span style='font-family:宋体'>比较方便，他读入文件编译并且执行。然而</span><span
+lang=EN-US>loadfile</span><span style='font-family:宋体'>更加灵活。在发生错误的情况下，</span><span
+lang=EN-US>loadfile</span><span style='font-family:宋体'>返回</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>和错误信息，这样我们就可以自定义错误处理。另外，如果我们运行一个文件多次的话，</span><span
+lang=EN-US>loadfile</span><span style='font-family:宋体'>只需要编译一次，但可多次运行。</span><span
+lang=EN-US>dofile</span><span style='font-family:宋体'>却每次都要编译。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>loadstring</span><span
+style='font-family:宋体'>与</span><span lang=EN-US>loadfile</span><span
+style='font-family:宋体'>相似，只不过它不是从文件里读入</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>，而是从一个串中读入。例如：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(226,235,255);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>f = loadstring(<span style='color:red'>&quot;i = i + 1&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>f</span><span
+style='font-family:宋体'>将是一个函数，调用时执行</span><span lang=EN-US>i=i+1</span><span
+style='font-family:宋体'>。</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(254,251,221);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>i = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,221,253)'><span
+lang=EN-US>f(); print(i)&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+1</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>f(); print(i)&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+2</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>loadstring</span><span
+style='font-family:宋体'>函数功能强大，但使用时需多加小心。确认没有其它简单的解决问题的方法再使用。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>把每一个</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>都作为一个匿名函数处理。例如：</span><span lang=EN-US>chunk &quot;a =
+1&quot;</span><span style='font-family:宋体'>，</span><span lang=EN-US>loadstring</span><span
+style='font-family:宋体'>返回与其等价的</span><span lang=EN-US>function () a = 1 end</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>与其他函数一样，</span><span
+lang=EN-US>chunks</span><span style='font-family:宋体'>可以定义局部变量也可以返回值：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(253,244,255);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>f = loadstring(<span style='color:red'>&quot;local a = 10; return a
++ 20&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,243,241)'><span
+lang=EN-US>print(f())&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 30</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>loadfile</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>loadstring</span><span
+style='font-family:宋体'>都不会抛出错误，如果发生错误他们将返回</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>加上错误信息：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,235,231)'><span
+lang=EN-US>print(loadstring(<span style='color:red'>&quot;i i&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --&gt; nil&nbsp;&nbsp;&nbsp; [string
+&quot;i i&quot;]:1: '=' expected near 'i'</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>另外，</span><span
+lang=EN-US>loadfile</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>loadstring</span><span style='font-family:宋体'>都不会有边界效应产生，他们仅仅编译</span><span
+lang=EN-US>chunk</span><span style='font-family:宋体'>成为自己内部实现的一个匿名函数。通常对他们的误解是他们定义了函数。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中的函数定义是发生在运行时的赋值而不是发生在编译时。假如我们有一个文件</span><span
+lang=EN-US>foo.lua</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(232,232,231);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>-- file `foo.lua'</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,242,253)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> foo (x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,232,243)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当我们执行命令</span><span
+lang=EN-US>f = loadfile(&quot;foo.lua&quot;)</span><span style='font-family:
+宋体'>后，</span><span lang=EN-US>foo</span><span style='font-family:宋体'>被编译了但还没有被定义，如果要定义他必须运行</span><span
+lang=EN-US>chunk</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,245,234)'><span
+lang=EN-US>f()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- defines `foo'</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>foo(<span style='color:red'>&quot;ok&quot;</span>)&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; ok</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果你想快捷的调用</span><span
+lang=EN-US>dostring</span><span style='font-family:宋体'>（比如加载并运行），可以这样</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(226,227,243);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>loadstring(s)()</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>调用</span><span
+lang=EN-US>loadstring</span><span style='font-family:宋体'>返回的结果，然而如果加载的内容存在语法错误的话，</span><span
+lang=EN-US>loadstring</span><span style='font-family:宋体'>返回</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>和错误信息（</span><span
+lang=EN-US>attempt to call a nil value</span><span style='font-family:宋体'>）；为了返回更清楚的错误信息可以使用</span><span
+lang=EN-US>assert</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(247,234,221);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>assert(loadstring(s))()</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>通常使用</span><span
+lang=EN-US>loadstring</span><span style='font-family:宋体'>加载一个字串没什么意义，例如：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(228,222,222);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>f = loadstring(&quot;i = i + 1&quot;)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>大概与</span><span
+lang=EN-US>f = function () i = i + 1 end</span><span style='font-family:宋体'>等价，但是第二段代码速度更快因为它只需要编译一次，第一段代码每次调用</span><span
+lang=EN-US>loadstring</span><span style='font-family:宋体'>都会重新编译，还有一个重要区别：</span><span
+lang=EN-US>loadstring</span><span style='font-family:宋体'>编译的时候不关心词法范围：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(244,251,232);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> i = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,252,241)'><span
+lang=EN-US>f = loadstring(<span style='color:red'>&quot;i = i + 1&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>g = <span style='color:blue'>function</span> () i = i + 1 <span
+style='color:blue'>end</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个例子中，和想象的一样</span><span
+lang=EN-US>g</span><span style='font-family:宋体'>使用局部变量</span><span lang=EN-US>i</span><span
+style='font-family:宋体'>，然而</span><span lang=EN-US>f</span><span
+style='font-family:宋体'>使用全局变量</span><span lang=EN-US>i</span><span
+style='font-family:宋体'>；</span><span lang=EN-US>loadstring</span><span
+style='font-family:宋体'>总是在全局环境中编译他的串。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>loadstring</span><span
+style='font-family:宋体'>通常用于运行程序外部的代码，比如运行用户自定义的代码。注意：</span><span lang=EN-US>loadstring</span><span
+style='font-family:宋体'>期望一个</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>，即语句。如果想要加载表达式，需要在表达式前加</span><span lang=EN-US>return</span><span
+style='font-family:宋体'>，那样将返回表达式的值。看例子：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(228,255,223);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print <span style='color:red'>&quot;enter your expression:&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,250,227)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> l = io.read()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> func =
+assert(loadstring(<span style='color:red'>&quot;return &quot;</span> .. l))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,241,245)'><span
+lang=EN-US>print(<span style='color:red'>&quot;the value of your expression is
+&quot;</span> .. func())</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>loadstring</span><span
+style='font-family:宋体'>返回的函数和普通函数一样，可以多次被调用：</span></p>
+
+<div style='border:RGB(255,107,25) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,229,231)'><span
+lang=EN-US>print <span style='color:red'>&quot;enter function to be plotted
+(with variable 'x'):&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> l = io.read()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,247,234)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> f =
+assert(loadstring(<span style='color:red'>&quot;return &quot;</span> .. l))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> i=1,20 <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,226,220)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; x = i&nbsp;&nbsp; <span style='color:green'>--
+global 'x' (to be visible from the chunk)</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(string.rep(<span style='color:red'>&quot;*&quot;</span>,
+f()))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,220,237)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

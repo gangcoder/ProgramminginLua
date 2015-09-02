@@ -1,0 +1,238 @@
+<html>
+
+<head>
+  <title>21.2.2 二进制文件 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;21.2.2 二进制文件</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>默认的简单模式总是以文本模式打开。在</span><span
+lang=EN-US>Unix</span><span style='font-family:宋体'>中二进制文件和文本文件并没有区别，但是在如</span><span
+lang=EN-US>Windows</span><span style='font-family:宋体'>这样的系统中，二进制文件必须以显式的标记来打开文件。控制这样的二进制文件，你必须将“</span><span
+lang=EN-US>b</span><span style='font-family:宋体'>”标记添加在</span><span lang=EN-US>io.open</span><span
+style='font-family:宋体'>函数的格式字符串参数中。在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中二进制文件的控制和文本类似。一个串可以包含任何字节值，库中几乎所有的函数都可以用来处理任意字节值。（你甚至可以对二进制的“串”进行模式比较，只要串中不存在</span><span
+lang=EN-US>0</span><span style='font-family:宋体'>值。如果想要进行</span><span
+lang=EN-US>0</span><span style='font-family:宋体'>值字节的匹配，你可以使用</span><span
+lang=EN-US>%z</span><span style='font-family:宋体'>代替）这样使用</span><span
+lang=EN-US>*all</span><span style='font-family:宋体'>模式就是读取整个文件的值，使用数字</span><span
+lang=EN-US>n</span><span style='font-family:宋体'>就是读取</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>个字节的值。以下是一个将文本文件从</span><span lang=EN-US>DOS</span><span
+style='font-family:宋体'>模式转换到</span><span lang=EN-US>Unix</span><span
+style='font-family:宋体'>模式的简单程序。（这样转换过程就是将“回车换行字符”替换成“换行字符”。）因为是以二进制形式（原稿是</span><span
+lang=EN-US>Text Mode</span><span style='font-family:宋体'>！！？？）打开这些文件的，这里无法使用标准输入输入文件（</span><span
+lang=EN-US>stdin/stdout</span><span style='font-family:宋体'>）。所以使用程序中提供的参数来得到输入、输出文件名。</span></p>
+
+<div style='border:RGB(200,142,81) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,225,237)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> inp =
+assert(io.open(arg[1], <span style='color:red'>&quot;rb&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> out =
+assert(io.open(arg[2], <span style='color:red'>&quot;wb&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,236,249)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> data = inp:read(<span
+style='color:red'>&quot;*all&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,225,226)'><span
+lang=EN-US>data = string.gsub(data, <span style='color:red'>&quot;\r\n&quot;</span>,
+<span style='color:red'>&quot;\n&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>out:write(data)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,255,245)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>assert(out:close())</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>可以使用如下的命令行来调用该程序。</span></p>
+
+<div style='border:RGB(200,142,81) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(253,236,229);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&gt; lua prog.lua file.dos file.unix</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二个例子程序：打印在二进制文件中找到的所有特定字符串。该程序定义了一种最少拥有六个“有效字符”，以零字节值结尾的特定串。（本程序中“有效字符”定义为文本数字、标点符号和空格符，由变量</span><span
+lang=EN-US>validchars</span><span style='font-family:宋体'>定义。）在程序中我们使用连接和</span><span
+lang=EN-US>string.rep</span><span style='font-family:宋体'>函数创建</span><span
+lang=EN-US>validchars</span><span style='font-family:宋体'>，以</span><span
+lang=EN-US>%z</span><span style='font-family:宋体'>结尾来匹配串的零结尾。</span></p>
+
+<div style='border:RGB(200,142,81) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(248,223,251);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> f =
+assert(io.open(arg[1], <span style='color:red'>&quot;rb&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,243,238)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> data = f:read(<span
+style='color:red'>&quot;*all&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> validchars = <span
+style='color:red'>&quot;[%w%p%s]&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,230,255)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> pattern =
+string.rep(validchars, 6) .. <span style='color:red'>&quot;+%z&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> w <span
+style='color:blue'>in</span> string.gfind(data, pattern) <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,246,245)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(w)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>最后一个例子：该程序对二进制文件进行一次值分析</span><a
+href="#_ftn6" name="_ftnref6" title=""><span class=MsoFootnoteReference><span
+lang=EN-US><span class=MsoFootnoteReference><span lang=EN-US style='font-size:
+10.5pt;font-family:"Times New Roman","serif"'>[6]</span></span></span></span></a><span
+style='font-family:宋体'>（</span><span lang=EN-US>Dump</span><span
+style='font-family:宋体'>）。程序的第一个参数是输入文件名，输出为标准输出。其按照</span><span lang=EN-US>10</span><span
+style='font-family:宋体'>字节为一段读取文件，将每一段各字节的十六进制表示显示出来。接着再以文本的形式写出该段，并将控制字符转换为点号。</span></p>
+
+<div style='border:RGB(200,142,81) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(221,252,242);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> f =
+assert(io.open(arg[1], <span style='color:red'>&quot;rb&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,237,223)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> block = 10</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>while</span><span lang=EN-US> <span
+style='color:blue'>true</span> <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,235,241)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> bytes =
+f:read(block)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> <span
+style='color:blue'>not</span> bytes <span style='color:blue'>then</span> <span
+style='color:blue'>break</span> <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,242,233)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> b <span
+style='color:blue'>in</span> string.gfind(bytes, <span style='color:red'>&quot;.&quot;</span>)
+<span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; io.write(string.format(<span
+style='color:red'>&quot;%02X &quot;</span>, string.byte(b)))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,243,226)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; io.write(string.rep(<span style='color:red'>&quot;&nbsp;&nbsp;
+&quot;</span>, block - string.len(bytes) + 1))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,222,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; io.write(string.gsub(bytes, <span
+style='color:red'>&quot;%c&quot;</span>, <span style='color:red'>&quot;.&quot;</span>),
+<span style='color:red'>&quot;\n&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果以</span><span
+lang=EN-US>vip</span><span style='font-family:宋体'>来命名该程序脚本文件。可以使用如下命令来执行该程序处理其自身：</span></p>
+
+<div style='border:RGB(200,142,81) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(228,254,234);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>prompt&gt; lua vip vip</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在</span><span
+lang=EN-US>Unix</span><span style='font-family:宋体'>系统中它将会会产生一个如下的输出样式：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(252,229,230);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>6C 6F 63 61 6C 20 66 20 3D 20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; local f
+= </span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,242,228)'><span
+lang=EN-US>61 73 73 65 72 74 28 69 6F 2E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; assert(io.</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>6F 70 65 6E 28 61 72 67 5B 31&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; open(arg[1</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,231,243)'><span
+lang=EN-US>5D 2C 20 22 72 62 22 29 29 0A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ],
+&quot;rb&quot;)).</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,253,250)'><span
+lang=EN-US>22 25 63 22 2C 20 22 2E 22 29&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;%c&quot;,
+&quot;.&quot;)</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>2C 20 22 5C 6E 22 29 0A 65 6E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ,
+&quot;\n&quot;).en</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,231,254)'><span
+lang=EN-US>64 0A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; d.</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

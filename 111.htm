@@ -1,0 +1,207 @@
+<html>
+
+<head>
+  <title>19.3 排序 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;19.3 排序</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>另一个有用的函数是</span><span
+lang=EN-US>table.sort</span><span style='font-family:宋体'>。他有两个参数：存放元素的</span><span
+lang=EN-US>array</span><span style='font-family:宋体'>和排序函数。排序函数有两个参数并且如果在</span><span
+lang=EN-US>array</span><span style='font-family:宋体'>中排序后第一个参数在第二个参数前面，排序函数必须返回</span><span
+lang=EN-US>true</span><span style='font-family:宋体'>。如果未提供排序函数，</span><span
+lang=EN-US>sort</span><span style='font-family:宋体'>使用默认的小于操作符进行比较。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一个常见的错误是企图对表的下标域进行排序。在一个表中，所有下标组成一个集合，但是无序的。如果你想对他们排序，必须将他们复制到一个</span><span
+lang=EN-US>array</span><span style='font-family:宋体'>然后对这个</span><span
+lang=EN-US>array</span><span style='font-family:宋体'>排序。我们看个例子，假定上面的读取源文件并创建了一个表，这个表给出了源文件中每一个函数被定义的地方的行号：</span></p>
+
+<div style='border:RGB(171,73,169) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,242,234)'><span
+lang=EN-US>lines = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaH_set = 10,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,253,245)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaH_get = 24,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaH_present = 48,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,239,230)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在你想以字母顺序打印出这些函数名，如果你使用</span><span
+lang=EN-US>pairs</span><span style='font-family:宋体'>遍历这个表，函数名出现的顺序将是随机的。然而，你不能直接排序他们，因为这些名字是表的</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>。当你将这些函数名放到一个数组内，就可以对这个数组进行排序。首先，必须创建一个数组来保存这些函数名，然后排序他们，最后打印出结果：</span></p>
+
+<div style='border:RGB(171,73,169) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,249,227)'><span
+lang=EN-US>a = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> n <span
+style='color:blue'>in</span> pairs(lines) <span style='color:blue'>do</span>
+table.insert(a, n) <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,223,239)'><span
+lang=EN-US>table.sort(a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> i,n <span
+style='color:blue'>in</span> ipairs(a) <span style='color:blue'>do</span>
+print(n) <span style='color:blue'>end</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>注意，对于</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>来说，数组也是无序的。但是我们知道怎样去计数，因此只要我们使用排序好的下标访问数组就可以得到排好序的函数名。这就是为什么我们一直使用</span><span
+lang=EN-US>ipairs</span><span style='font-family:宋体'>而不是</span><span
+lang=EN-US>pairs</span><span style='font-family:宋体'>遍历数组的原因。前者使用</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>的顺序</span><span lang=EN-US>1</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>2</span><span style='font-family:
+宋体'>、……，后者表的自然存储顺序。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有一个更好的解决方法，我们可以写一个迭代子来根据</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>值遍历这个表。一个可选的参数</span><span
+lang=EN-US>f</span><span style='font-family:宋体'>可以指定排序的方式。首先，将排序的</span><span
+lang=EN-US>keys</span><span style='font-family:宋体'>放到数组内，然后遍历这个数组，每一步从原始表中返回</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>和</span><span lang=EN-US>value</span><span
+style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(171,73,169) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(244,254,241);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> pairsByKeys (t,
+f)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,221,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> a = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> n <span
+style='color:blue'>in</span> pairs(t) <span style='color:blue'>do</span>
+table.insert(a, n) <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,231,250)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; table.sort(a, f)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> i = 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- iterator variable</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,233,250)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> iter = <span
+style='color:blue'>function</span> ()&nbsp;&nbsp;&nbsp; <span style='color:
+green'>-- iterator function</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i = i + 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,224,251)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+a[i] == <span style='color:blue'>nil</span> <span style='color:blue'>then</span>
+<span style='color:blue'>return</span> <span style='color:blue'>nil</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span>
+<span style='color:blue'>return</span> a[i], t[a[i]]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,248,245)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,255,241)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> iter</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有了这个函数，很容易以字母顺序打印这些函数名，循环：</span></p>
+
+<div style='border:RGB(171,73,169) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(227,247,220);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> name, line <span
+style='color:blue'>in</span> pairsByKeys(lines) <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,230,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(name, line)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>打印结果：</span></p>
+
+<div style='border:RGB(171,73,169) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(250,251,228);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>luaH_get&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 24</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,235,220)'><span
+lang=EN-US>luaH_present&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 48</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>luaH_set&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 10</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section29 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

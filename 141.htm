@@ -1,0 +1,74 @@
+<html>
+
+<head>
+  <title>24.3.2 类库中的错误处理 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;24.3.2 类库中的错误处理</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>是安全的语言，也就是说，不管你些什么样的代码，也不管代码如何错误，你都可以根据</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>本身知道程序的行为。另外，错误也会根据</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>被发现和解释。你可以与</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>比较一下，</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>语言中很多错误的程序的行为只能依据硬件或者由程序计数器给出的错误出现的位置被解释。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>不论什么时候你向</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中添加一个新的</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数，你都可能打破原来的安全性。比如，一个类似</span><span
+lang=EN-US>poke</span><span style='font-family:宋体'>的函数，在任意的内存地址存放任意的字节，可能使得内存瘫痪。你必须想法设法保证你的插件（</span><span
+lang=EN-US>add-ons</span><span style='font-family:宋体'>）对于</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>来讲是安全的，并且提高比较好的错误处理。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>正如我们前面所讨论的，每一个</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>程序都有他自己的错勿处理方式，当你打算为</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>写一个库函数的时候，这里有一些标准的处理错误的方法可以参考。不论什么时候，</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数发现错误只要简单的调用</span><span
+lang=EN-US>lua_error</span><span style='font-family:宋体'>（或者</span><span
+lang=EN-US>luaL_error</span><span style='font-family:宋体'>，后者更好，因为她调用了前者并格式化了错误信息）。</span><span
+lang=EN-US>Lua_error</span><span style='font-family:宋体'>函数会清理所有在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中需要被清理的，然后和错误信息一起回到最初的执行</span><span
+lang=EN-US>lua_pcall</span><span style='font-family:宋体'>的地方。</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section35 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

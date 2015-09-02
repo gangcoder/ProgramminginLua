@@ -1,0 +1,115 @@
+<html>
+
+<head>
+  <title>23.2 Hooks - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;23.2 Hooks</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>debug</span><span
+style='font-family:宋体'>库的</span><span lang=EN-US>hook</span><span
+style='font-family:宋体'>是这样一种机制：注册一个函数，用来在程序运行中某一事件到达时被调用。有四种可以触发一个</span><span
+lang=EN-US>hook</span><span style='font-family:宋体'>的事件：当</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>调用一个函数的时候</span><span
+lang=EN-US>call</span><span style='font-family:宋体'>事件发生；每次函数返回的时候，</span><span
+lang=EN-US>return</span><span style='font-family:宋体'>事件发生；</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>开始执行代码的新行时候，</span><span
+lang=EN-US>line</span><span style='font-family:宋体'>事件发生；运行指定数目的指令之后，</span><span
+lang=EN-US>count</span><span style='font-family:宋体'>事件发生。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>使用单个参数调用</span><span
+lang=EN-US>hooks</span><span style='font-family:宋体'>，参数为一个描述产生调用的事件：</span><span
+lang=EN-US>&quot;call&quot;</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>&quot;return&quot;</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>&quot;line&quot; </span><span style='font-family:宋体'>或</span><span
+lang=EN-US> &quot;count&quot;</span><span style='font-family:宋体'>。另外，对于</span><span
+lang=EN-US>line</span><span style='font-family:宋体'>事件，还可以传递第二个参数：新行号。我们在一个</span><span
+lang=EN-US>hook</span><span style='font-family:宋体'>内总是可以使用</span><span
+lang=EN-US>debug.getinfo</span><span style='font-family:宋体'>获取更多的信息。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>使用带有两个或者三个参数的</span><span
+lang=EN-US>debug.sethook </span><span style='font-family:宋体'>函数来注册一个</span><span
+lang=EN-US>hook</span><span style='font-family:宋体'>：第一个参数是</span><span
+lang=EN-US>hook</span><span style='font-family:宋体'>函数；第二个参数是一个描述我们打算监控的事件的字符串；可选的第三个参数是一个数字，描述我们打算获取</span><span
+lang=EN-US>count</span><span style='font-family:宋体'>事件的频率。为了监控</span><span
+lang=EN-US>call</span><span style='font-family:宋体'>、</span><span lang=EN-US>return</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>line</span><span
+style='font-family:宋体'>事件，可以将他们的第一个字母（</span><span lang=EN-US>'c'</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>'r' </span><span
+style='font-family:宋体'>或</span><span lang=EN-US> 'l'</span><span
+style='font-family:宋体'>）组合成一个</span><span lang=EN-US>mask</span><span
+style='font-family:宋体'>字符串即可。要想关掉</span><span lang=EN-US>hooks</span><span
+style='font-family:宋体'>，只需要不带参数地调用</span><span lang=EN-US>sethook</span><span
+style='font-family:宋体'>即可。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面的简单代码，是一个安装原始的跟踪器：打印解释器执行的每一个新行的行号：</span></p>
+
+<div style='border:RGB(197,240,209) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,237,220)'><span
+lang=EN-US>debug.sethook(print, <span style='color:red'>&quot;l&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>上面这一行代码，简单的将</span><span
+lang=EN-US>print</span><span style='font-family:宋体'>函数作为</span><span
+lang=EN-US>hook</span><span style='font-family:宋体'>函数，并指示</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>当</span><span lang=EN-US>line</span><span
+style='font-family:宋体'>事件发生时调用</span><span lang=EN-US>print</span><span
+style='font-family:宋体'>函数。可以使用</span><span lang=EN-US>getinfo</span><span
+style='font-family:宋体'>将当前正在执行的文件名信息加上去，使得跟踪器稍微精致点的：</span></p>
+
+<div style='border:RGB(197,240,209) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,234,235)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> trace (event,
+line)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> s =
+debug.getinfo(2).short_src</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,252,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(s .. <span style='color:red'>&quot;:&quot;</span>
+.. line)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,220,238)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>debug.sethook(trace, <span style='color:red'>&quot;l&quot;</span>)</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,209 @@
+<html>
+
+<head>
+  <title>15.2 私有成员（Privacy） - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;15.2 私有成员（Privacy）</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有时候，一个</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>公开他的所有内容，也就是说，任何</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>的客户端都可以访问他。然而，一个</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>拥有自己的私有部分（也就是只有</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>本身才能访问）也是很有用的。在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中一个传统的方法是将私有部分定义为局部变量来实现。例如，我们修改上面的例子增加私有函数来检查一个值是否为有效的复数：</span></p>
+
+<div style='border:RGB(8,101,170) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,246,243)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> P = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>complex = P</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,240,234)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> <span
+style='color:blue'>function</span> checkComplex (c)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> <span
+style='color:blue'>not</span> ((type(c) == <span style='color:red'>&quot;table&quot;</span>)
+<span style='color:blue'>and</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,254,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; tonumber(c.r) <span style='color:blue'>and</span>
+tonumber(c.i)) <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error(<span style='color:red'>&quot;bad
+complex number&quot;</span>, 3)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,226,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,251,224)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> P.add (c1, c2)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,251,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; checkComplex(c1);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; checkComplex(c2);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,249,234)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> P.new(c1.r
++ c2.r, c1.i + c2.i)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,252,226)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,240,235)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>return</span><span lang=EN-US> P</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这种方式各有什么优点和缺点呢？</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>中所有的名字都在一个独立的命名空间中。</span><span
+lang=EN-US>Package</span><span style='font-family:宋体'>中的每一个实体（</span><span
+lang=EN-US>entity</span><span style='font-family:宋体'>）都清楚地标记为公有还是私有。另外，我们实现一个真正的隐私（</span><span
+lang=EN-US>privacy</span><span style='font-family:宋体'>）：私有实体在</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>外部是不可访问的。缺点是访问同一个</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>内的其他公有的实体写法冗余，必须加上前缀</span><span
+lang=EN-US>P.</span><span style='font-family:宋体'>。还有一个大的问题是，当我们修改函数的状态</span><span
+lang=EN-US>(</span><span style='font-family:宋体'>公有变成私有或者私有变成公有</span><span
+lang=EN-US>)</span><span style='font-family:宋体'>我们必须修改函数得调用方式。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有一个有趣的方法可以立刻解决这两个问题。我们可以将</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>内的所有函数都声明为局部的，最后将他们放在最终的表中。按照这种方法，上面的</span><span
+lang=EN-US>complex package</span><span style='font-family:宋体'>修改如下：</span></p>
+
+<div style='border:RGB(8,101,170) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(252,235,226);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> <span
+style='color:blue'>function</span> checkComplex (c)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,243,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> <span
+style='color:blue'>not</span> ((type(c) == <span style='color:red'>&quot;table&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>and</span> tonumber(c.r)
+<span style='color:blue'>and</span> tonumber(c.i)) <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,243,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error(<span style='color:red'>&quot;bad
+complex number&quot;</span>, 3)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,238,221)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,222,244)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> <span
+style='color:blue'>function</span> new (r, i) <span style='color:blue'>return</span>
+{r=r, i=i} <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> <span
+style='color:blue'>function</span> add (c1, c2)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,250,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; checkComplex(c1);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; checkComplex(c2);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,252,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> new(c1.r +
+c2.r, c1.i + c2.i)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,249,221)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,222,229)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>complex = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,232,233)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; new = new,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; add = add,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,245,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; sub = sub,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; mul = mul,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,227,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; div = div,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在我们不再需要调用函数的时候在前面加上前缀，公有的和私有的函数调用方法相同。在</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>的结尾处，有一个简单的列表列出所有公有的函数。可能大多数人觉得这个列表放在</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>的开始处更自然，但我们不能这样做，因为我们必须首先定义局部函数。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

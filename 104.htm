@@ -1,0 +1,78 @@
+<html>
+
+<head>
+  <title>17.2 关联对象属性 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;17.2 关联对象属性</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>weak tables</span><span
+style='font-family:宋体'>的另一个重要的应用就是和对象的属性关联。在一个对象上加入更多的属性是无时无刻都会发生的：</span> <span
+style='font-family:宋体'>函数名称，</span><span lang=EN-US>tables</span><span
+style='font-family:宋体'>的缺省值，数组的大小，等等。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当对象是表的时候，我们可以使用一个合适的唯一</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>来将属性保存在表中。就像我们在前面说的那样，一个很简单并且可以防止错误的方法是建立一个新的对象（典型的比如</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>）然后把它当成</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>使用。然而，如果对象不是</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>，它就不能自己保存自身的属性。即使是</span><span
+lang=EN-US>tables</span><span style='font-family:宋体'>，有些时候我们可能也不想把属性保存在原来的对象中去。例如，我们可能希望将属性作为私有的，或者我们不想在访问</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>中元素的时候受到这个额外的属性的干扰。在上述这些情况下，我们需要一个替代的方法来将属性和对象联系起来。当然，一个外部的</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>提供了一种理想化的方式来联系属性和对象（</span><span
+lang=EN-US>tables</span><span style='font-family:宋体'>有时被称作联合数组并不偶然）。我们把这个对象当作</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>来使用，他们的属性作为</span><span
+lang=EN-US>vaule</span><span style='font-family:宋体'>。一个外部的</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>可以保存任何类型对象的属性（就像</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>允许我们将任何对象看作</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>）。此外，保存在一个外部</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>的属性不会妨碍到其他的对象，并且可以像这个</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>本身一样私有化。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>然而，这个看起来完美的解决方案有一个巨大的缺点：一旦我们在一个</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>中将一个对象使用为</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>，我们就将这个对象锁定为永久存在。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>不能收集一个正在被当作</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>使用的对象。如果我们使用一个普通的</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>来关联函数和名字，那么所有的这些函数将永远不会被收集。正如你所想的那样，我们可以通过使用</span><span
+lang=EN-US>weak table</span><span style='font-family:宋体'>来解决这个问题。这一次，我们需要</span><span
+lang=EN-US>weak keys</span><span style='font-family:宋体'>。一旦没有其他地方的引用，</span><span
+lang=EN-US>weak keys</span><span style='font-family:宋体'>并不会阻止任何的</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>被收集。从另一方面说，这个</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>不会存在</span><span
+lang=EN-US>weak vaules</span><span style='font-family:宋体'>；否则，活动对象的属性就可能被收集了。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>本身使用这种技术来保存数组的大小。像我们下面即将看到的那样，</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>库提供了一个函数来设定数组的大小，另一个函数来读取数组的大小。当你设定了一个数组的大小，</span><span
+lang=EN-US>Lua </span><span style='font-family:宋体'>将这个尺寸保存在一个私有的</span><span
+lang=EN-US>weak table</span><span style='font-family:宋体'>，索引就是数组本身，而</span><span
+lang=EN-US>value</span><span style='font-family:宋体'>就是它的尺寸。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

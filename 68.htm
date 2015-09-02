@@ -1,0 +1,91 @@
+<html>
+
+<head>
+  <title>11.3 链表 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;11.3 链表</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中用</span><span lang=EN-US>tables</span><span
+style='font-family:宋体'>很容易实现链表，每一个节点是一个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>，指针是这个表的一个域（</span><span lang=EN-US>field</span><span
+style='font-family:宋体'>），并且指向另一个节点（</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>）。例如，要实现一个只有两个域：值和指针的基本链表，代码如下：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>根节点：</span></p>
+
+<div style='border:RGB(39,79,239) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,250,223)'><span
+lang=EN-US>list = nil</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在链表开头插入一个值为</span><span
+lang=EN-US>v</span><span style='font-family:宋体'>的节点：</span></p>
+
+<div style='border:RGB(39,79,239) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,243,226)'><span
+lang=EN-US>list = {next = list, value = v}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>要遍历这个链表只需要：</span></p>
+
+<div style='border:RGB(39,79,239) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,233,235)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> l = list</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>while</span><span lang=EN-US> l <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,243,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(l.value)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; l = l.next</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,242,233)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>其他类型的链表，像双向链表和循环链表类似的也是很容易实现的。然后在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中在很少情况下才需要这些数据结构，因为通常情况下有更简单的方式来替换链表。比如，我们可以用一个非常大的数组来表示栈，其中一个域</span><span
+lang=EN-US>n</span><span style='font-family:宋体'>指向栈顶。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

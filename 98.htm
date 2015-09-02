@@ -1,0 +1,235 @@
+<html>
+
+<head>
+  <title>16.2 继承 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;16.2 继承</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>通常面向对象语言中，继承使得类可以访问其他类的方法，这在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中也很容易现实：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>假定我们有一个基类</span><span
+lang=EN-US>Account</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(162,33,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,255,243)'><span
+lang=EN-US>Account = {balance = 0}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,243,220)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Account:new (o)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; o = o <span style='color:blue'>or</span> {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,225,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; setmetatable(o, self)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; self.__index = self</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,235,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> o</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,253,242)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Account:deposit
+(v)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,230,237)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; self.balance = self.balance + v</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,234,227)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Account:withdraw
+(v)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,245,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> v &gt;
+self.balance <span style='color:blue'>then</span> error<span style='color:red'>&quot;insufficient
+funds&quot;</span> <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; self.balance = self.balance - v</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,250,238)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们打算从基类派生出一个子类</span><span
+lang=EN-US>SpecialAccount</span><span style='font-family:宋体'>，这个子类允许客户取款超过它的存款余额限制，我们从一个空类开始，从基类继承所有操作：</span></p>
+
+<div style='border:RGB(162,33,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,225,230)'><span
+lang=EN-US>SpecialAccount = Account:new()</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>到现在为止，</span><span
+lang=EN-US>SpecialAccount</span><span style='font-family:宋体'>仅仅是</span><span
+lang=EN-US>Account</span><span style='font-family:宋体'>的一个实例。现在奇妙的事情发生了：</span></p>
+
+<div style='border:RGB(162,33,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,246,242)'><span
+lang=EN-US>s = SpecialAccount:new{limit=1000.00}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>SpecialAccount</span><span
+style='font-family:宋体'>从</span><span lang=EN-US>Account</span><span
+style='font-family:宋体'>继承了</span><span lang=EN-US>new</span><span
+style='font-family:宋体'>方法，当</span><span lang=EN-US>new</span><span
+style='font-family:宋体'>执行的时候，</span><span lang=EN-US>self</span><span
+style='font-family:宋体'>参数指向</span><span lang=EN-US>SpecialAccount</span><span
+style='font-family:宋体'>。所以，</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>是</span><span lang=EN-US>SpecialAccount</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>__index </span><span
+style='font-family:宋体'>也是</span><span lang=EN-US>SpecialAccount</span><span
+style='font-family:宋体'>。这样，</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>继承了</span><span lang=EN-US>SpecialAccount</span><span
+style='font-family:宋体'>，后者继承了</span><span lang=EN-US>Account</span><span
+style='font-family:宋体'>。当我们执行：</span></p>
+
+<div style='border:RGB(162,33,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,232,246)'><span
+lang=EN-US>s:deposit(100.00)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>在</span><span lang=EN-US>s</span><span style='font-family:
+宋体'>中找不到</span><span lang=EN-US>deposit</span><span style='font-family:宋体'>域，他会到</span><span
+lang=EN-US>SpecialAccount</span><span style='font-family:宋体'>中查找，在</span><span
+lang=EN-US>SpecialAccount</span><span style='font-family:宋体'>中找不到，会到</span><span
+lang=EN-US>Account</span><span style='font-family:宋体'>中查找。使得</span><span
+lang=EN-US>SpecialAccount</span><span style='font-family:宋体'>特殊之处在于，它可以重定义从父类中继承来的方法：</span></p>
+
+<div style='border:RGB(162,33,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,229,229)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US>
+SpecialAccount:withdraw (v)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> v -
+self.balance &gt;= self:getLimit() <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,234,237)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error<span style='color:red'>&quot;insufficient
+funds&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,235,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; self.balance = self.balance - v</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,229,229)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US>
+SpecialAccount:getLimit ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,229,229)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> self.limit
+<span style='color:blue'>or</span> 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在，当我们调用方法</span><span
+lang=EN-US>s:withdraw(200.00)</span><span style='font-family:宋体'>，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>不会到</span><span lang=EN-US>Account</span><span
+style='font-family:宋体'>中查找，因为它第一次救在</span><span lang=EN-US>SpecialAccount</span><span
+style='font-family:宋体'>中发现了新的</span><span lang=EN-US>withdraw</span><span
+style='font-family:宋体'>方法，由于</span><span lang=EN-US>s.limit</span><span
+style='font-family:宋体'>等于</span><span lang=EN-US>1000.00</span><span
+style='font-family:宋体'>（记住我们创建</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>的时候初始化了这个值）程序执行了取款操作，</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>balance</span><span
+style='font-family:宋体'>变成了负值。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中面向对象有趣的一个方面是你不需要创建一个新类去指定一个新的行为。如果仅仅一个对象需要特殊的行为，你可以直接在对象中实现，例如，如果账号</span><span
+lang=EN-US>s</span><span style='font-family:宋体'>表示一些特殊的客户：取款限制是他的存款的</span><span
+lang=EN-US>10%</span><span style='font-family:宋体'>，你只需要修改这个单独的账号：</span></p>
+
+<div style='border:RGB(162,33,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(235,245,239);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> s:getLimit ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,228,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+self.balance * 0.10</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这样声明之后，调用</span><span
+lang=EN-US>s:withdraw(200.00)</span><span style='font-family:宋体'>将运行</span><span
+lang=EN-US>SpecialAccount</span><span style='font-family:宋体'>的</span><span
+lang=EN-US>withdraw</span><span style='font-family:宋体'>方法，但是当方法调用</span><span
+lang=EN-US>self:getLimit</span><span style='font-family:宋体'>时，最后的定义被触发。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

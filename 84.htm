@@ -1,0 +1,242 @@
+<html>
+
+<head>
+  <title>13.4.4 监控表 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;13.4.4 监控表</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>__index</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>__newindex</span><span
+style='font-family:宋体'>都是只有当表中访问的域不存在时候才起作用。捕获对一个表的所有访问情况的唯一方法就是保持表为空。因此，如果我们想监控一个表的所有访问情况，我们应该为真实的表创建一个代理。这个代理是一个空表，并且带有</span><span
+lang=EN-US>__index</span><span style='font-family:宋体'>和</span><span lang=EN-US>__newindex
+metamethods</span><span style='font-family:宋体'>，由这两个方法负责跟踪表的所有访问情况并将其指向原始的表。假定，</span><span
+lang=EN-US>t</span><span style='font-family:宋体'>是我们想要跟踪的原始表，我们可以：</span></p>
+
+<div style='border:RGB(83,36,85) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,250,222)'><span
+lang=EN-US>t = {}&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>-- original
+table (created somewhere)</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,231,252)'><span
+lang=EN-US style='color:green'>-- keep a private access to original table</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> _t = t</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,220,225)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>-- create proxy</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,236,245)'><span
+lang=EN-US>t = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,243,251)'><span
+lang=EN-US style='color:green'>-- create metatable</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> mt = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,248,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; __index = <span style='color:blue'>function</span>
+(t,k)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(<span style='color:red'>&quot;*access to
+element &quot;</span> .. tostring(k))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,221,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> _t[k]&nbsp; <span
+style='color:green'>-- access the original table</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,248,251)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; __newindex = <span style='color:blue'>function</span>
+(t,k,v)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,224,226)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(<span style='color:red'>&quot;*update of
+element &quot;</span> .. tostring(k) ..</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span
+style='color:red'>&quot; to &quot;</span> .. tostring(v))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,231,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; _t[k] = v&nbsp; &nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- update original table</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,240,245)'><span
+lang=EN-US>}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>setmetatable(t, mt)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这段代码将跟踪所有对</span><span
+lang=EN-US>t</span><span style='font-family:宋体'>的访问情况：</span></p>
+
+<div style='border:RGB(83,36,85) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(229,220,242);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&gt; t[2] = 'hello'</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,229,232)'><span
+lang=EN-US>*update of element 2 to hello</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&gt; print(t[2])</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,237,225)'><span
+lang=EN-US>*access to element 2</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>hello</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>（注意：不幸的是，这个设计不允许我们遍历表。</span><span
+lang=EN-US>Pairs</span><span style='font-family:宋体'>函数将对</span><span
+lang=EN-US>proxy</span><span style='font-family:宋体'>进行操作，而不是原始的表。）如果我们想监控多张表，我们不需要为每一张表都建立一个不同的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>。我们只要将每一个</span><span
+lang=EN-US>proxy</span><span style='font-family:宋体'>和他原始的表关联，所有的</span><span
+lang=EN-US>proxy</span><span style='font-family:宋体'>共享一个公用的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>即可。将表和对应的</span><span
+lang=EN-US>proxy</span><span style='font-family:宋体'>关联的一个简单的方法是将原始的表作为</span><span
+lang=EN-US>proxy</span><span style='font-family:宋体'>的域，只要我们保证这个域不用作其他用途。一个简单的保证它不被作他用的方法是创建一个私有的没有他人可以访问的</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>。将上面的思想汇总，最终的结果如下：</span></p>
+
+<div style='border:RGB(83,36,85) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(224,232,229);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>-- create private index</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,239,227)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> index = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,241,231)'><span
+lang=EN-US style='color:green'>-- create metatable</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> mt = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,237,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; __index = <span style='color:blue'>function</span>
+(t,k)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print(<span style='color:red'>&quot;*access
+to element &quot;</span> .. tostring(k))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,243,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+t[index][k]&nbsp;&nbsp; <span style='color:green'>-- access the original table</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,230,235)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; __newindex = <span style='color:blue'>function</span>
+(t,k,v)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,226,236)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(<span style='color:red'>&quot;*update of
+element &quot;</span> .. tostring(k) .. <span style='color:red'>&quot; to
+&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ..
+tostring(v))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,254,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; t[index][k] = v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- update original table</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,229,225)'><span
+lang=EN-US>}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,244,239)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> track (t)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> proxy = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,239,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; proxy[index] = t</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; setmetatable(proxy, mt)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,223,252)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> proxy</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在，不管什么时候我们想监控表</span><span
+lang=EN-US>t</span><span style='font-family:宋体'>，我们要做得只是</span><span
+lang=EN-US>t=track(t)</span><span style='font-family:宋体'>。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

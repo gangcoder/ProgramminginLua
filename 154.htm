@@ -1,0 +1,140 @@
+<html>
+
+<head>
+  <title>27.3.2 References - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;27.3.2 References</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>你应该记住，永远不要使用数字作为</span><span
+lang=EN-US>registry </span><span style='font-family:宋体'>的</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>，因为这种类型的</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>是保留给</span><span lang=EN-US>reference</span><span
+style='font-family:宋体'>系统使用。</span><span lang=EN-US>Reference</span><span
+style='font-family:宋体'>系统是由辅助库中的一对函数组成，这对函数用来不需要担心名称冲突的将值保存到</span><span
+lang=EN-US>registry </span><span style='font-family:宋体'>中去。（实际上，这些函数可以用于任何一个表，但他们典型的被用于</span><span
+lang=EN-US>registry</span><span style='font-family:宋体'>）</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>调用</span></p>
+
+<div style='border:RGB(137,228,219) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,255,248)'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> r = luaL_ref(L,
+LUA_REGISTRYINDEX);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>从栈中弹出一个值，以一个新的数字作为</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>将其保存到</span><span lang=EN-US>registry</span><span
+style='font-family:宋体'>中，并返回这个</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>。我们将这个</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>称之为</span><span lang=EN-US>reference</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>顾名思义，我们使用</span><span
+lang=EN-US>references</span><span style='font-family:宋体'>主要用于：将一个指向</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>值的</span><span lang=EN-US>reference</span><span
+style='font-family:宋体'>存储到一个</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>结构体中。正如前面我们所见到的，我们永远不要将一个指向</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>字符串的指针保存到获取这个字符串的外部的</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数中。另外，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>甚至不提供指向其他对象的指针，比如</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>或者函数。因此，我们不能通过指针指向</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>对象。当我们需要这种指针的时候，我们创建一个</span><span lang=EN-US>reference</span><span
+style='font-family:宋体'>并将其保存在</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>中。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>要想将一个</span><span
+lang=EN-US>reference</span><span style='font-family:宋体'>的对应的值入栈，只需要：</span></p>
+
+<div style='border:RGB(137,228,219) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,230,236)'><span
+lang=EN-US>lua_rawgeti(L, LUA_REGISTRYINDEX, r);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>最后，我们调用下面的函数释放值和</span><span
+lang=EN-US>reference</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(137,228,219) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,228,230)'><span
+lang=EN-US>luaL_unref(L, LUA_REGISTRYINDEX, r);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>调用这个之后，</span><span
+lang=EN-US>luaL_ref</span><span style='font-family:宋体'>可以再次返回</span><span
+lang=EN-US>r</span><span style='font-family:宋体'>作为一个新的</span><span lang=EN-US>reference</span><span
+style='font-family:宋体'>。</span><span lang=EN-US> </span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>reference </span><span
+style='font-family:宋体'>系统将</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>作为特殊情况对待，不管什么时候，你以</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>调用</span><span lang=EN-US>luaL_ref</span><span
+style='font-family:宋体'>的话，不会创建一新的</span><span lang=EN-US>reference </span><span
+style='font-family:宋体'>，而是返回一个常量</span><span lang=EN-US>reference LUA_REFNIL</span><span
+style='font-family:宋体'>。下面的调用没有效果：</span></p>
+
+<div style='border:RGB(137,228,219) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,253,223)'><span
+lang=EN-US>luaL_unref(L, LUA_REGISTRYINDEX, LUA_REFNIL);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>然而</span></p>
+
+<div style='border:RGB(137,228,219) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,235,223)'><span
+lang=EN-US>lua_rawgeti(L, LUA_REGISTRYINDEX, LUA_REFNIL);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>像预期的一样，将一个</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>入栈。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>reference</span><span
+style='font-family:宋体'>系统也定义了常量</span><span lang=EN-US>LUA_NOREF</span><span
+style='font-family:宋体'>，她是一个表示任何非有效的</span><span lang=EN-US>reference</span><span
+style='font-family:宋体'>的整数值，用来标记无效的</span><span lang=EN-US>reference</span><span
+style='font-family:宋体'>。任何企图获取</span><span lang=EN-US>LUA_NOREF</span><span
+style='font-family:宋体'>返回</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>，任何释放他的操作都没有效果。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

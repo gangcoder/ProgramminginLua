@@ -1,0 +1,263 @@
+<html>
+
+<head>
+  <title> 第12章 数据文件与持久化 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第12章 数据文件与持久化</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当我们处理数据文件的，一般来说，写文件比读取文件内容来的容易。因为我们可以很好的控制文件的写操作，而从文件读取数据常常碰到不可预知的情况。一个健壮的程序不仅应该可以读取存有正确格式的数据还应该能够处理坏文件（译者注：对数据内容和格式进行校验，对异常情况能够做出恰当处理）。正因为如此，实现一个健壮的读取数据文件的程序是很困难的。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>正如我们在</span><span
+lang=EN-US>Section 10.1</span><span style='font-family:宋体'>（译者：第</span><span
+lang=EN-US>10</span><span style='font-family:宋体'>章</span><span lang=EN-US>Complete
+Examples</span><span style='font-family:宋体'>）中看到的例子，文件格式可以通过使用</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中的</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>构造器来描述。我们只需要在写数据的稍微做一些做一点额外的工作，读取数据将变得容易很多。方法是：将我们的数据文件内容作为</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>代码写到</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>程序中去。通过使用</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>构造器，这些存放在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>代码中的数据可以像其他普通的文件一样看起来引人注目。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了更清楚地描述问题，下面我们看看例子。如果我们的数据是预先确定的格式，比如</span><span
+lang=EN-US>CSV</span><span style='font-family:宋体'>（逗号分割值），我们几乎没得选择。（在第</span><span
+lang=EN-US>20</span><span style='font-family:宋体'>章，我们介绍如何在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中处理</span><span lang=EN-US>CSV</span><span
+style='font-family:宋体'>文件）。但是如果我们打算创建一个文件为了将来使用，除了</span><span lang=EN-US>CSV</span><span
+style='font-family:宋体'>，我们可以使用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>构造器来我们表述我们数据，这种情况下，我们将每一个数据记录描述为一个</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>构造器。将下面的代码</span><span
+lang=EN-US> </span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,244,246)'><span
+lang=EN-US>Donald E. Knuth,Literate Programming,CSLI,1992</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>Jon Bentley,More Programming Pearls,Addison-Wesley,1990</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>写成</span></p>
+
+<div style='border:RGB(88,97,240) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(223,220,239);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>Entry{<span style='color:red'>&quot;Donald E. Knuth&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,255,245)'><span
+lang=EN-US style='color:red'>&quot;Literate Programming&quot;</span><span
+lang=EN-US>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&quot;CSLI&quot;</span><span lang=EN-US>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,254,228)'><span
+lang=EN-US>1992}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,244,229)'><span
+lang=EN-US>Entry{<span style='color:red'>&quot;Jon Bentley&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&quot;More Programming Pearls&quot;</span><span
+lang=EN-US>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,244,226)'><span
+lang=EN-US style='color:red'>&quot;Addison-Wesley&quot;</span><span lang=EN-US>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>1990}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>记住</span><span
+lang=EN-US>Entry{...}</span><span style='font-family:宋体'>与</span><span
+lang=EN-US>Entry({...})</span><span style='font-family:宋体'>等价，他是一个以表作为唯一参数的函数调用。所以，前面那段数据在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>程序中表示如上。如果要读取这个段数据，我们只需要运行我们的</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>代码。例如下面这段代码计算数据文件中记录数：</span></p>
+
+<div style='border:RGB(88,97,240) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(248,244,251);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> count = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,222,239)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Entry (b) count
+= count + 1 <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>dofile(<span style='color:red'>&quot;data&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,244,220)'><span
+lang=EN-US>print(<span style='color:red'>&quot;number of entries: &quot;</span>
+.. count)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面这段程序收集一个作者名列表中的名字是否在数据文件中出现，如果在文件中出现则打印出来。（作者名字是</span><span
+lang=EN-US>Entry</span><span style='font-family:宋体'>的第一个域；所以，如果</span><span
+lang=EN-US>b</span><span style='font-family:宋体'>是一个</span><span lang=EN-US>entry</span><span
+style='font-family:宋体'>的值，</span><span lang=EN-US>b[1]</span><span
+style='font-family:宋体'>则代表作者名）</span></p>
+
+<div style='border:RGB(88,97,240) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,246,251)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> authors = {}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- a set to collect authors</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Entry (b)
+authors[b[1]] = <span style='color:blue'>true</span> <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,238,233)'><span
+lang=EN-US>dofile(<span style='color:red'>&quot;data&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> name <span
+style='color:blue'>in</span> pairs(authors) <span style='color:blue'>do</span>
+print(name) <span style='color:blue'>end</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>注意，在这些程序段中使用事件驱动的方法：</span><span
+lang=EN-US>Entry</span><span style='font-family:宋体'>函数作为回调函数，</span><span
+lang=EN-US>dofile</span><span style='font-family:宋体'>处理数据文件中的每一记录都回调用它。当数据文件的大小不是太大的情况下，我们可以使用</span><span
+lang=EN-US>name-value</span><span style='font-family:宋体'>对来描述数据：</span></p>
+
+<div style='border:RGB(88,97,240) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(220,231,232);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>Entry{</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,234,225)'><span
+lang=EN-US>author = <span style='color:red'>&quot;Donald E. Knuth&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>title = <span style='color:red'>&quot;Literate Programming&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,242,253)'><span
+lang=EN-US>publisher = <span style='color:red'>&quot;CSLI&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>year = 1992</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,223,226)'><span
+lang=EN-US>}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,253,245)'><span
+lang=EN-US>Entry{</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>author = <span style='color:red'>&quot;Jon Bentley&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,226,231)'><span
+lang=EN-US>title = <span style='color:red'>&quot;More Programming Pearls&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>publisher = <span style='color:red'>&quot;Addison-Wesley&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,227,224)'><span
+lang=EN-US>year = 1990</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>（如果这种格式让你想起</span><span
+lang=EN-US>BibTeX</span><span style='font-family:宋体'>，这并不奇怪。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中构造器正是根据来自</span><span
+lang=EN-US>BibTeX</span><span style='font-family:宋体'>的灵感实现的）这种格式我们称之为自描述数据格式，因为每一个数据段都根据他的意思简短的描述为一种数据格式。相对</span><span
+lang=EN-US>CSV</span><span style='font-family:宋体'>和其他紧缩格式，自描述数据格式更容易阅读和理解，当需要修改的时候可以容易的手工编辑，而且不需要改动数据文件。例如，如果我们想增加一个域，只需要对读取程序稍作修改即可，当指定的域不存在时，也可以赋予默认值。使用</span><span
+lang=EN-US>name-value</span><span style='font-family:宋体'>对描述的情况下，上面收集作者名的代码可以改写为：</span></p>
+
+<div style='border:RGB(88,97,240) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(226,234,243);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> authors = {} <span
+style='color:green'>-- a set to collect authors</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,237,225)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Entry (b)
+authors[b.author] = <span style='color:blue'>true</span> <span
+style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>dofile(<span style='color:red'>&quot;data&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,248,245)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> name <span
+style='color:blue'>in</span> pairs(authors) <span style='color:blue'>do</span>
+print(name) <span style='color:blue'>end</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在，记录域的顺序无关紧要了，甚至某些记录即使不存在</span><span
+lang=EN-US>author</span><span style='font-family:宋体'>这个域，我们也只需要稍微改动一下代码即可：</span></p>
+
+<div style='border:RGB(88,97,240) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,253,245)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Entry (b)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> b.author <span
+style='color:blue'>then</span> authors[b.author] = <span style='color:blue'>true</span>
+<span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,255,246)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>不仅运行速度快，编译速度也快。例如，上面这段搜集作者名的代码处理一个</span><span
+lang=EN-US>2MB</span><span style='font-family:宋体'>的数据文件时间不会超过</span><span
+lang=EN-US>1</span><span style='font-family:宋体'>秒。另外，这不是偶然的，数据描述是</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>的主要应用之一，从</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>发明以来，我们花了很多心血使他能够更快的编译和运行大的</span><span
+lang=EN-US>chunks</span><span style='font-family:宋体'>。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

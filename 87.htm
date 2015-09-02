@@ -1,0 +1,225 @@
+<html>
+
+<head>
+  <title>14.1 使用动态名字访问全局变量 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;14.1 使用动态名字访问全局变量</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>通常，赋值操作对于访问和修改全局变量已经足够。然而，我们经常需要一些原编程（</span><span
+lang=EN-US>meta-programming</span><span style='font-family:宋体'>）的方式，比如当我们需要操纵一个名字被存储在另一个变量中的全局变量，或者需要在运行时才能知道的全局变量。为了获取这种全局变量的值，有的程序员可能写出下面类似的代码：</span></p>
+
+<div style='border:RGB(133,212,36) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,240,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; loadstring(<span style='color:red'>&quot;value =
+&quot;</span> .. varname)()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>or </span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,239,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; value = loadstring(<span style='color:red'>&quot;return
+&quot;</span> .. varname)()</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果</span><span
+lang=EN-US>varname</span><span style='font-family:宋体'>是</span><span lang=EN-US>x</span><span
+style='font-family:宋体'>，上面连接操作的结果为：</span><span lang=EN-US>&quot;return x&quot;</span><span
+style='font-family:宋体'>（第一种形式为</span><span lang=EN-US> &quot;value = x&quot;</span><span
+style='font-family:宋体'>），当运行时才会产生最终的结果。然而这段代码涉及到一个新的</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>的创建和编译以及其他很多额外的问题。你可以换种方式更高效更简洁的完成同样的功能，代码如下：</span></p>
+
+<div style='border:RGB(133,212,36) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,224,245)'><span
+lang=EN-US>value = _G[varname]</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>因为环境是一个普通的表，所以你可以使用你需要获取的变量（变量名）索引表即可。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>也可以用相似的方式对一个全局变量赋值：</span><span
+lang=EN-US>_G[varname] = value</span><span style='font-family:宋体'>。小心：一些程序员对这些函数很兴奋，并且可能写出这样的代码：</span><span
+lang=EN-US>_G[&quot;a&quot;] = _G[&quot;var1&quot;]</span><span
+style='font-family:宋体'>，这只是</span><span lang=EN-US>a = var1</span><span
+style='font-family:宋体'>的复杂的写法而已。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>对前面的问题概括一下，表域可以是型如</span><span
+lang=EN-US>&quot;io.read&quot; or &quot;a.b.c.d&quot;</span><span
+style='font-family:宋体'>的动态名字。我们用循环解决这个问题，从</span><span lang=EN-US>_G</span><span
+style='font-family:宋体'>开始，一个域一个域的遍历：</span></p>
+
+<div style='border:RGB(133,212,36) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,238,253)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> getfield (f)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> v = _G&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- start with the table of globals</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,246,236)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> w <span
+style='color:blue'>in</span> string.gfind(f, <span style='color:red'>&quot;[%w_]+&quot;</span>)
+<span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; v = v[w]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,237,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> v</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,247,228)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们使用</span><span
+lang=EN-US>string</span><span style='font-family:宋体'>库的</span><span lang=EN-US>gfind</span><span
+style='font-family:宋体'>函数来迭代</span><span lang=EN-US>f</span><span
+style='font-family:宋体'>中的所有单词（单词指一个或多个子母下划线的序列）。相对应的，设置一个域的函数稍微复杂些。赋值如：</span><span
+lang=EN-US> </span></p>
+
+<div style='border:RGB(133,212,36) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,243,246)'><span
+lang=EN-US>a.b.c.d.e = v</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>实际等价于：</span><span
+lang=EN-US> </span></p>
+
+<div style='border:RGB(133,212,36) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,254,243)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> temp = a.b.c.d</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>temp.e = v</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>也就是说，我们必须记住最后一个名字，必须独立的处理最后一个域。新的</span><span
+lang=EN-US>setfield</span><span style='font-family:宋体'>函数当其中的域（译者注：中间的域肯定是表）不存在的时候还需要创建中间表。</span></p>
+
+<div style='border:RGB(133,212,36) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(239,227,235);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> setfield (f, v)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,251,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> t = _G&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- start with the table of globals</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> w, d <span
+style='color:blue'>in</span> string.gfind(f, <span style='color:red'>&quot;([%w_]+)(.?)&quot;</span>)
+<span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,230,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+d == <span style='color:red'>&quot;.&quot;</span> <span style='color:blue'>then</span>&nbsp; <span
+style='color:green'>-- not last field?</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t[w] =
+t[w] <span style='color:blue'>or</span> {}&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- create table if absent</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,253,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t =
+t[w]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- get the table</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- last field</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,238,235)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t[w] =
+v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:
+green'>-- do the assignment</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,250,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个新的模式匹配以变量</span><span
+lang=EN-US>w</span><span style='font-family:宋体'>加上一个可选的点（保存在变量</span><span
+lang=EN-US>d</span><span style='font-family:宋体'>中）的域。如果一个域名后面不允许跟上点，表明它是最后一个名字。（我们将在第</span><span
+lang=EN-US>20</span><span style='font-family:宋体'>章讨论模式匹配问题）。使用上面的函数</span></p>
+
+<div style='border:RGB(133,212,36) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(240,254,240);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>setfield(<span style='color:red'>&quot;t.x.y&quot;</span>, 10)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>创建一个全局变量表</span><span
+lang=EN-US>t</span><span style='font-family:宋体'>，另一个表</span><span lang=EN-US>t.x</span><span
+style='font-family:宋体'>，并且对</span><span lang=EN-US>t.x.y</span><span
+style='font-family:宋体'>赋值为</span><span lang=EN-US>10</span><span
+style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(133,212,36) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(241,248,240);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(t.x.y)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 10</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,243,222)'><span
+lang=EN-US>print(getfield(<span style='color:red'>&quot;t.x.y&quot;</span>)) &nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 10</span></span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

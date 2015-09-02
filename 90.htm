@@ -1,0 +1,62 @@
+<html>
+
+<head>
+  <title> 第15章 Packages - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第15章 Packages</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>很多语言专门提供了某种机制组织全局变量的命名，比如</span><span
+lang=EN-US>Modula</span><span style='font-family:宋体'>的</span><span lang=EN-US>modules</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>Java</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>Perl</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>packages</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>C++</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>namespaces</span><span
+style='font-family:宋体'>。每一种机制对在</span><span lang=EN-US>package</span><span
+style='font-family:宋体'>中声明的元素的可见性以及其他一些细节的使用都有不同的规则。但是他们都提供了一种避免不同库中命名冲突的问题的机制。每一个程序库创建自己的命名空间，在这个命名空间中定义的名字和其他命名空间中定义的名字互不干涉。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>并没有提供明确的机制来实现</span><span lang=EN-US>packages</span><span
+style='font-family:宋体'>。然而，我们通过语言提供的基本的机制很容易实现他。主要的思想是：像标准库一样，使用表来描述</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>使用表实现</span><span
+lang=EN-US>packages</span><span style='font-family:宋体'>的明显的好处是：我们可以像其他表一样使用</span><span
+lang=EN-US>packages</span><span style='font-family:宋体'>，并且可以使用语言提供的所有的功能，带来很多便利。大多数语言中，</span><span
+lang=EN-US>packages</span><span style='font-family:宋体'>不是第一类值</span><span
+lang=EN-US>(first-class values)</span><span style='font-family:宋体'>（也就是说，他们不能存储在变量里，不能作为函数参数。。。）因此，这些语言需要特殊的方法和技巧才能实现类似的功能。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中，虽然我们一直都用表来实现</span><span lang=EN-US>pachages</span><span
+style='font-family:宋体'>，但也有其他不同的方法可以实现</span><span lang=EN-US>package</span><span
+style='font-family:宋体'>，在这一章，我们将介绍这些方法。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

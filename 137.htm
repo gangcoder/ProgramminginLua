@@ -1,0 +1,150 @@
+<html>
+
+<head>
+  <title>24.2.2 查询元素 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;24.2.2 查询元素</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>API</span><span
+style='font-family:宋体'>用索引来访问栈中的元素。在栈中的第一个元素（也就是第一个被压入栈的）有索引</span><span
+lang=EN-US>1</span><span style='font-family:宋体'>，下一个有索引</span><span lang=EN-US>2</span><span
+style='font-family:宋体'>，以此类推。我们也可以用栈顶作为参照来存取元素，利用负索引。在这种情况下，</span><span
+lang=EN-US>-1</span><span style='font-family:宋体'>指出栈顶元素（也就是最后被压入的），</span><span
+lang=EN-US>-2</span><span style='font-family:宋体'>指出它的前一个元素，以此类推。例如，调用</span><span
+lang=EN-US>lua_tostring(L, -1)</span><span style='font-family:宋体'>以字符串的形式返回栈顶的值。我们下面将看到，在某些场合使用正索引访问栈比较方便，另外一些情况下，使用负索引访问栈更方便。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>API</span><span
+style='font-family:宋体'>提供了一套</span><span lang=EN-US>lua_is*</span><span
+style='font-family:宋体'>函数来检查一个元素是否是一个指定的类型，</span><span lang=EN-US>*</span><span
+style='font-family:宋体'>可以是任何</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>类型。因此有</span><span lang=EN-US>lua_isnumber,lua_isstring,lua_istable</span><span
+style='font-family:宋体'>以及类似的函数。所有这些函数都有同样的原型：</span></p>
+
+<div style='border:RGB(66,173,241) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,245,251)'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> lua_is... (lua_State
+*L, <span style='color:blue'>int</span> index);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>lua_isnumber</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>lua_isstring</span><span
+style='font-family:宋体'>函数不检查这个值是否是指定的类型，而是看它是否能被转换成指定的那种类型。例如，任何数字类型都满足</span><span
+lang=EN-US>lua_isstring</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>还有一个</span><span
+lang=EN-US>lua_type</span><span style='font-family:宋体'>函数，它返回栈中元素的类型。（</span><span
+lang=EN-US>lua_is*</span><span style='font-family:宋体'>中的有些函数实际上是用了这个函数定义的宏）在</span><span
+lang=EN-US>lua.h</span><span style='font-family:宋体'>头文件中，每种类型都被定义为一个常量：</span><span
+lang=EN-US>LUA_TNIL</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>LUA_TBOOLEAN</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>LUA_TNUMBER</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>LUA_TSTRING</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>LUA_TTABLE</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>LUA_TFUNCTION</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>LUA_TUSERDATA</span><span style='font-family:宋体'>以及</span><span
+lang=EN-US>LUA_TTHREAD</span><span style='font-family:宋体'>。这个函数主要被用在与一个</span><span
+lang=EN-US>switch</span><span style='font-family:宋体'>语句联合使用。当我们需要真正的检查字符串和数字类型时它也是有用的</span><span
+lang=EN-US> </span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span style='font-family:宋体'>为了从栈中获得值，这里有</span><span
+lang=EN-US>lua_to*</span><span style='font-family:宋体'>函数：</span></p>
+
+<div style='border:RGB(66,173,241) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,244,228)'><span
+lang=EN-US>int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lua_toboolean
+(lua_State *L, int index);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>double&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lua_tonumber
+(lua_State *L, int index);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,235,238)'><span
+lang=EN-US>const char *&nbsp; lua_tostring (lua_State *L, int index);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>size_t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lua_strlen
+(lua_State *L, int index);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>即使给定的元素的类型不正确，调用上面这些函数也没有什么问题。在这种情况下，</span><span
+lang=EN-US>lua_toboolean</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>lua_tonumber</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>lua_strlen</span><span style='font-family:宋体'>返回</span><span
+lang=EN-US>0</span><span style='font-family:宋体'>，其他函数返回</span><span lang=EN-US>NULL</span><span
+style='font-family:宋体'>。由于</span><span lang=EN-US>ANSI C</span><span
+style='font-family:宋体'>没有提供有效的可以用来判断错误发生数字值，所以返回的</span><span lang=EN-US>0</span><span
+style='font-family:宋体'>是没有什么用处的。对于其他函数而言，我们一般不需要使用对应的</span><span lang=EN-US>lua_is*</span><span
+style='font-family:宋体'>函数：我们只需要调用</span><span lang=EN-US>lua_is*</span><span
+style='font-family:宋体'>，测试返回结果是否为</span><span lang=EN-US>NULL</span><span
+style='font-family:宋体'>即可。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua_tostring</span><span
+style='font-family:宋体'>函数返回一个指向字符串的内部拷贝的指针。你不能修改它（使你想起那里有一个</span><span
+lang=EN-US>const</span><span style='font-family:宋体'>）。只要这个指针对应的值还在栈内，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>会保证这个指针一直有效。当一个</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数返回后，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>会清理他的栈，所以，有一个原则：永远不要将指向</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>字符串的指针保存到访问他们的外部函数中。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua_string</span><span
+style='font-family:宋体'>返回的字符串结尾总会有一个字符结束标志</span><span lang=EN-US>0</span><span
+style='font-family:宋体'>，但是字符串中间也可能包含</span><span lang=EN-US>0</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>lua_strlen</span><span
+style='font-family:宋体'>返回字符串的实际长度。特殊情况下，假定栈顶的值是一个字符串，下面的断言</span><span
+lang=EN-US>(assert)</span><span style='font-family:宋体'>总是有效的：</span></p>
+
+<div style='border:RGB(66,173,241) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(225,255,222);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>const</span><span lang=EN-US> <span
+style='color:blue'>char</span> *s = lua_tostring(L, -1);&nbsp;&nbsp; <span
+style='color:green'>/* any Lua string */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,230,232)'><span
+lang=EN-US>size_t l = lua_strlen(L, -1);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* its length */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>assert(s[l] == '\0');</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,228,221)'><span
+lang=EN-US>assert(strlen(s) &lt;= l);</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

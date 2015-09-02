@@ -1,0 +1,242 @@
+<html>
+
+<head>
+  <title>26.2 C 函数库 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;26.2 C 函数库</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一个</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>库实际上是一个定义了一系列</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>函数的</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>，并将这些函数保存在适当的地方，通常作为</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>的域来保存。</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>C</span><span style='font-family:
+宋体'>库就是这样实现的。除了定义</span><span lang=EN-US>C</span><span style='font-family:宋体'>函数之外，还必须定义一个特殊的用来和</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>库的主</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>通信的特殊函数。一旦调用，这个函数就会注册库中所有的</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数，并将他们保存到适当的位置。像一个</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>主</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>一样，她也会初始化其他一些在库中需要初始化的东西。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>通过这个注册过程，就可以看到库中的</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数。一旦一个</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数被注册之后并保存到</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中，在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>程序中就可以直接引用他的地址（当我们注册这个函数的时候传递给</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的地址）来访问这个函数了。换句话说，一旦</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数被注册之后，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>调用这个函数并不依赖于函数名，包的位置，或者调用函数的可见的规则。通常</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>库都有一个外部（</span><span
+lang=EN-US>public/extern</span><span style='font-family:宋体'>）的用来打开库的函数。其他的函数可能都是私有的，在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>中被声明为</span><span lang=EN-US>static</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当你打算使用</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数来扩展</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的时候，即使你仅仅只想注册一个</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数，将你的</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>代码设计为一个库是个比较好的思想：不久的将来你就会发现你需要其他的函数。一般情况下，辅助库对这种实现提供了帮助。</span><span
+lang=EN-US>luaL_openlib</span><span style='font-family:宋体'>函数接受一个</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数的列表和他们对应的函数名，并且作为一个库在一个</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>中注册所有这些函数。看一个例子，假定我们想用一个我们前面提过的</span><span
+lang=EN-US>l_dir</span><span style='font-family:宋体'>函数创建一个库。首先，我们必须定义库函数：</span></p>
+
+<div style='border:RGB(236,143,82) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,237,236)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> l_dir (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...&nbsp;&nbsp;&nbsp; <span style='color:green'>/*
+as before */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,221,252)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二步，我们声明一个数组，保存所有的函数和他们对应的名字。这个数组的元素类型为</span><span
+lang=EN-US>luaL_reg</span><span style='font-family:宋体'>：是一个带有两个域的结构体，一个字符串和一个函数指针。</span></p>
+
+<div style='border:RGB(236,143,82) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,250,221)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>const</span> <span style='color:blue'>struct</span> luaL_reg
+mylib [] = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;dir&quot;</span>,
+l_dir},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,236,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {NULL, NULL}&nbsp; <span style='color:green'>/*
+sentinel */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>};</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在我们的例子中，只有一个函数</span><span
+lang=EN-US>l_dir</span><span style='font-family:宋体'>需要声明。注意数组中最后一对必须是</span><span
+lang=EN-US>{NULL, NULL}</span><span style='font-family:宋体'>，用来表示结束。第三步，我们使用</span><span
+lang=EN-US>luaL_openlib</span><span style='font-family:宋体'>声明主函数：</span></p>
+
+<div style='border:RGB(236,143,82) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(249,245,247);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> luaopen_mylib
+(lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,237,220)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_openlib(L, <span style='color:red'>&quot;mylib&quot;</span>,
+mylib, 0);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 1;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,221,242)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>luaL_openlib</span><span
+style='font-family:宋体'>的第二个参数是库的名称。这个函数按照指定的名字创建</span><span lang=EN-US>(</span><span
+style='font-family:宋体'>或者</span><span lang=EN-US>reuse)</span><span
+style='font-family:宋体'>一个表，并使用数组</span><span lang=EN-US>mylib</span><span
+style='font-family:宋体'>中的</span><span lang=EN-US>name-function</span><span
+style='font-family:宋体'>对填充这个表。</span><span lang=EN-US>luaL_openlib</span><span
+style='font-family:宋体'>还允许我们为库中所有的函数注册公共的</span><span lang=EN-US>upvalues</span><span
+style='font-family:宋体'>。例子中不需要使用</span><span lang=EN-US>upvalues</span><span
+style='font-family:宋体'>，所以最后一个参数为</span><span lang=EN-US>0</span><span
+style='font-family:宋体'>。</span><span lang=EN-US>luaL_openlib</span><span
+style='font-family:宋体'>返回的时候，将保存库的表放到栈内。</span><span lang=EN-US>luaL_openlib</span><span
+style='font-family:宋体'>函数返回</span><span lang=EN-US>1</span><span
+style='font-family:宋体'>，返回这个值给</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>。（</span><span lang=EN-US>The luaopen_mylib function
+returns 1 to return this value to Lua</span><span style='font-family:宋体'>）（和</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>库一样，这个返回值是可选的，因为库本身已经赋给了一个全局变量。另外，像在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>标准库中的一样，这个返回不会有额外的花费，在有时候可能是有用的。）</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>完成库的代码编写之后，我们必须将它链接到</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>解释器。最常用的方式使用动态连接库，如果你的</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>解释器支持这个特性的话（我们在</span><span
+lang=EN-US>8.2</span><span style='font-family:宋体'>节已经讨论过了动态连接库）。在这种情况下，你必须用你的代码创建动态连接库（</span><span
+lang=EN-US>windows</span><span style='font-family:宋体'>下</span><span lang=EN-US>.dll</span><span
+style='font-family:宋体'>文件，</span><span lang=EN-US>linux</span><span
+style='font-family:宋体'>下</span><span lang=EN-US>.so</span><span
+style='font-family:宋体'>文件）。到这一步，你就可以在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中直接使用</span><span lang=EN-US>loadlib</span><span
+style='font-family:宋体'>加载你刚才定义的函数库了，下面这个调用：</span></p>
+
+<div style='border:RGB(236,143,82) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,226,224)'><span
+lang=EN-US>mylib = loadlib(<span style='color:red'>&quot;fullname-of-your-library&quot;</span>,
+<span style='color:red'>&quot;luaopen_mylib&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>将</span><span
+lang=EN-US>luaopen_mylib</span><span style='font-family:宋体'>函数转换成</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中的一个</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数，并将这个函数赋值给</span><span lang=EN-US>mylib</span><span
+style='font-family:宋体'>（那就是为什么</span><span lang=EN-US>luaopen_mylib</span><span
+style='font-family:宋体'>必须和其他的</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数有相同的原型的原因所在）。然后，调用</span><span lang=EN-US>mylib()</span><span
+style='font-family:宋体'>，将运行</span><span lang=EN-US>luaopen_mylib</span><span
+style='font-family:宋体'>打开你定义的函数库。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果你的解释器不支持动态链接库，你必须将你的新的函数库重新编译到你的</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中去。除了这以外，还不要一些方式告诉独立运行的</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>解释器，当他打开一个新的状态的时候必须打开这个新定义的函数库。宏定义可以很容易实现这个功能。第一，你必须使用下面的内容创建一个头文件（我们可以称之为</span><span
+lang=EN-US>mylib.h</span><span style='font-family:宋体'>）：</span></p>
+
+<div style='border:RGB(236,143,82) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,222,237)'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> luaopen_mylib
+(lua_State *L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,226,245)'><span
+lang=EN-US style='color:blue'>#define</span><span lang=EN-US> LUA_EXTRALIBS { <span
+style='color:red'>&quot;mylib&quot;</span>, luaopen_mylib },</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第一行声明了打开库的函数。第二行定义了一个宏</span><span
+lang=EN-US>LUA_EXTRALIBS</span><span style='font-family:宋体'>作为函数数组的新的入口，当解释器创建新的状态的时候会调用这个宏。（这个函数数组的类型为</span><span
+lang=EN-US>struct luaL_reg[]</span><span style='font-family:宋体'>，因此我们需要将名字也放进去）</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了在解释器中包含这个头文件，你可以在你的编译选项中定义一个宏</span><span
+lang=EN-US>LUA_USERCONFIG</span><span style='font-family:宋体'>。对于命令行的编译器，你只需添加一个下面这样的选项即可：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,234,231)'><span
+lang=EN-US>-DLUA_USERCONFIG=\&quot;mylib.h\&quot;</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>（反斜线防止双引号被</span><span
+lang=EN-US>shell</span><span style='font-family:宋体'>解释，当我们在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>中指定一个头文件时，这些引号是必需的。）在一个整合的开发环境中，你必须在工程设置中添加类似的东西。然后当你重新编译</span><span
+lang=EN-US>lua.c</span><span style='font-family:宋体'>的时候，它包含</span><span
+lang=EN-US>mylib.h</span><span style='font-family:宋体'>，并且因此在函数库的列表中可以用新定义的</span><span
+lang=EN-US>LUA_EXTRALIBS</span><span style='font-family:宋体'>来打开函数库。</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section37 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

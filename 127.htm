@@ -1,0 +1,256 @@
+<html>
+
+<head>
+  <title>23.1 自省（Introspective） - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;23.1 自省（Introspective）</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在</span><span
+lang=EN-US>debug</span><span style='font-family:宋体'>库中主要的自省函数是</span><span
+lang=EN-US>debug.getinfo</span><span style='font-family:宋体'>。他的第一个参数可以是一个函数或者栈级别。对于函数</span><span
+lang=EN-US>foo</span><span style='font-family:宋体'>调用</span><span lang=EN-US>debug.getinfo(foo)</span><span
+style='font-family:宋体'>，将返回关于这个函数信息的一个表。这个表有下列一些域：</span></p>
+
+<p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>ü<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span lang=EN-US>source</span><span style='font-family:宋体'>，标明函数被定义的地方。如果函数在一个字符串内被定义（通过</span><span
+lang=EN-US>loadstring</span><span style='font-family:宋体'>），</span><span
+lang=EN-US>source</span><span style='font-family:宋体'>就是那个字符串。如果函数在一个文件中定义，</span><span
+lang=EN-US>source</span><span style='font-family:宋体'>是</span><span lang=EN-US>@</span><span
+style='font-family:宋体'>加上文件名。</span></p>
+
+<p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>ü<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span lang=EN-US>short_src</span><span style='font-family:宋体'>，</span><span
+lang=EN-US>source</span><span style='font-family:宋体'>的简短版本（最多</span><span
+lang=EN-US>60</span><span style='font-family:宋体'>个字符），记录一些有用的错误信息。</span></p>
+
+<p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>ü<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span lang=EN-US>linedefined</span><span style='font-family:宋体'>，</span><span
+lang=EN-US>source</span><span style='font-family:宋体'>中函数被定义之处的行号。</span></p>
+
+<p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>ü<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span lang=EN-US>what</span><span style='font-family:宋体'>，标明函数类型。如果</span><span
+lang=EN-US>foo</span><span style='font-family:宋体'>是一个普通得</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>函数，结果为</span><span
+lang=EN-US> &quot;Lua&quot;</span><span style='font-family:宋体'>；如果是一个</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数，结果为</span><span lang=EN-US>
+&quot;C&quot;</span><span style='font-family:宋体'>；如果是一个</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的主</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>，结果为</span><span lang=EN-US> &quot;main&quot;</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>ü<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span lang=EN-US>name</span><span style='font-family:宋体'>，函数的合理名称。</span></p>
+
+<p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>ü<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span lang=EN-US>namewhat</span><span style='font-family:宋体'>，上一个字段代表的含义。这个字段的取值可能为：</span><span
+lang=EN-US>W&quot;global&quot;</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>&quot;local&quot;</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>&quot;method&quot;</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>&quot;field&quot;</span><span style='font-family:宋体'>，或者</span><span
+lang=EN-US> &quot;&quot;</span><span style='font-family:宋体'>（空字符串）。空字符串意味着</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>没有找到这个函数名。</span></p>
+
+<p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>ü<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span lang=EN-US>nups</span><span style='font-family:宋体'>，函数的</span><span
+lang=EN-US>upvalues</span><span style='font-family:宋体'>的个数。</span></p>
+
+<p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>ü<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span lang=EN-US>func</span><span style='font-family:宋体'>，函数本身；详细情况看后面。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当</span><span
+lang=EN-US>foo</span><span style='font-family:宋体'>是一个</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数的时候，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>无法知道很多相关的信息，所以对这种函数，只有</span><span lang=EN-US>what</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>name</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>namewhat</span><span
+style='font-family:宋体'>这几个域的值可用。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>以数字</span><span
+lang=EN-US> n</span><span style='font-family:宋体'>调用</span><span lang=EN-US>debug.getinfo(n)</span><span
+style='font-family:宋体'>时，返回在</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>级栈的活动函数的信息数据。比如，如果</span><span lang=EN-US>n=1</span><span
+style='font-family:宋体'>，返回的是正在进行调用的那个函数的信息。（</span><span lang=EN-US>n=0</span><span
+style='font-family:宋体'>表示</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数</span><span lang=EN-US>getinfo</span><span
+style='font-family:宋体'>本身）如果</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>比栈中活动函数的个数大的话，</span><span lang=EN-US>debug.getinfo</span><span
+style='font-family:宋体'>返回</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>。当你使用数字</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>调用</span><span lang=EN-US>debug.getinfo</span><span
+style='font-family:宋体'>查询活动函数的信息的时候，返回的结果</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>中有一个额外的域：</span><span lang=EN-US>currentline</span><span
+style='font-family:宋体'>，即在那个时刻函数所在的行号。另外，</span><span lang=EN-US>func</span><span
+style='font-family:宋体'>表示指定</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>级的活动函数。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>字段名的写法有些技巧。记住：因为在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中函数是第一类值，所以一个函数可能有多个函数名。查找指定值的函数的时候，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>会首先在全局变量中查找，如果没找到才会到调用这个函数的代码中看它是如何被调用的。后面这种情况只有在我们使用数字调用</span><span
+lang=EN-US>getinfo</span><span style='font-family:宋体'>的时候才会起作用，也就是这个时候我们能够获取调用相关的详细信息。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>函数</span><span
+lang=EN-US>getinfo </span><span style='font-family:宋体'>的效率并不高。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>以不消弱程序执行的方式保存</span><span
+lang=EN-US>debug</span><span style='font-family:宋体'>信息（</span><span lang=EN-US>Lua
+keeps debug information in a form that does not impair program execution</span><span
+style='font-family:宋体'>），效率被放在第二位。为了获取比较好地执行性能，</span><span lang=EN-US>getinfo</span><span
+style='font-family:宋体'>可选的第二个参数可以用来指定选取哪些信息。指定了这个参数之后，程序不会浪费时间去收集那些用户不关心的信息。这个参数的格式是一个字符串，每一个字母代表一种类型的信息，可用的字母的含义如下：</span></p>
+
+<div align=center>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=54 valign=top style='width:40.35pt;border:none;border-top:solid green 1.5pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>'n'</span></p>
+  </td>
+  <td width=355 valign=top style='width:266.2pt;border:none;border-top:solid green 1.5pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>selects fields name and namewhat</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=54 valign=top style='width:40.35pt;border:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>'f'</span></p>
+  </td>
+  <td width=355 valign=top style='width:266.2pt;border:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>selects field func</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=54 valign=top style='width:40.35pt;border:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>'S'</span></p>
+  </td>
+  <td width=355 valign=top style='width:266.2pt;border:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>selects fields source, short_src, what, and
+  linedefined</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=54 valign=top style='width:40.35pt;border:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>'l'</span></p>
+  </td>
+  <td width=355 valign=top style='width:266.2pt;border:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>selects field currentline</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=54 valign=top style='width:40.35pt;border:none;border-bottom:solid green 1.5pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>'u'</span></p>
+  </td>
+  <td width=355 valign=top style='width:266.2pt;border:none;border-bottom:solid green 1.5pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a><span lang=EN-US>selects field nup</span></p>
+  </td>
+ </tr>
+</table>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面的函数阐明了</span><span
+lang=EN-US>debug.getinfo</span><span style='font-family:宋体'>的使用，函数打印一个活动栈的原始跟踪信息（</span><span
+lang=EN-US>traceback</span><span style='font-family:宋体'>）：</span></p>
+
+<div style='border:RGB(234,63,120) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,253,245)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> traceback ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> level = 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,242,247)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>while</span> <span
+style='color:blue'>true</span> <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+info = debug.getinfo(level, <span style='color:red'>&quot;Sl&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,242,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+<span style='color:blue'>not</span> info <span style='color:blue'>then</span> <span
+style='color:blue'>break</span> <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+info.what == <span style='color:red'>&quot;C&quot;</span> <span
+style='color:blue'>then</span>&nbsp;&nbsp;&nbsp; <span style='color:green'>--
+is a C function?</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,248,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print(level,
+<span style='color:red'>&quot;C function&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span>&nbsp;&nbsp; <span
+style='color:green'>-- a Lua function</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,228,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print(string.format(<span
+style='color:red'>&quot;[%s]:%d&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; info.short_src,
+info.currentline))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,242,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; level = level + 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,231,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>不难改进这个函数，使得</span><span
+lang=EN-US>getinfo</span><span style='font-family:宋体'>获取更多的数据，实际上</span><span
+lang=EN-US>debug</span><span style='font-family:宋体'>库提供了一个改善的版本</span><span
+lang=EN-US>debug.traceback</span><span style='font-family:宋体'>，与我们上面的函数不同的是，</span><span
+lang=EN-US>debug.traceback</span><span style='font-family:宋体'>并不打印结果，而是返回一个字符串。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

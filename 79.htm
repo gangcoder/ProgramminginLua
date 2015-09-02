@@ -1,0 +1,131 @@
+<html>
+
+<head>
+  <title>13.3 库定义的Metamethods - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;13.3 库定义的Metamethods</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在一些库中，在自己的</span><span
+lang=EN-US>metatables</span><span style='font-family:宋体'>中定义自己的域是很普遍的情况。到目前为止，我们看到的所有</span><span
+lang=EN-US>metamethods</span><span style='font-family:宋体'>都是</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>核心部分的。有虚拟机负责处理运算符涉及到的</span><span
+lang=EN-US>metatables</span><span style='font-family:宋体'>和为运算符定义操作的</span><span
+lang=EN-US>metamethods</span><span style='font-family:宋体'>。但是，</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>是一个普通的表，任何人都可以使用。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>tostring</span><span
+style='font-family:宋体'>是一个典型的例子。如前面我们所见，</span><span lang=EN-US>tostring</span><span
+style='font-family:宋体'>以简单的格式表示出</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(79,237,112) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,250,239)'><span
+lang=EN-US>print({})&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+table: 0x8062ac0</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>（注意：</span><span
+lang=EN-US>print</span><span style='font-family:宋体'>函数总是调用</span><span
+lang=EN-US>tostring</span><span style='font-family:宋体'>来格式化它的输出）。然而当格式化一个对象的时候，</span><span
+lang=EN-US>tostring</span><span style='font-family:宋体'>会首先检查对象是否存在一个带有</span><span
+lang=EN-US>__tostring</span><span style='font-family:宋体'>域的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>。如果存在则以对象作为参数调用对应的函数来完成格式化，返回的结果即为</span><span
+lang=EN-US>tostring</span><span style='font-family:宋体'>的结果。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在我们集合的例子中我们已经定义了一个函数来将集合转换成字符串打印出来。因此，我们只需要将集合的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>的</span><span
+lang=EN-US>__tostring</span><span style='font-family:宋体'>域调用我们定义的打印函数：</span></p>
+
+<div style='border:RGB(79,237,112) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,230,244)'><span
+lang=EN-US>Set.mt.__tostring = Set.tostring</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这样，不管什么时候我们调用</span><span
+lang=EN-US>print</span><span style='font-family:宋体'>打印一个集合，</span><span
+lang=EN-US>print</span><span style='font-family:宋体'>都会自动调用</span><span
+lang=EN-US>tostring</span><span style='font-family:宋体'>，而</span><span
+lang=EN-US>tostring</span><span style='font-family:宋体'>则会调用</span><span
+lang=EN-US>Set.tostring</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(79,237,112) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,231,232)'><span
+lang=EN-US>s1 = Set.new{10, 4, 5}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(s1)&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+{4, 5, 10}</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>setmetatable/getmetatable</span><span
+style='font-family:宋体'>函数也会使用</span><span lang=EN-US>metafield</span><span
+style='font-family:宋体'>，在这种情况下，可以保护</span><span lang=EN-US>metatables</span><span
+style='font-family:宋体'>。假定你想保护你的集合使其使用者既看不到也不能修改</span><span lang=EN-US>metatables</span><span
+style='font-family:宋体'>。如果你对</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>设置了</span><span lang=EN-US>__metatable</span><span
+style='font-family:宋体'>的值，</span><span lang=EN-US>getmetatable</span><span
+style='font-family:宋体'>将返回这个域的值，而调用</span><span lang=EN-US>setmetatable </span><span
+style='font-family:宋体'>将会出错：</span></p>
+
+<div style='border:RGB(79,237,112) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(231,224,252);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>Set.mt.__metatable = <span style='color:red'>&quot;not your business&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,253,221)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>s1 = Set.new{}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,246,222)'><span
+lang=EN-US>print(getmetatable(s1))&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; not your business</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>setmetatable(s1, {})</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,241,239)'><span
+lang=EN-US>stdin:1: cannot change protected metatable</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

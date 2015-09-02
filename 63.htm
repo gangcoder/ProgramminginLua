@@ -1,0 +1,384 @@
+<html>
+
+<head>
+  <title>10.2 马尔可夫链算法 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;10.2 马尔可夫链算法</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们第二个例子是马尔可夫链算法的实现，我们的程序以前</span><span
+lang=EN-US>n(n=2)</span><span style='font-family:宋体'>个单词串为基础随机产生一个文本串。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>程序的第一部分读出原文，并且对没两个单词的前缀建立一个表，这个表给出了具有那些前缀的单词的一个顺序。建表完成后，这个程序利用这张表生成一个随机的文本。在此文本中，每个单词都跟随着它的的前两个单词，这两个单词在文本中有相同的概率。这样，我们就产生了一个非常随机，但并不完全随机的文本。例如，当应用这个程序的输出结果会出现“构造器也可以通过表构造器，那么一下几行的插入语对于整个文件来说，不是来存储每个功能的内容，而是来展示它的结构。”如果你想在队列里找到最大元素并返回最大值，接着显示提示和运行代码。下面的单词是保留单词，不能用在度和弧度之间转换。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们编写一个函数用来将两个单词中间加上空个连接起来：</span></p>
+
+<div style='border:RGB(199,138,207) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,246,232)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> prefix (w1, w2)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> w1 .. ' '
+.. w2</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,240,232)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们用</span><span
+lang=EN-US>NOWORD</span><span style='font-family:宋体'>（即</span><span lang=EN-US>\n</span><span
+style='font-family:宋体'>）表示文件的结尾并且初始化前缀单词，例如，下面的文本：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,222,227)'><span
+lang=EN-US>the more we try the more we do</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>初始化构造的表为：</span></p>
+
+<div style='border:RGB(199,138,207) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,227,252)'><span
+lang=EN-US>{</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; [<span style='color:red'>&quot;\n \n&quot;</span>]&nbsp;&nbsp;&nbsp;&nbsp; =
+{<span style='color:red'>&quot;the&quot;</span>}, </span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,222,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; [<span style='color:red'>&quot;\n the&quot;</span>]&nbsp;&nbsp;&nbsp; =
+{<span style='color:red'>&quot;more&quot;</span>}, </span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; [<span style='color:red'>&quot;the more&quot;</span>]&nbsp; =
+{<span style='color:red'>&quot;we&quot;</span>, <span style='color:red'>&quot;we&quot;</span>},
+</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,242,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; [<span style='color:red'>&quot;more we&quot;</span>]&nbsp;&nbsp; =
+{<span style='color:red'>&quot;try&quot;</span>, <span style='color:red'>&quot;do&quot;</span>},
+</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; [<span style='color:red'>&quot;we try&quot;</span>]&nbsp;&nbsp;&nbsp; =
+{<span style='color:red'>&quot;the&quot;</span>}, </span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,238,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; [<span style='color:red'>&quot;try the&quot;</span>]&nbsp;&nbsp; =
+{<span style='color:red'>&quot;more&quot;</span>}, </span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; [<span style='color:red'>&quot;we do&quot;</span>]&nbsp;&nbsp;&nbsp;&nbsp; =
+{<span style='color:red'>&quot;\n&quot;</span>}, </span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,241,228)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们使用全局变量</span><span
+lang=EN-US>statetab</span><span style='font-family:宋体'>来保存这个表，下面我们完成一个插入函数用来在这个</span><span
+lang=EN-US>statetab</span><span style='font-family:宋体'>中插入新的单词。</span></p>
+
+<div style='border:RGB(199,138,207) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,245,225)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> insert (index,
+value)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> <span
+style='color:blue'>not</span> statetab[index] <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,245,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; statetab[index] = {value}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,244,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; table.insert(statetab[index],
+value)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,245,230)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个函数中首先检查指定的前缀是否存在，如果不存在则创建一个新的并赋上新值。如果已经存在则调用</span><span
+lang=EN-US>table.insert</span><span style='font-family:宋体'>将新值插入到列表尾部。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们使用两个变量</span><span
+lang=EN-US>w1</span><span style='font-family:宋体'>和</span><span lang=EN-US>w2</span><span
+style='font-family:宋体'>来保存最后读入的两个单词的值，对于每一个前缀，我们保存紧跟其后的单词的列表。例如上面例子中初始化构造的表。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>初始化表之后，下面来看看如何生成一个</span><span
+lang=EN-US>MAXGEN</span><span style='font-family:宋体'>（</span><span lang=EN-US>=1000</span><span
+style='font-family:宋体'>）个单词的文本。首先，重新初始化</span><span lang=EN-US>w1</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>w2</span><span
+style='font-family:宋体'>，然后对于每一个前缀，在其</span><span lang=EN-US>next</span><span
+style='font-family:宋体'>单词的列表中随机选择一个，打印此单词并更新</span><span lang=EN-US>w1</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>w2</span><span
+style='font-family:宋体'>，完整的代码如下：</span></p>
+
+<div style='border:RGB(199,138,207) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,232,234)'><span
+lang=EN-US style='color:green'>-- Markov Chain Program in Lua</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,242,228)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> allwords ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> line =
+io.read() <span style='color:green'>-- current line</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,254,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> pos = 1 <span
+style='color:green'>-- current position in the line</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> <span
+style='color:blue'>function</span> () <span style='color:green'>-- iterator
+function</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,223,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>while</span>
+line <span style='color:blue'>do</span> <span style='color:green'>-- repeat
+while there are lines</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>local</span> s, e = string.find(line, <span
+style='color:red'>&quot;%w+&quot;</span>, pos)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,224,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>if</span> s <span style='color:blue'>then</span> <span
+style='color:green'>-- found a word?</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pos
+= e + 1 <span style='color:green'>-- update next position</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,242,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>return</span> string.sub(line, s, e) <span style='color:
+green'>-- return the word</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>else</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,229,223)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; line
+= io.read() <span style='color:green'>-- word not found; try next line</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pos
+= 1 <span style='color:green'>-- restart from first position</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,248,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,245,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+<span style='color:blue'>nil</span> <span style='color:green'>-- no more lines:
+end of traversal</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,238,251)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,220,244)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> prefix (w1, w2)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> w1 .. ' '
+.. w2</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,231,223)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,228,238)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> statetab</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,240,250)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> insert (index,
+value)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> <span
+style='color:blue'>not</span> statetab[index] <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,223,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; statetab[index] = {n=0}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,245,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; table.insert(statetab[index], value)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,232,235)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> N = 2</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,240,243)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> MAXGEN = 10000</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> NOWORD = <span
+style='color:red'>&quot;\n&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,253,251)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>-- build table</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,238,220)'><span
+lang=EN-US>statetab = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> w1, w2 = NOWORD, NOWORD</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,228,240)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> w <span
+style='color:blue'>in</span> allwords() <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; insert(prefix(w1, w2), w)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,248,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; w1 = w2; w2 = w;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,235,240)'><span
+lang=EN-US>insert(prefix(w1, w2), NOWORD)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,246,245)'><span
+lang=EN-US style='color:green'>-- generate text</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>w1 = NOWORD; w2 = NOWORD <span style='color:green'>-- reinitialize</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,240,237)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> i=1,MAXGEN <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> list =
+statetab[prefix(w1, w2)]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,220,252)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>-- choose a random item
+from list</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> r =
+math.random(table.getn(list))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,255,250)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> nextword =
+list[r]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> nextword ==
+NOWORD <span style='color:blue'>then</span> <span style='color:blue'>return</span>
+<span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,252,252)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; io.write(nextword, <span style='color:red'>&quot;
+&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; w1 = w2; w2 = nextword</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,236,228)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section18 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

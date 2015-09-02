@@ -1,0 +1,164 @@
+<html>
+
+<head>
+  <title>11.2 矩阵和多维数组 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;11.2 矩阵和多维数组</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中有两种表示矩阵的方法，一是“数组的数组”。也就是说，</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>的每个元素是另一个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>。例如，可以使用下面代码创建一个</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>行</span><span lang=EN-US>m</span><span style='font-family:
+宋体'>列的矩阵：</span></p>
+
+<div style='border:RGB(30,1,79) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,243,221)'><span
+lang=EN-US>mt = {}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- create the matrix</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> i=1,N <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,223,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; mt[i] = {}&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- create a new row</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> j=1,M <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,234,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mt[i][j] = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,231,245)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>由于</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>是对象，所以每一行我们必须显式地创建一个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>，比起</span><span lang=EN-US>c</span><span
+style='font-family:宋体'>或</span><span lang=EN-US>pascal</span><span
+style='font-family:宋体'>，这显得冗余，但另一方面也提供了更多的灵活性，例如可修改前面的例子创建一个三角矩阵：</span></p>
+
+<div style='border:RGB(30,1,79) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,234,230)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> j=1,M <span
+style='color:blue'>do</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>改成</span></p>
+
+<div style='border:RGB(30,1,79) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,240,241)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> j=1,i <span
+style='color:blue'>do</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这样实现的三角矩阵比起整个矩阵，仅使用一半的内存空间。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>表示矩阵的另一方法，是将行和列组合起来。如果索引下标都是整数，通过第一个索引乘于一个常量（列）再加上第二个索引，看下面的例子实现创建</span><span
+lang=EN-US>n</span><span style='font-family:宋体'>行</span><span lang=EN-US>m</span><span
+style='font-family:宋体'>列的矩阵：</span></p>
+
+<div style='border:RGB(30,1,79) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,250,225)'><span
+lang=EN-US>mt = {}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- create the matrix</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> i=1,N <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,247,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> j=1,M <span
+style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mt[i*M + j] = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,220,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果索引是字符串，可用一个单字符将两个字符串索引连接起来构成一个单一的索引下标，例如一个矩阵</span><span
+lang=EN-US>m</span><span style='font-family:宋体'>，索引下标为</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>t</span><span style='font-family:
+宋体'>，假定</span><span lang=EN-US>s</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>t</span><span style='font-family:宋体'>都不包含冒号，代码为：</span><span
+lang=EN-US>m[s..':'..t]</span><span style='font-family:宋体'>，如果</span><span
+lang=EN-US>s</span><span style='font-family:宋体'>或者</span><span lang=EN-US>t</span><span
+style='font-family:宋体'>包含冒号将导致混淆，比如</span><span lang=EN-US>(&quot;a:&quot;,
+&quot;b&quot;) </span><span style='font-family:宋体'>和</span><span lang=EN-US>(&quot;a&quot;,
+&quot;:b&quot;)</span><span style='font-family:宋体'>，当对这种情况有疑问的时候可以使用控制字符来连接两个索引字符串，比如</span><span
+lang=EN-US>'\0'</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>实际应用中常常使用稀疏矩阵，稀疏矩阵指矩阵的大部分元素都为空或者</span><span
+lang=EN-US>0</span><span style='font-family:宋体'>的矩阵。例如，我们通过图的邻接矩阵来存储图，也就是说：当</span><span
+lang=EN-US>m,n</span><span style='font-family:宋体'>两个节点有连接时，矩阵的</span><span
+lang=EN-US>m,n</span><span style='font-family:宋体'>值为对应的</span><span lang=EN-US>x</span><span
+style='font-family:宋体'>，否则为</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>。如果一个图有</span><span lang=EN-US>10000</span><span
+style='font-family:宋体'>个节点，平均每个节点大约有</span><span lang=EN-US>5</span><span
+style='font-family:宋体'>条边，为了存储这个图需要一个行列分别为</span><span lang=EN-US>10000</span><span
+style='font-family:宋体'>的矩阵，总计</span><span lang=EN-US>10000*10000</span><span
+style='font-family:宋体'>个元素，实际上大约只有</span><span lang=EN-US>50000</span><span
+style='font-family:宋体'>个元素非空（每行有五列非空，与每个节点有五条边对应）。很多数据结构的书上讨论采用何种方式才能节省空间，但是在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中你不需要这些技术，因为用</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>实现的数据本身天生的就具有稀疏的特性。如果用我们上面说的第一种多维数组来表示，需要</span><span
+lang=EN-US>10000</span><span style='font-family:宋体'>个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>，每个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>大约需要五个元素（</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>）；如果用第二种表示方法来表示，只需要一张大约</span><span lang=EN-US>50000</span><span
+style='font-family:宋体'>个元素的表，不管用那种方式，你只需要存储那些非</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>的元素。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

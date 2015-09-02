@@ -1,0 +1,291 @@
+<html>
+
+<head>
+  <title>16.3 多重继承 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;16.3 多重继承</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>由于</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中的对象不是元生</span><span
+lang=EN-US>(primitive)</span><span style='font-family:宋体'>的，所以在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中有很多方法可以实现面向对象的程序设计。我们前面所见到的使用</span><span
+lang=EN-US>index metamethod</span><span style='font-family:宋体'>的方法可能是简洁、性能、灵活各方面综合最好的。然而，针对一些特殊情况也有更适合的实现方式。下面我们在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中多重继承的实现。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>实现的关键在于：将函数用作</span><span
+lang=EN-US>__index</span><span style='font-family:宋体'>。记住，当一个表的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>存在一个</span><span
+lang=EN-US>__index</span><span style='font-family:宋体'>函数时，如果</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>调用一个原始表中不存在的函数，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>将调用这个</span><span lang=EN-US>__index</span><span
+style='font-family:宋体'>指定的函数。这样可以用</span><span lang=EN-US>__index</span><span
+style='font-family:宋体'>实现在多个父类中查找子类不存在的域。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>多重继承意味着一个类拥有多个父类，所以，我们不能用创建一个类的方法去创建子类。取而代之的是，我们定义一个特殊的函数</span><span
+lang=EN-US>createClass</span><span style='font-family:宋体'>来完成这个功能，将被创建的新类的父类作为这个函数的参数。这个函数创建一个表来表示新类，并且将它的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>设定为一个可以实现多继承的</span><span
+lang=EN-US>__index metamethod</span><span style='font-family:宋体'>。尽管是多重继承，每一个实例依然属于一个在其中能找得到它需要的方法的单独的类。所以，这种类和父类之间的关系与传统的类与实例的关系是有区别的。特别是，一个类不能同时是其实例的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>又是自己的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>。在下面的实现中，我们将一个类作为他的实例的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>，创建另一个表作为类的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(165,88,104) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,228,239)'><span
+lang=EN-US style='color:green'>-- look up for `k' in list of tables 'plist'</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> <span
+style='color:blue'>function</span> search (k, plist)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,236,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> i=1,
+table.getn(plist) <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+v = plist[i][k]&nbsp;&nbsp;&nbsp; <span style='color:green'>-- try 'i'-th
+superclass</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,222,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+v <span style='color:blue'>then</span> <span style='color:blue'>return</span> v
+<span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,239,224)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,241,220)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> createClass
+(...)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> c = {}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- new class</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,251,237)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>-- class will search
+for each method in the list of its</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,229,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>-- parents (`arg' is
+the list of parents)</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; setmetatable(c, {__index = <span
+style='color:blue'>function</span> (t, k)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,233,230)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> search(k,
+arg)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,254,254)'><span
+lang=EN-US style='color:blue'>end</span><span lang=EN-US>})</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,247,220)'><span
+lang=EN-US style='color:green'>-- prepare `c' to be the metatable of its
+instances</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>c.__index = c</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,232,253)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>-- define a new constructor for this new class</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,251,232)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> c:new (o)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; o = o <span style='color:blue'>or</span> {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,220,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; setmetatable(o, c)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> o</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,252,235)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,247,252)'><span
+lang=EN-US style='color:green'>-- return new class</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> c</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,241,225)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>让我们用一个小例子阐明一下</span><span
+lang=EN-US>createClass</span><span style='font-family:宋体'>的使用，假定我们前面的类</span><span
+lang=EN-US>Account</span><span style='font-family:宋体'>和另一个类</span><span
+lang=EN-US>Named</span><span style='font-family:宋体'>，</span><span lang=EN-US>Named</span><span
+style='font-family:宋体'>只有两个方法</span><span lang=EN-US>setname and getname</span><span
+style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(165,88,104) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,252,253)'><span
+lang=EN-US>Named = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Named:getname ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,241,234)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> self.name</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,234,237)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> Named:setname
+(n)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,240,226)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; self.name = n</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了创建一个继承于这两个类的新类，我们调用</span><span
+lang=EN-US>createClass</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(165,88,104) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(233,229,239);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>NamedAccount = createClass(Account, Named)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了创建和使用实例，我们像通常一样：</span></p>
+
+<div style='border:RGB(165,88,104) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(226,241,221);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>account = NamedAccount:new{name = <span style='color:red'>&quot;Paul&quot;</span>}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,243,255)'><span
+lang=EN-US>print(account:getname())&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+Paul</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在我们看看上面最后一句发生了什么，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>在</span><span lang=EN-US>account</span><span
+style='font-family:宋体'>中找不到</span><span lang=EN-US>getname</span><span
+style='font-family:宋体'>，因此他查找</span><span lang=EN-US>account</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>__index</span><span
+style='font-family:宋体'>，即</span><span lang=EN-US>NamedAccount</span><span
+style='font-family:宋体'>。但是，</span><span lang=EN-US>NamedAccount</span><span
+style='font-family:宋体'>也没有</span><span lang=EN-US>getname</span><span
+style='font-family:宋体'>，因此</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>查找</span><span lang=EN-US>NamedAccount </span><span
+style='font-family:宋体'>的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>__index</span><span
+style='font-family:宋体'>，因为这个域包含一个函数，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>调用这个函数并首先到</span><span lang=EN-US>Account</span><span
+style='font-family:宋体'>中查找</span><span lang=EN-US>getname</span><span
+style='font-family:宋体'>，没有找到，然后到</span><span lang=EN-US>Named</span><span
+style='font-family:宋体'>中查找，找到并返回最终的结果。当然，由于搜索的复杂性，多重继承的效率比起单继承要低。一个简单的改善性能的方法是将继承方法拷贝到子类。使用这种技术，</span><span
+lang=EN-US>index</span><span style='font-family:宋体'>方法如下：</span></p>
+
+<div style='border:RGB(165,88,104) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,231,230)'><span
+lang=EN-US>...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,228,247)'><span
+lang=EN-US>setmetatable(c, {__index = <span style='color:blue'>function</span>
+(t, k)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> v =
+search(k, arg)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,227,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; t[k] = v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- save for next access</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> v</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,235,226)'><span
+lang=EN-US style='color:blue'>end</span><span lang=EN-US>})</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,250,251)'><span
+lang=EN-US>...</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>应用这个技巧，访问继承的方法和访问局部方法一样快（特别是第一次访问）。缺点是系统运行之后，很难改变方法的定义，因为这种改变不能影响继承链的下端。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

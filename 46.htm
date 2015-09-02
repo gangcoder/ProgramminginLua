@@ -1,0 +1,182 @@
+<html>
+
+<head>
+  <title>7.2 范性for的语义 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;7.2 范性for的语义</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>前面我们看到的迭代器有一个缺点：每次调用都需要创建一个闭包，大多数情况下这种做法都没什么问题，例如在</span><span
+lang=EN-US>allwords</span><span style='font-family:宋体'>迭代器中创建一个闭包的代价比起读整个文件来说微不足道，然而在有些情况下创建闭包的代价是不能忍受的。在这些情况下我们可以使用范性</span><span
+lang=EN-US>for</span><span style='font-family:宋体'>本身来保存迭代的状态。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>前面我们看到在循环过程中范性</span><span
+lang=EN-US>for</span><span style='font-family:宋体'>在自己内部保存迭代函数，实际上它保存三个值：迭代函数、状态常量、控制变量。下面详细说明。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>范性</span><span
+lang=EN-US>for</span><span style='font-family:宋体'>的文法如下：</span></p>
+
+<div style='border:RGB(120,154,16) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,232,253)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> &lt;var-list&gt; <span
+style='color:blue'>in</span> &lt;exp-list&gt; <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; &lt;body&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,237,237)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>&lt;var-list&gt;</span><span
+style='font-family:宋体'>是以一个或多个逗号分隔的变量名列表，</span><span lang=EN-US>&lt;exp-list&gt;</span><span
+style='font-family:宋体'>是以一个或多个逗号分隔的表达式列表，通常情况下</span><span lang=EN-US>exp-list</span><span
+style='font-family:宋体'>只有一个值：迭代工厂的调用。</span></p>
+
+<div style='border:RGB(120,154,16) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,243,238)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> k, v <span
+style='color:blue'>in</span> pairs(t) <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(k, v)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,224,253)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>上面代码中，</span><span
+lang=EN-US>k, v</span><span style='font-family:宋体'>为变量列表；</span><span
+lang=EN-US>pair(t)</span><span style='font-family:宋体'>为表达式列表。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在很多情况下变量列表也只有一个变量，比如：</span></p>
+
+<div style='border:RGB(120,154,16) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,253,226)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> line <span
+style='color:blue'>in</span> io.lines() <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; io.write(line, <span style='color:red'>'\n'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,242,225)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们称变量列表中第一个变量为控制变量，其值为</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>时循环结束。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面我们看看范性</span><span
+lang=EN-US>for</span><span style='font-family:宋体'>的执行过程：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>首先，初始化，计算</span><span
+lang=EN-US>in</span><span style='font-family:宋体'>后面表达式的值，表达式应该返回范性</span><span
+lang=EN-US>for</span><span style='font-family:宋体'>需要的三个值：迭代函数、状态常量、控制变量；与多值赋值一样，如果表达式返回的结果个数不足三个会自动用</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>补足，多出部分会被忽略。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二，将状态常量和控制变量作为参数调用迭代函数（注意：对于</span><span
+lang=EN-US>for</span><span style='font-family:宋体'>结构来说，状态常量没有用处，仅仅在初始化时获取他的值并传递给迭代函数）。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第三，将迭代函数返回的值赋给变量列表。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第四，如果返回的第一个值为</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>循环结束，否则执行循环体。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第五，回到第二步再次调用迭代函数。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>更具体地说：</span></p>
+
+<div style='border:RGB(120,154,16) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,232,233)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> var_1, ..., var_n <span
+style='color:blue'>in</span> explist <span style='color:blue'>do</span> block <span
+style='color:blue'>end</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>等价于</span></p>
+
+<div style='border:RGB(120,154,16) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,255,252)'><span
+lang=EN-US style='color:blue'>do</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> _f, _s,
+_var = explist</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,248,252)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>while</span> <span
+style='color:blue'>true</span> <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+var_1, ... , var_n = _f(_s, _var)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,230,223)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _var = var_1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+_var == <span style='color:blue'>nil</span> <span style='color:blue'>then</span>
+<span style='color:blue'>break</span> <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,223,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; block</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,255,225)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果我们的迭代函数是</span><span
+lang=EN-US>f</span><span style='font-family:宋体'>，状态常量是</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>，控制变量的初始值是</span><span lang=EN-US>a0</span><span
+style='font-family:宋体'>，那么控制变量将循环：</span><span lang=EN-US>a1=f(s,a0)</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>a2=f(s,a1)</span><span
+style='font-family:宋体'>、……，直到</span><span lang=EN-US>ai=nil</span><span
+style='font-family:宋体'>。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

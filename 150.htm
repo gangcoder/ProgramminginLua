@@ -1,0 +1,234 @@
+<html>
+
+<head>
+  <title>27.1 数组操作 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;27.1 数组操作</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中数组实际上就是以特殊方式使用的</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>的别名。我们可以使用任何操纵</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>的函数来对数组操作，即</span><span lang=EN-US>lua_settable</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>lua_gettable</span><span
+style='font-family:宋体'>。然而，与</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>常规简洁思想（</span><span lang=EN-US>economy and simplicity</span><span
+style='font-family:宋体'>）相反的是，</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>为数组操作提供了一些特殊的函数。这样做的原因出于性能的考虑：因为我们经常在一个算法（比如排序）的循环的内层访问数组，所以这种内层操作的性能的提高会对整体的性能的改善有很大的影响。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>API</span><span
+style='font-family:宋体'>提供了下面两个数组操作函数：</span></p>
+
+<div style='border:RGB(120,156,170) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,240,235)'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_rawgeti
+(lua_State *L, <span style='color:blue'>int</span> index, <span
+style='color:blue'>int</span> key);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_rawseti
+(lua_State *L, <span style='color:blue'>int</span> index, <span
+style='color:blue'>int</span> key);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>关于的</span><span
+lang=EN-US>lua_rawgeti</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>lua_rawseti</span><span style='font-family:宋体'>的描述有些使人糊涂，因为它涉及到两个索引：</span><span
+lang=EN-US>index</span><span style='font-family:宋体'>指向</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>在栈中的位置；</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>指向元素在</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>中的位置。当</span><span lang=EN-US>t</span><span
+style='font-family:宋体'>使用负索引的时候（</span><span lang=EN-US>otherwise</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>you must compensate for the new
+item in the stack</span><span style='font-family:宋体'>），调用</span><span
+lang=EN-US>lua_rawgeti(L,t,key)</span><span style='font-family:宋体'>等价于：</span></p>
+
+<div style='border:RGB(120,156,170) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(227,234,235);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_pushnumber(L, key);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,246,253)'><span
+lang=EN-US>lua_rawget(L, t);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>调用</span><span
+lang=EN-US>lua_rawseti(L, t, key)</span><span style='font-family:宋体'>（也要求</span><span
+lang=EN-US>t</span><span style='font-family:宋体'>使用负索引）等价于：</span></p>
+
+<div style='border:RGB(120,156,170) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,230,252)'><span
+lang=EN-US>lua_pushnumber(L, key);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_insert(L, -2);&nbsp;&nbsp; <span style='color:green'>/* put
+'key' below previous value */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,233,248)'><span
+lang=EN-US>lua_rawset(L, t);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>注意这两个寒暑都是用</span><span
+lang=EN-US>raw</span><span style='font-family:宋体'>操作，他们的速度较快，总之，用作数组的</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>很少使用</span><span
+lang=EN-US>metamethods</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面看如何使用这些函数的具体的例子，我们将前面的</span><span
+lang=EN-US>l_dir</span><span style='font-family:宋体'>函数的循环体：</span></p>
+
+<div style='border:RGB(120,156,170) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,230,242)'><span
+lang=EN-US>lua_pushnumber(L, i++);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* key */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_pushstring(L, entry-&gt;d_name);&nbsp; <span style='color:green'>/*
+value */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,250,221)'><span
+lang=EN-US>lua_settable(L, -3);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>改写为：</span></p>
+
+<div style='border:RGB(120,156,170) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,247,232)'><span
+lang=EN-US>lua_pushstring(L, entry-&gt;d_name);&nbsp; <span style='color:green'>/*
+value */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_rawseti(L, -2, i++);&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* set table at key 'i' */</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面是一个更完整的例子，下面的代码实现了</span><span
+lang=EN-US>map</span><span style='font-family:宋体'>函数：以数组的每一个元素为参数调用一个指定的函数，并将数组的该元素替换为调用函数返回的结果。</span></p>
+
+<div style='border:RGB(120,156,170) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(231,234,243);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> l_map (lua_State *L)
+{</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,250,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span> i, n;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,233,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* 1st argument must be
+a table (t) */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_checktype(L, 1, LUA_TTABLE);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,242,241)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* 2nd argument must be
+a function (f) */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,235,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_checktype(L, 2, LUA_TFUNCTION);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,236,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; n = luaL_getn(L, 1);&nbsp; <span
+style='color:green'>/* get size of table */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,251,223)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> (i=1;
+i&lt;=n; i++) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lua_pushvalue(L, 2);&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* push f */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,223,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lua_rawgeti(L, 1, i);&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* push t[i] */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lua_call(L, 1, 1);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* call f(t[i]) */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,247,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lua_rawseti(L, 1, i);&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* t[i] = result */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; }</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,221,245)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 0;&nbsp; <span
+style='color:green'>/* no results */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,232,230)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这里面引入了三个新的函数。</span><span
+lang=EN-US>luaL_checktype</span><span style='font-family:宋体'>（在</span><span
+lang=EN-US>lauxlib.h</span><span style='font-family:宋体'>中定义）用来检查给定的参数有指定的类型；否则抛出错误。</span><span
+lang=EN-US>luaL_getn</span><span style='font-family:宋体'>函数栈中指定位置的数组的大小（</span><span
+lang=EN-US>table.getn</span><span style='font-family:宋体'>是调用</span><span
+lang=EN-US>luaL_getn</span><span style='font-family:宋体'>来完成工作的）。</span><span
+lang=EN-US>lua_call</span><span style='font-family:宋体'>的运行是无保护的，他与</span><span
+lang=EN-US>lua_pcall</span><span style='font-family:宋体'>相似，但是在错误发生的时候她抛出错误而不是返回错误代码。当你在应用程序中写主流程的代码时，不应该使用</span><span
+lang=EN-US>lua_call</span><span style='font-family:宋体'>，因为你应该捕捉任何可能发生的错误。当你写一个函数的代码时，使用</span><span
+lang=EN-US>lua_call</span><span style='font-family:宋体'>是比较好的想法，如果有错误发生，把错误留给关心她的人去处理。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

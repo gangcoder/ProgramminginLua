@@ -1,0 +1,351 @@
+<html>
+
+<head>
+  <title>28.2 Metatables - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;28.2 Metatables</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们上面的实现有一个很大的安全漏洞。假如使用者写了如下类似的代码：</span><span
+lang=EN-US>array.set(io.stdin, 1, 0)</span><span style='font-family:宋体'>。</span><span
+lang=EN-US>io.stdin </span><span style='font-family:宋体'>中的值是一个带有指向流</span><span
+lang=EN-US>(FILE*)</span><span style='font-family:宋体'>的指针的</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>。因为它是一个</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>，所以</span><span
+lang=EN-US>array.set</span><span style='font-family:宋体'>很乐意接受它作为参数，程序运行的结果可能导致内存</span><span
+lang=EN-US>core dump</span><span style='font-family:宋体'>（如果你够幸运的话，你可能得到一个访问越界（</span><span
+lang=EN-US>index-out-of-range</span><span style='font-family:宋体'>）错误）。这样的错误对于任何一个</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>库来说都是不能忍受的。不论你如何使用一个</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>库，都不应该破坏</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>数据或者从</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>产生</span><span lang=EN-US>core dump</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了区分数组和其他的</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>，我们单独为数组创建了一个</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>（记住</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>也可以拥有</span><span
+lang=EN-US>metatables</span><span style='font-family:宋体'>）。下面，我们每次创建一个新的数组的时候，我们将这个单独的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>标记为数组的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>。每次我们访问数组的时候，我们都要检查他是否有一个正确的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>。因为</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>代码不能改变</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>，所以他不会伪造我们的代码。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们还需要一个地方来保存这个新的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>，这样我们才能够当创建新数组和检查一个给定的</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>是否是一个数组的时候，可以访问这个</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>。正如我们前面介绍过的，有两种方法可以保存</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>：在</span><span
+lang=EN-US>registry</span><span style='font-family:宋体'>中，或者在库中作为函数的</span><span
+lang=EN-US>upvalue</span><span style='font-family:宋体'>。在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中一般习惯于在</span><span
+lang=EN-US>registry</span><span style='font-family:宋体'>中注册新的</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>类型，使用类型名作为索引，</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>作为值。和其他的</span><span
+lang=EN-US>registry</span><span style='font-family:宋体'>中的索引一样，我们必须选择一个唯一的类型名，避免冲突。我们将这个新的类型称为</span><span
+lang=EN-US> &quot;LuaBook.array&quot;</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>辅助库提供了一些函数来帮助我们解决问题，我们这儿将用到的前面未提到的辅助函数有：</span></p>
+
+<div style='border:RGB(117,68,204) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,226,233)'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US>&nbsp;&nbsp; luaL_newmetatable
+(lua_State *L, <span style='color:blue'>const</span> <span style='color:blue'>char</span>
+*tname);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US>&nbsp;
+luaL_getmetatable (lua_State *L, <span style='color:blue'>const</span> <span
+style='color:blue'>char</span> *tname);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,227,233)'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> *luaL_checkudata
+(lua_State *L, <span style='color:blue'>int</span> index,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>const</span> <span style='color:blue'>char</span> *tname);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>luaL_newmetatable</span><span
+style='font-family:宋体'>函数创建一个新表（将用作</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>），将新表放到栈顶并建立表和</span><span lang=EN-US>registry</span><span
+style='font-family:宋体'>中类型名的联系。这个关联是双向的：使用类型名作为表的</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>；同时使用表作为类型名的</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>（这种双向的关联，使得其他的两个函数的实现效率更高）。</span><span lang=EN-US>luaL_getmetatable</span><span
+style='font-family:宋体'>函数获取</span><span lang=EN-US>registry</span><span
+style='font-family:宋体'>中的</span><span lang=EN-US>tname</span><span
+style='font-family:宋体'>对应的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>。最后，</span><span lang=EN-US>luaL_checkudata</span><span
+style='font-family:宋体'>检查在栈中指定位置的对象是否为带有给定名字的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>usertatum</span><span
+style='font-family:宋体'>。如果对象不存在正确的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>，返回</span><span lang=EN-US>NULL</span><span
+style='font-family:宋体'>（或者它不是一个</span><span lang=EN-US>userdata</span><span
+style='font-family:宋体'>）；否则，返回</span><span lang=EN-US>userdata</span><span
+style='font-family:宋体'>的地址。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面来看具体的实现。第一步修改打开库的函数，新版本必须创建一个用作数组</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>的表：</span></p>
+
+<div style='border:RGB(117,68,204) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(228,232,241);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> luaopen_array
+(lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,221,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_newmetatable(L, <span style='color:red'>&quot;LuaBook.array&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_openlib(L, <span style='color:red'>&quot;array&quot;</span>,
+arraylib, 0);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,222,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 1;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二步，修改</span><span
+lang=EN-US>newarray</span><span style='font-family:宋体'>，使得在创建数组的时候设置数组的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(117,68,204) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(223,236,229);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> newarray (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,250,234)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span> n =
+luaL_checkint(L, 1);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; size_t nbytes = <span style='color:blue'>sizeof</span>(NumArray)
++ (n - 1)*<span style='color:blue'>sizeof</span>(<span style='color:blue'>double</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,250,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; NumArray *a = (NumArray *)lua_newuserdata(L,
+nbytes);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,229,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_getmetatable(L, <span style='color:red'>&quot;LuaBook.array&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_setmetatable(L, -2);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,239,248)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; a-&gt;size = n;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,228,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 1;&nbsp; <span
+style='color:green'>/* new userdatum is already on the stack */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>lua_setmetatable</span><span
+style='font-family:宋体'>函数将表出栈，并将其设置为给定位置的对象的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>。在我们的例子中，这个对象就是新的</span><span lang=EN-US>userdatum</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>最后一步，</span><span
+lang=EN-US>setarray</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>getarray</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>getsize</span><span style='font-family:宋体'>检查他们的第一个参数是否是一个有效的数组。因为我们打算在参数错误的情况下抛出一个错误信息，我们定义了下面的辅助函数：</span></p>
+
+<div style='border:RGB(117,68,204) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(253,223,252);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> NumArray
+*checkarray (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,230,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>void</span> *ud =
+luaL_checkudata(L, 1, <span style='color:red'>&quot;LuaBook.array&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_argcheck(L, ud != NULL, 1, <span
+style='color:red'>&quot;`array' expected&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,240,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> (NumArray
+*)ud;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>使用</span><span
+lang=EN-US>checkarray</span><span style='font-family:宋体'>，新定义的</span><span
+lang=EN-US>getsize</span><span style='font-family:宋体'>是更直观、更清楚：</span></p>
+
+<div style='border:RGB(117,68,204) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(255,248,245);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> getsize (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,244,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; NumArray *a = checkarray(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushnumber(L, a-&gt;size);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,226,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 1;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>由于</span><span
+lang=EN-US>setarray</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>getarray</span><span style='font-family:宋体'>检查第二个参数</span><span
+lang=EN-US>index</span><span style='font-family:宋体'>的代码相同，我们抽象出他们的共同部分，在一个单独的函数中完成：</span></p>
+
+<div style='border:RGB(117,68,204) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(229,227,234);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>double</span> *getelem (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,230,220)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; NumArray *a = checkarray(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span> index =
+luaL_checkint(L, 2);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,220,223)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_argcheck(L, 1 &lt;= index &amp;&amp; index
+&lt;= a-&gt;size, 2,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,237,241)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:red'>&quot;index out of range&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,241,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* return element
+address */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+&amp;a-&gt;values[index - 1];</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,220,248)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>使用这个</span><span
+lang=EN-US>getelem</span><span style='font-family:宋体'>，函数</span><span
+lang=EN-US>setarray</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>getarray</span><span style='font-family:宋体'>更加直观易懂：</span></p>
+
+<div style='border:RGB(117,68,204) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,220,230)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> setarray (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>double</span> newvalue =
+luaL_checknumber(L, 3);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,227,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; *getelem(L) = newvalue;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 0;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,234,236)'><span
+lang=EN-US>}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,246,228)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> getarray (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushnumber(L, *getelem(L));</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,222,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 1;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在，假如你尝试类似</span><span
+lang=EN-US>array.get(io.stdin, 10)</span><span style='font-family:宋体'>的代码，你将会得到正确的错误信息：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(251,251,238);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>error: bad argument #1 to 'getarray' ('array' expected)</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href=3.htm>lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+
