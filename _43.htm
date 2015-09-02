@@ -1,0 +1,313 @@
+<html>
+
+<head>
+  <title>6.3 正确的尾调用（Proper Tail Calls） - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;6.3 正确的尾调用（Proper Tail Calls）</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中函数的另一个有趣的特征是可以正确的处理尾调用（</span><span lang=EN-US>proper
+tail recursion</span><span style='font-family:宋体'>，一些书使用术语“尾递归”，虽然并未涉及到递归的概念）。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>尾调用是一种类似在函数结尾的</span><span
+lang=EN-US>goto</span><span style='font-family:宋体'>调用，当函数最后一个动作是调用另外一个函数时，我们称这种调用尾调用。例如：</span></p>
+
+<div style='border:RGB(190,17,51) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,229,237)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> f(x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> g(x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,222,222)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>g</span><span
+style='font-family:宋体'>的调用是尾调用。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>例子中</span><span
+lang=EN-US>f</span><span style='font-family:宋体'>调用</span><span lang=EN-US>g</span><span
+style='font-family:宋体'>后不会再做任何事情，这种情况下当被调用函数</span><span lang=EN-US>g</span><span
+style='font-family:宋体'>结束时程序不需要返回到调用者</span><span lang=EN-US>f</span><span
+style='font-family:宋体'>；所以尾调用之后程序不需要在栈中保留关于调用者的任何信息。一些编译器比如</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>解释器利用这种特性在处理尾调用时不使用额外的栈，我们称这种语言支持正确的尾调用。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>由于尾调用不需要使用栈空间，那么尾调用递归的层次可以无限制的。例如下面调用不论</span><span
+lang=EN-US>n</span><span style='font-family:宋体'>为何值不会导致栈溢出。</span></p>
+
+<div style='border:RGB(190,17,51) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,227,237)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> foo (n)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> n &gt; 0 <span
+style='color:blue'>then</span> <span style='color:blue'>return</span> foo(n -
+1) <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,234,248)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>需要注意的是：必须明确什么是尾调用。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一些调用者函数调用其他函数后也没有做其他的事情但不属于尾调用。比如：</span></p>
+
+<div style='border:RGB(190,17,51) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,235,250)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> f (x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; g(x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,239,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>上面这个例子中</span><span
+lang=EN-US>f</span><span style='font-family:宋体'>在调用</span><span lang=EN-US>g</span><span
+style='font-family:宋体'>后，不得不丢弃</span><span lang=EN-US>g</span><span
+style='font-family:宋体'>地返回值，所以不是尾调用，同样的下面几个例子也不时尾调用：</span></p>
+
+<div style='border:RGB(190,17,51) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(246,248,243);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>return</span><span lang=EN-US> g(x) + 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- must do the addition</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,249,234)'><span
+lang=EN-US style='color:blue'>return</span><span lang=EN-US> x <span
+style='color:blue'>or</span> g(x)&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- must adjust to 1 result</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>return</span><span lang=EN-US> (g(x))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- must adjust to 1 result</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中类似</span><span lang=EN-US>return g(...)</span><span
+style='font-family:宋体'>这种格式的调用是尾调用。但是</span><span lang=EN-US>g</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>g</span><span style='font-family:
+宋体'>的参数都可以是复杂表达式，因为</span><span lang=EN-US>Lua</span><span style='font-family:
+宋体'>会在调用之前计算表达式的值。例如下面的调用是尾调用：</span></p>
+
+<div style='border:RGB(190,17,51) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(242,227,229);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>return</span><span lang=EN-US> x[i].foo(x[j] + a*b,
+i + j)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>可以将尾调用理解成一种</span><span
+lang=EN-US>goto</span><span style='font-family:宋体'>，在状态机的编程领域尾调用是非常有用的。状态机的应用要求函数记住每一个状态，改变状态只需要</span><span
+lang=EN-US>goto(or call)</span><span style='font-family:宋体'>一个特定的函数。我们考虑一个迷宫游戏作为例子：迷宫有很多个房间，每个房间有东西南北四个门，每一步输入一个移动的方向，如果该方向存在即到达该方向对应的房间，否则程序打印警告信息。目标是：从开始的房间到达目的房间。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个迷宫游戏是典型的状态机，每个当前的房间是一个状态。我们可以对每个房间写一个函数实现这个迷宫游戏，我们使用尾调用从一个房间移动到另外一个房间。一个四个房间的迷宫代码如下：</span></p>
+
+<div style='border:RGB(190,17,51) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(233,233,228);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> room1 ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,221,235)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> move =
+io.read()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> move == <span
+style='color:red'>&quot;south&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,245,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room3()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>elseif</span> move == <span
+style='color:red'>&quot;east&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,225,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room2()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,246,247)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print(<span style='color:red'>&quot;invalid
+move&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room1()&nbsp;&nbsp; <span style='color:green'>-- stay in the same room</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,230,235)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,221,228)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> room2 ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,229,235)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> move =
+io.read()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> move == <span
+style='color:red'>&quot;south&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,228,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room4()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>elseif</span> move == <span
+style='color:red'>&quot;west&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,229,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room1()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,226,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print(<span style='color:red'>&quot;invalid
+move&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room2()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,222,236)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,223,236)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> room3 ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,230,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> move =
+io.read()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> move == <span
+style='color:red'>&quot;north&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,220,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room1()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>elseif</span> move == <span
+style='color:red'>&quot;east&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,242,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room4()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,253,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print(<span style='color:red'>&quot;invalid
+move&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+room3()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,225,251)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,255,249)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> room4 ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,236,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(<span style='color:red'>&quot;congratilations!&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们可以调用</span><span
+lang=EN-US>room1()</span><span style='font-family:宋体'>开始这个游戏。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果没有正确的尾调用，每次移动都要创建一个栈，多次移动后可能导致栈溢出。但正确的尾调用可以无限制的尾调用，因为每次尾调用只是一个</span><span
+lang=EN-US>goto</span><span style='font-family:宋体'>到另外一个函数并不是传统的函数调用。</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section14 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

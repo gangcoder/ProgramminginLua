@@ -1,0 +1,109 @@
+<html>
+
+<head>
+  <title>15.3 包与文件 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;15.3 包与文件</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们经常写一个</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>然后将所有的代码放到一个单独的文件中。然后我们只需要执行这个文件即加载</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>。例如，如果我们将上面我们的复数的</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>代码放到一个文件</span><span
+lang=EN-US>complex.lua</span><span style='font-family:宋体'>中，命令“</span><span
+lang=EN-US>require complex</span><span style='font-family:宋体'>”将打开这个</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>。记住</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>命令不会将相同的</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>加载多次。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>需要注意的问题是，搞清楚保存</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>的文件名和</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>名的关系。当然，将他们联系起来是一个好的想法，因为</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>命令使用文件而不是</span><span
+lang=EN-US>packages</span><span style='font-family:宋体'>。一种解决方法是在</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>的后面加上后缀（比如</span><span
+lang=EN-US>.lua</span><span style='font-family:宋体'>）来命名文件。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>并不需要固定的扩展名，而是由你的路径设置决定。例如，如果你的路径包含：</span><span
+lang=EN-US>&quot;/usr/local/lualibs/?.lua&quot;</span><span style='font-family:
+宋体'>，那么复数</span><span lang=EN-US>package</span><span style='font-family:宋体'>可能保存在一个</span><span
+lang=EN-US>complex.lua</span><span style='font-family:宋体'>文件中。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有些人喜欢先命名文件后命名</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>。也就是说，如果你重命名文件，</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>也会被重命名。这个解决方法提供了很大的灵活性。例如，如果你有两个有相同名称的</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>，你不需要修改任何一个，只需要重命名一下文件。在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中我们使用</span><span lang=EN-US>_REQUIREDNAME</span><span
+style='font-family:宋体'>变量来重命名。记住，当</span><span lang=EN-US>require</span><span
+style='font-family:宋体'>加载一个文件的时候，它定义了一个变量来表示虚拟的文件名。因此，在你的</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>中可以这样写：</span></p>
+
+<div style='border:RGB(6,225,208) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,223,248)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> P = {}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- package</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> _REQUIREDNAME == <span
+style='color:blue'>nil</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,235,241)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; complex = P</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>else</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,243,229)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; _G[_REQUIREDNAME] = P</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>代码中的</span><span
+lang=EN-US>if</span><span style='font-family:宋体'>测试使得我们可以不需要</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>就可以使用</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>。如果</span><span
+lang=EN-US>_REQUIREDNAME</span><span style='font-family:宋体'>没有定义，我们用固定的名字表示</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>（例子中</span><span
+lang=EN-US>complex</span><span style='font-family:宋体'>）。另外，</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>使用虚拟文件名注册他自己。如果以使用者将库放到文件</span><span
+lang=EN-US>cpx.lua</span><span style='font-family:宋体'>中并且运行</span><span
+lang=EN-US>require cpx</span><span style='font-family:宋体'>，那么</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>将本身加载到表</span><span
+lang=EN-US>cpx</span><span style='font-family:宋体'>中。如果其他的使用者将库改名为</span><span
+lang=EN-US>cpx_v1.lua</span><span style='font-family:宋体'>并且运行</span><span
+lang=EN-US>require cpx_v1</span><span style='font-family:宋体'>，那么</span><span
+lang=EN-US>package</span><span style='font-family:宋体'>将自动将本身加载到表</span><span
+lang=EN-US>cpx_v1</span><span style='font-family:宋体'>当中。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

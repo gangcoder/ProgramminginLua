@@ -1,0 +1,89 @@
+<html>
+
+<head>
+  <title>0.2 Lua的使用者 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;0.2 Lua的使用者</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>使用者分为三大类：使用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>嵌入到其他应用中的、独立使用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的、将</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>C</span><span style='font-family:
+宋体'>混合使用的。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第一：很多人使用</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>嵌入在应用程序，比如</span><span
+lang=EN-US>CGILua</span><span style='font-family:宋体'>（搭建动态网页）、</span><span
+lang=EN-US>LuaOrb</span><span style='font-family:宋体'>（访问</span><span
+lang=EN-US>CORBA</span><span style='font-family:宋体'>对象。这些类型用</span><span
+lang=EN-US>Lua-API</span><span style='font-family:宋体'>注册新函数，创建新类型，通过配置</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>就可以改变应用宿主语言的行为。通常，这种应用的使用者并不知道</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>是一种独立的语言。例如：</span><span
+lang=EN-US>CGILua</span><span style='font-family:宋体'>用户一般会认为</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>是一种用于</span><span lang=EN-US>Web</span><span
+style='font-family:宋体'>的语言。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二：作为一种独立运行的语言，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>也是很有用的，主要用于文本处理或者只运行一次的小程序。这种应用</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>主要使用它的标准库来实现，标准库提供模式匹配和其它一些字串处理的功能。我们可以这样认为：</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>是文本处理领域的嵌入式语言。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第三：还有一些使用者使用其他语言开发，把</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>当作库使用。这些人大多使用</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>语言开发，但使用</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>建立简单灵活易于使用的接口。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>本书面向以上三类读者。书的第一部分阐述了语言的本身，展示语言的潜在功能。我们讲述了不同的语言结构，并用一些例子展示如何解决实际问题。这部分既包括基本的语言的控制结构，也包括高级的迭代子和协同。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二部分重点放在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>特有的数据结构――</span><span
+lang=EN-US>tables</span><span style='font-family:宋体'>上</span><span lang=EN-US>,</span><span
+style='font-family:宋体'>讨论了数据结构、持久性、包及面向对象编程，这里我们将看到</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的真正强大之处。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第三部分介绍标准库。每个标准库一章：数学库、</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>库、</span><span lang=EN-US>string</span><span
+style='font-family:宋体'>库、</span><span lang=EN-US>I/O</span><span
+style='font-family:宋体'>库、</span><span lang=EN-US>OS</span><span
+style='font-family:宋体'>库、</span><span lang=EN-US>Debug</span><span
+style='font-family:宋体'>库。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>最后一部分介绍了</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>和</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>接口的</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>，这部分介绍在</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>语言中开发应用而不是</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中，应用对于那些打算将</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>嵌入到</span><span lang=EN-US>C/C++</span><span
+style='font-family:宋体'>中的读者可能会对此部分更感兴趣。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

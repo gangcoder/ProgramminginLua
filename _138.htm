@@ -1,0 +1,340 @@
+<html>
+
+<head>
+  <title>24.2.3 其他堆栈操作 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;24.2.3 其他堆栈操作</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>除开上面所提及的</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>与堆栈交换值的函数外，</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>也提供了下列函数来完成通常的堆栈维护工作：</span></p>
+
+<div style='border:RGB(89,36,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,255,228)'><span
+lang=EN-US style='color:blue'>int&nbsp; </span><span lang=EN-US>lua_gettop
+(lua_State *L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_settop (lua_State
+*L, <span style='color:blue'>int</span> index);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,224,245)'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_pushvalue
+(lua_State *L, <span style='color:blue'>int</span> index);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_remove
+(lua_State *L, <span style='color:blue'>int</span> index);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,222,244)'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_insert
+(lua_State *L, <span style='color:blue'>int</span> index);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_replace
+(lua_State *L, <span style='color:blue'>int</span> index);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>函数</span><span
+lang=EN-US>lua_gettop</span><span style='font-family:宋体'>返回堆栈中的元素个数，它也是栈顶元素的索引。注意一个负数索引</span><span
+lang=EN-US>-x</span><span style='font-family:宋体'>对应于正数索引</span><span
+lang=EN-US>gettop-x+1</span><span style='font-family:宋体'>。</span><span
+lang=EN-US>lua_settop</span><span style='font-family:宋体'>设置栈顶（也就是堆栈中的元素个数）为一个指定的值。如果开始的栈顶高于新的栈顶，顶部的值被丢弃。否则，为了得到指定的大小这个函数压入相应个数的空值（</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>）到栈上。特别的，</span><span
+lang=EN-US>lua_settop(L,0)</span><span style='font-family:宋体'>清空堆栈。你也可以用负数索引作为调用</span><span
+lang=EN-US>lua_settop</span><span style='font-family:宋体'>的参数；那将会设置栈顶到指定的索引。利用这种技巧，</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>提供了下面这个宏，它从堆栈中弹出</span><span
+lang=EN-US>n</span><span style='font-family:宋体'>个元素：</span></p>
+
+<div style='border:RGB(89,36,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(237,221,229);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>#define</span><span lang=EN-US>
+lua_pop(L,n)&nbsp; lua_settop(L, -(n)-1)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>函数</span><span
+lang=EN-US>lua_pushvalue</span><span style='font-family:宋体'>压入堆栈上指定索引的一个抟贝到栈顶；</span><span
+lang=EN-US>lua_remove</span><span style='font-family:宋体'>移除指定索引位置的元素，并将其上面所有的元素下移来填补这个位置的空白；</span><span
+lang=EN-US>lua_insert</span><span style='font-family:宋体'>移动栈顶元素到指定索引的位置，并将这个索引位置上面的元素全部上移至栈顶被移动留下的空隔；最后，</span><span
+lang=EN-US>lua_replace</span><span style='font-family:宋体'>从栈顶弹出元素值并将其设置到指定索引位置，没有任何移动操作。注意到下面的操作对堆栈没有任何影响：</span></p>
+
+<div style='border:RGB(89,36,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(226,248,236);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_settop(L, -1);&nbsp;&nbsp; <span style='color:green'>/* set top
+to its current value */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,238,241)'><span
+lang=EN-US>lua_insert(L, -1);&nbsp;&nbsp; <span style='color:green'>/* move top
+element to the top */</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了说明这些函数的用法，这里有一个有用的帮助函数，它</span><span
+lang=EN-US>dump</span><span style='font-family:宋体'>整个堆栈的内容：</span></p>
+
+<div style='border:RGB(89,36,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,224,254)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>void</span> stackDump (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span> i;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,227,246)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span> top =
+lua_gettop(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> (i = 1; i
+&lt;= top; i++) {&nbsp; <span style='color:green'>/* repeat for each level */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,223,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span>
+t = lua_type(L, i);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>switch</span>
+(t) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,226,227)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>case</span>
+LUA_TSTRING: &nbsp;<span style='color:green'>/* strings */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,249,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf(<span
+style='color:red'>&quot;`%s'&quot;</span>, lua_tostring(L, i));</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>break</span>;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,224,229)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>case</span>
+LUA_TBOOLEAN:&nbsp; <span style='color:green'>/* booleans */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,220,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf(lua_toboolean(L,
+i) ? <span style='color:red'>&quot;true&quot;</span> : <span style='color:red'>&quot;false&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>break</span>;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,237,225)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>case</span>
+LUA_TNUMBER:&nbsp; <span style='color:green'>/* numbers */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,221,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf(<span
+style='color:red'>&quot;%g&quot;</span>, lua_tonumber(L, i));</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>break</span>;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,250,231)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; </span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>default</span>:&nbsp;
+<span style='color:green'>/* other values */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,228,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf(<span
+style='color:red'>&quot;%s&quot;</span>, lua_typename(L, t));</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>break</span>;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,225,242)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,226,252)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf(<span style='color:red'>&quot;&nbsp;
+&quot;</span>);&nbsp; <span style='color:green'>/* put a separator */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; }</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,252,247)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; printf(<span style='color:red'>&quot;\n&quot;</span>);&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* end the listing */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个函数从栈底到栈顶遍历了整个堆栈，依照每个元素自己的类型打印出其值。它用引号输出字符串；以</span><span
+lang=EN-US>%g</span><span style='font-family:宋体'>的格式输出数字；对于其它值（</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>，函数，等等）它仅仅输出它们的类型（</span><span
+lang=EN-US>lua_typename</span><span style='font-family:宋体'>转换一个类型码到类型名）。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面的函数利用</span><span
+lang=EN-US>stackDump</span><span style='font-family:宋体'>更进一步的说明了</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>堆栈的操作。</span></p>
+
+<div style='border:RGB(89,36,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(246,253,253);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>#include</span><span lang=EN-US> &lt;stdio.h&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,237,229)'><span
+lang=EN-US style='color:blue'>#include</span><span lang=EN-US> &lt;lua.h&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,226,238)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>void</span> stackDump (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,232,220)'><span
+lang=EN-US>}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,245,233)'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> main (<span
+style='color:blue'>void</span>) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_State *L = lua_open();</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,229,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushboolean(L, 1); lua_pushnumber(L, 10);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushnil(L); lua_pushstring(L, <span
+style='color:red'>&quot;hello&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,235,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; stackDump(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* true&nbsp; 10&nbsp; nil&nbsp; `hello'&nbsp; */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,243,255)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushvalue(L, -4); stackDump(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,247,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* true&nbsp; 10&nbsp; nil&nbsp; `hello'&nbsp; true&nbsp;
+*/</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,247,226)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_replace(L, 3); stackDump(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* true&nbsp; 10&nbsp; true&nbsp; `hello'&nbsp; */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,249,242)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_settop(L, 6); stackDump(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,252,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* true&nbsp; 10&nbsp; true&nbsp; `hello'&nbsp; nil&nbsp;
+nil&nbsp; */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,246,220)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_remove(L, -3); stackDump(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* true&nbsp; 10&nbsp; true&nbsp; nil&nbsp; nil&nbsp; */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,247,230)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_settop(L, -5); stackDump(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,248,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* true&nbsp; */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,242,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_close(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 0;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,248,247)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

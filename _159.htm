@@ -1,0 +1,294 @@
+<html>
+
+<head>
+  <title>28.3 访问面向对象的数据 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;28.3 访问面向对象的数据</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面我们来看看如何定义类型为对象的</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>，以致我们就可以使用面向对象的语法来操作对象的实例，比如：</span></p>
+
+<div style='border:RGB(71,189,246) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,223,228)'><span
+lang=EN-US>a = array.new(1000)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(a:size())&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 1000</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,239,225)'><span
+lang=EN-US>a:set(10, 3.4)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(a:get(10))&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+3.4</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>记住</span><span
+lang=EN-US>a:size()</span><span style='font-family:宋体'>等价于</span><span
+lang=EN-US> a.size(a)</span><span style='font-family:宋体'>。所以，我们必须使得表达式</span><span
+lang=EN-US>a.size</span><span style='font-family:宋体'>调用我们的</span><span
+lang=EN-US>getsize</span><span style='font-family:宋体'>函数。这儿的关键在于</span><span
+lang=EN-US>__index </span><span style='font-family:宋体'>元方法（</span><span
+lang=EN-US>metamethod</span><span style='font-family:宋体'>）的使用。对于表来说，不管什么时候只要找不到给定的</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>，这个元方法就会被调用。对于</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>来讲，每次被访问的时候元方法都会被调用，因为</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>根本就没有任何</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>假如我们运行下面的代码：</span></p>
+
+<div style='border:RGB(71,189,246) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(237,235,229);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> metaarray =
+getmetatable(array.new(1))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,249,225)'><span
+lang=EN-US>metaarray.__index = metaarray</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>metaarray.set = array.set</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,237,222)'><span
+lang=EN-US>metaarray.get = array.get</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>metaarray.size = array.size</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第一行，我们仅仅创建一个数组并获取他的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>，</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>被赋值给</span><span
+lang=EN-US>metaarray</span><span style='font-family:宋体'>（我们不能从</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中设置</span><span lang=EN-US>userdata</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>，但是我们在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中无限制的访问</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>）。接下来，我们设置</span><span lang=EN-US>metaarray.__index</span><span
+style='font-family:宋体'>为</span><span lang=EN-US>metaarray</span><span
+style='font-family:宋体'>。当我们计算</span><span lang=EN-US>a.size</span><span
+style='font-family:宋体'>的时候，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>在对象</span><span lang=EN-US>a</span><span
+style='font-family:宋体'>中找不到</span><span lang=EN-US>size</span><span
+style='font-family:宋体'>这个键值，因为对象是一个</span><span lang=EN-US>userdatum</span><span
+style='font-family:宋体'>。所以，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>试着从对象</span><span lang=EN-US>a </span><span
+style='font-family:宋体'>的</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>__index</span><span
+style='font-family:宋体'>域获取这个值，正好</span><span lang=EN-US>__index</span><span
+style='font-family:宋体'>就是</span><span lang=EN-US>metaarray</span><span
+style='font-family:宋体'>。但是</span><span lang=EN-US>metaarray.size</span><span
+style='font-family:宋体'>就是</span><span lang=EN-US>array.size,</span><span
+style='font-family:宋体'>因此</span><span lang=EN-US>a.size(a)</span><span
+style='font-family:宋体'>如我们预期的返回</span><span lang=EN-US>array.size(a)</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当然，我们可以在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>中完成同样的事情，甚至可以做得更好：现在数组是对象，他有自己的操作，我们在表数组中不需要这些操作。我们实现的库唯一需要对外提供的函数就是</span><span
+lang=EN-US>new</span><span style='font-family:宋体'>，用来创建一个新的数组。所有其他的操作作为方法实现。</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>代码可以直接注册他们。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>getsize</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>getarray</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>setarray</span><span
+style='font-family:宋体'>与我们前面的实现一样，不需要改变。我们需要改变的只是如何注册他们。也就是说，我们必须改变打开库的函数。首先，我们需要分离函数列表，一个作为普通函数，一个作为方法：</span></p>
+
+<div style='border:RGB(71,189,246) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(255,246,243);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>const</span> <span style='color:blue'>struct</span> luaL_reg
+arraylib_f [] = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,235,226)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;new&quot;</span>,
+newarray},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {NULL, NULL}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,229,235)'><span
+lang=EN-US>};</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,225,232)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>const</span> <span style='color:blue'>struct</span> luaL_reg
+arraylib_m [] = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;set&quot;</span>,
+setarray},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,236,234)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;get&quot;</span>,
+getarray},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;size&quot;</span>,
+getsize},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,237,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {NULL, NULL}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>};</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>新版本打开库的函数</span><span
+lang=EN-US>luaopen_array</span><span style='font-family:宋体'>，必须创建一个</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>，并将其赋值给自己的</span><span
+lang=EN-US>__index</span><span style='font-family:宋体'>域，在那儿注册所有的方法，创建并填充数组表：</span></p>
+
+<div style='border:RGB(71,189,246) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(236,249,255);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> luaopen_array
+(lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,238,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_newmetatable(L, <span style='color:red'>&quot;LuaBook.array&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,230,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushstring(L, <span style='color:red'>&quot;__index&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushvalue(L, -2);&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* pushes the metatable */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,246,246)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_settable(L, -3); <span style='color:green'>/*
+metatable.__index = metatable */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,248,236)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_openlib(L, NULL, arraylib_m, 0);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,236,250)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_openlib(L, <span style='color:red'>&quot;array&quot;</span>,
+arraylib_f, 0);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 1;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,228,247)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这里我们使用了</span><span
+lang=EN-US>luaL_openlib</span><span style='font-family:宋体'>的另一个特征，第一次调用，当我们传递一个</span><span
+lang=EN-US>NULL</span><span style='font-family:宋体'>作为库名时，</span><span
+lang=EN-US>luaL_openlib</span><span style='font-family:宋体'>并没有创建任何包含函数的表；相反，他认为封装函数的表在栈内，位于临时的</span><span
+lang=EN-US>upvalues</span><span style='font-family:宋体'>的下面。在这个例子中，封装函数的表是</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>本身，也就是</span><span
+lang=EN-US>luaL_openlib</span><span style='font-family:宋体'>放置方法的地方。第二次调用</span><span
+lang=EN-US>luaL_openlib</span><span style='font-family:宋体'>正常工作：根据给定的数组名创建一个新表，并在表中注册指定的函数（例子中只有一个函数</span><span
+lang=EN-US>new</span><span style='font-family:宋体'>）。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面的代码，我们为我们的新类型添加一个</span><span
+lang=EN-US>__tostring</span><span style='font-family:宋体'>方法，这样一来</span><span
+lang=EN-US>print(a)</span><span style='font-family:宋体'>将打印数组加上数组的大小，大小两边带有圆括号（比如，</span><span
+lang=EN-US>array(1000)</span><span style='font-family:宋体'>）：</span></p>
+
+<div style='border:RGB(71,189,246) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,250,254)'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> array2string
+(lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; NumArray *a = checkarray(L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,254,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushfstring(L, <span style='color:red'>&quot;array(%d)&quot;</span>,
+a-&gt;size);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 1;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,234,225)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>函数</span><span
+lang=EN-US>lua_pushfstring</span><span style='font-family:宋体'>格式化字符串，并将其放到栈顶。为了在数组对象的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>中包含</span><span
+lang=EN-US>array2string</span><span style='font-family:宋体'>，我们还必须在</span><span
+lang=EN-US>arraylib_m</span><span style='font-family:宋体'>列表中添加</span><span
+lang=EN-US>array2string</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(71,189,246) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,249,244)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>const</span> <span style='color:blue'>struct</span> luaL_reg
+arraylib_m [] = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;__tostring&quot;</span>,
+array2string},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,255,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;set&quot;</span>,
+setarray},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,241,229)'><span
+lang=EN-US>};</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,332 @@
+<html>
+
+<head>
+  <title>29.1 目录迭代器 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;29.1 目录迭代器</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>前面我们实现了一个</span><span
+lang=EN-US>dir</span><span style='font-family:宋体'>函数，给定一个目录作为参数，这个函数以一个</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>的方式返回目录下所有文件。我们新版本的</span><span
+lang=EN-US>dir</span><span style='font-family:宋体'>函数将返回一个迭代子，每次调用这个迭代子的时候会返回目录中的一个入口（</span><span
+lang=EN-US>entry</span><span style='font-family:宋体'>）。按新版本的实现方式，我们可以使用循环来遍历整个目录：</span></p>
+
+<div style='border:RGB(117,253,220) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,243,240)'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> fname <span
+style='color:blue'>in</span> dir(<span style='color:red'>&quot;.&quot;</span>) <span
+style='color:blue'>do</span>&nbsp; print(fname)&nbsp; <span style='color:blue'>end</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>语言中，我们需要</span><span
+lang=EN-US>DIR</span><span style='font-family:宋体'>这种结构才能够迭代一个目录。通过</span><span
+lang=EN-US>opendir</span><span style='font-family:宋体'>才能创建一个</span><span
+lang=EN-US>DIR</span><span style='font-family:宋体'>的实例，并且必须显式的调用</span><span
+lang=EN-US>closedir</span><span style='font-family:宋体'>来释放资源。我们以前实现的</span><span
+lang=EN-US>dir</span><span style='font-family:宋体'>用一个本地变量保存</span><span
+lang=EN-US>DIR</span><span style='font-family:宋体'>的实例，并且在获取目录中最后一个文件名之后关闭实例。但我们新实现的</span><span
+lang=EN-US>dir</span><span style='font-family:宋体'>中不能在本地变量中保存</span><span
+lang=EN-US>DIR</span><span style='font-family:宋体'>的实例，因为有很多个调用都要访问这个值，另外，也不能仅仅在获取目录中最后一个文件名之后关闭目录。如果程序循环过程中中断退出，迭代子根本就不会取得最后一个文件名，所以，为了保证</span><span
+lang=EN-US>DIR</span><span style='font-family:宋体'>的实例一定能够被释放掉，我们将它的地址保存在一个</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>中，并使用这个</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>的</span><span
+lang=EN-US>__gc</span><span style='font-family:宋体'>的元方法来释放目录结构。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>尽管我们实现中</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>的作用很重要，但这个用来表示一个目录的</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>，并不需要在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>可见范围之内。</span><span
+lang=EN-US>Dir</span><span style='font-family:宋体'>函数返回一个迭代子函数，迭代子函数需要在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>的可见范围之内。目录可能是迭代子函数的一个</span><span
+lang=EN-US>upvalue</span><span style='font-family:宋体'>。这样一来，迭代子函数就可以直接访问这个结构</span><a
+href="#_ftn9" name="_ftnref9" title=""><span class=MsoFootnoteReference><span
+lang=EN-US><span class=MsoFootnoteReference><span lang=EN-US style='font-size:
+10.5pt;font-family:"Times New Roman","serif"'>[9]</span></span></span></span></a><span
+style='font-family:宋体'>，但是</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>不可以（也不需要）访问这个结构。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>总的来说，我们需要三个</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数。第一，</span><span lang=EN-US>dir</span><span
+style='font-family:宋体'>函数，一个</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>调用他产生迭代器的工厂，这个函数必须打开</span><span lang=EN-US>DIR</span><span
+style='font-family:宋体'>结构并将他作为迭代函数的</span><span lang=EN-US>upvalue</span><span
+style='font-family:宋体'>。第二，我们需要一个迭代函数。第三，</span><span lang=EN-US>__gc</span><span
+style='font-family:宋体'>元方法，负责关闭</span><span lang=EN-US>DIR</span><span
+style='font-family:宋体'>结构。一般来说，我们还需要一个额外的函数来进行一些初始的操作，比如为目录创建</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>，并初始化这个</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>首先看我们的</span><span
+lang=EN-US>dir</span><span style='font-family:宋体'>函数：</span></p>
+
+<div style='border:RGB(117,253,220) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,239,242)'><span
+lang=EN-US style='color:blue'>#include</span><span lang=EN-US> &lt;dirent.h&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>#include</span><span lang=EN-US> &lt;errno.h&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,229,243)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>/* forward declaration for the iterator function
+*/</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,239,242)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> dir_iter (lua_State *L);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,232,224)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> l_dir (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>const</span> <span
+style='color:blue'>char</span> *path = luaL_checkstring(L, 1);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,232,221)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* create a userdatum
+to store a DIR address */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,221,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; DIR **d = (DIR **)lua_newuserdata(L, <span
+style='color:blue'>sizeof</span>(DIR *));</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,242,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* set its metatable */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_getmetatable(L, <span style='color:red'>&quot;LuaBook.dir&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,242,246)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_setmetatable(L, -2);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,242,237)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* try to open the
+given directory */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; *d = opendir(path);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,252,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> (*d ==
+NULL)&nbsp; <span style='color:green'>/* error opening the directory? */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; luaL_error(L, <span
+style='color:red'>&quot;cannot open %s: %s&quot;</span>, path,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,237,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; strerror(errno));</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,233,229)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* creates and returns
+the iterator function</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; (its sole
+upvalue, the directory userdatum,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,233,232)'><span
+lang=EN-US style='color:green'>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; is already on
+the stack top */</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushcclosure(L, dir_iter, 1);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,237,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 1;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这儿有一点需要注意的，我们必须在打开目录之前创建</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>。如果我们先打开目录，然后调用</span><span
+lang=EN-US>lua_newuserdata</span><span style='font-family:宋体'>会抛出错误，这样我们就无法获取</span><span
+lang=EN-US>DIR</span><span style='font-family:宋体'>结构。按照正确的顺序，</span><span
+lang=EN-US>DIR</span><span style='font-family:宋体'>结构一旦被创建，就会立刻和</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>关联起来；之后不管发生什么，</span><span
+lang=EN-US>__gc</span><span style='font-family:宋体'>元方法都会自动的释放这个结构。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二个函数是迭代器：</span></p>
+
+<div style='border:RGB(117,253,220) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(249,252,251);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> dir_iter (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,255,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; DIR *d = *(DIR **)lua_touserdata(L,
+lua_upvalueindex(1));</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>struct</span> dirent
+*entry;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,226,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> ((entry =
+readdir(d)) != NULL) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lua_pushstring(L,
+entry-&gt;d_name);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,254,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+1;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; }</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,226,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span> <span
+style='color:blue'>return</span> 0;&nbsp; <span style='color:green'>/* no more
+values to return */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>__gc</span><span
+style='font-family:宋体'>元方法用来关闭目录，但有一点需要小心：因为我们在打开目录之前创建</span><span lang=EN-US>userdatum</span><span
+style='font-family:宋体'>，所以不管</span><span lang=EN-US>opendir</span><span
+style='font-family:宋体'>的结果是什么，</span><span lang=EN-US>userdatum</span><span
+style='font-family:宋体'>将来都会被收集。如果</span><span lang=EN-US>opendir</span><span
+style='font-family:宋体'>失败，将来就没有什么可以关闭的了：</span></p>
+
+<div style='border:RGB(117,253,220) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(246,233,240);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>int</span> dir_gc (lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,220,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; DIR *d = *(DIR **)lua_touserdata(L, 1);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> (d)
+closedir(d);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,255,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 0;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>最后一个函数打开这个只有一个函数的库：</span></p>
+
+<div style='border:RGB(117,253,220) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(254,222,225);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> luaopen_dir
+(lua_State *L) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,253,234)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; luaL_newmetatable(L, <span style='color:red'>&quot;LuaBook.dir&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,235,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* set its __gc field
+*/</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushstring(L, <span style='color:red'>&quot;__gc&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,246,234)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushcfunction(L, dir_gc);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_settable(L, -3);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,252,241)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>/* register the `dir'
+function */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,241,229)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushcfunction(L, l_dir);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_setglobal(L, <span style='color:red'>&quot;dir&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,236,249)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> 0;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,249,227)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>整个例子有一个注意点。开始的时候，</span><span
+lang=EN-US>dir_gc</span><span style='font-family:宋体'>看起来应该检查他的参数是否是一个目录。否则，一个恶意的使用者可能用其他类型的参数（比如，文件）调用这个函数导致严重的后果。然而，在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>程序中无法访问这个函数：他被存放在目录的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>中，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>程序从来不会访问这些目录。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,485 @@
+<html>
+
+<head>
+  <title>10.1 Lua作为数据描述语言使用 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;10.1 Lua作为数据描述语言使用</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>慢慢地，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>正被世界上越来越多的人使用。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>官方网站的数据库中保存着一些“使用了</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>”的项目的信息。在数据库中，我们用一个构造器以自动归档的方式表示每个工程入口，代码如下：</span></p>
+
+<div style='border:RGB(235,78,229) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,244,220)'><span
+lang=EN-US>entry{</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; title = <span style='color:red'>&quot;Tecgraf&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,255,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; org = <span style='color:red'>&quot;Computer
+Graphics Technology Group, PUC-Rio&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; url = <span style='color:red'>&quot;http://www.tecgraf.puc-rio.br/&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,227,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; contact = <span style='color:red'>&quot;Waldemar
+Celes&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; description = [[</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,223,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; TeCGraf is the result of a partnership between
+PUC-Rio,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; the Pontifical Catholic University of Rio de
+Janeiro,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,250,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; and &lt;A HREF=&quot;http://www.petrobras.com.br/&quot;&gt;PETROBRAS&lt;/A&gt;,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; the Brazilian Oil Company.</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,228,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; TeCGraf is Lua's birthplace,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; and the language has been used there since 1993.</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,243,231)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; Currently, more than thirty programmers in
+TeCGraf use</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; Lua regularly; they have written more than two
+hundred</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,224,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; thousand lines of code, distributed among dozens
+of</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; final products.]]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,239,248)'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有趣的是，工程入口是存放在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>文件中的，每个工程入口以</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>的形式作为参数去调用</span><span
+lang=EN-US>entry</span><span style='font-family:宋体'>函数。我们的目的是写一个程序将这些数据以</span><span
+lang=EN-US>html</span><span style='font-family:宋体'>格式展示出来。由于工程太多，我们首先列出工程的标题，然后显示每个工程的明细。结果如下：</span></p>
+
+<div style='border:RGB(235,78,229) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,248,247)'><span
+lang=EN-US>&lt;HTML&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;HEAD&gt;&lt;TITLE&gt;Projects using Lua&lt;/TITLE&gt;&lt;/HEAD&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,245,233)'><span
+lang=EN-US>&lt;BODY BGCOLOR=<span style='color:red'>&quot;#FFFFFF&quot;</span>&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>Here are brief descriptions of some projects around the</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,252,229)'><span
+lang=EN-US>world that use &lt;A HREF=<span style='color:red'>&quot;home.html&quot;</span>&gt;Lua&lt;/A&gt;.</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,250,222)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;UL&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,254,223)'><span
+lang=EN-US>&lt;LI&gt;&lt;A HREF=<span style='color:red'>&quot;#1&quot;</span>&gt;TeCGraf&lt;/A&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;LI&gt; ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,230,225)'><span
+lang=EN-US>&lt;/UL&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,238,244)'><span
+lang=EN-US>&lt;H3&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;A NAME=<span style='color:red'>&quot;1&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,235,237)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; HREF=<span style='color:red'>&quot;http://www.tecgraf.puc-rio.br/&quot;</span>&gt;TeCGraf&lt;/A&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,238,254)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;SMALL&gt;&lt;EM&gt;Computer Graphics Technology Group,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,249,251)'><span
+lang=EN-US>PUC-Rio&lt;/EM&gt;&lt;/SMALL&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;/H3&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,236,238)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>TeCGraf is the result of a partnership between</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,237,223)'><span
+lang=EN-US>...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>distributed among dozens of final products.&lt;P&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,245,254)'><span
+lang=EN-US>Contact: Waldemar Celes</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,227,233)'><span
+lang=EN-US>&lt;A NAME=<span style='color:red'>&quot;2&quot;</span>&gt;&lt;/A&gt;&lt;HR&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,246,225)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;/BODY&gt;&lt;/HTML&gt;</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了读取数据，我们需要做的是正确的定义函数</span><span
+lang=EN-US>entry</span><span style='font-family:宋体'>，然后使用</span><span
+lang=EN-US>dofile</span><span style='font-family:宋体'>直接运行数据文件（</span><span
+lang=EN-US>db.lua</span><span style='font-family:宋体'>）即可。注意，我们需要遍历入口列表两次，第一次为了获取标题，第二次为了获取每个工程的表述。一种方法是：使用相同的</span><span
+lang=EN-US>entry</span><span style='font-family:宋体'>函数运行数据文件一次将所有的入口放在一个数组内；另一种方法：使用不同的</span><span
+lang=EN-US>entry</span><span style='font-family:宋体'>函数运行数据文件两次。因为</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>编译文件是很快的，这里我们选用第二种方法。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>首先，我们定义一个辅助函数用来格式化文本的输出（参见</span><span
+lang=EN-US>5.2</span><span style='font-family:宋体'>函数部分内容）</span></p>
+
+<div style='border:RGB(235,78,229) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(224,243,235);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> fwrite (fmt,
+...)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,233,231)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+io.write(string.format(fmt, unpack(arg)))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二，我们定义一个</span><span
+lang=EN-US>BEGIN</span><span style='font-family:宋体'>函数用来写</span><span
+lang=EN-US>html</span><span style='font-family:宋体'>页面的头部</span><span
+lang=EN-US> </span></p>
+
+<div style='border:RGB(235,78,229) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(230,249,252);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> BEGIN()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,254,237)'><span
+lang=EN-US>io.write([[</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;HTML&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,222,237)'><span
+lang=EN-US>&lt;HEAD&gt;&lt;TITLE&gt;Projects using
+Lua&lt;/TITLE&gt;&lt;/HEAD&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;BODY BGCOLOR=<span style='color:red'>&quot;#FFFFFF&quot;</span>&gt;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,246,242)'><span
+lang=EN-US>Here are brief descriptions of some projects around the</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>world that use &lt;A HREF=<span style='color:red'>&quot;home.html&quot;</span>&gt;Lua&lt;/A&gt;.</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,241,228)'><span
+lang=EN-US>]])</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第三，定义</span><span
+lang=EN-US>entry</span><span style='font-family:宋体'>函数</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>a. </span><span
+style='font-family:宋体'>第一个</span><span lang=EN-US>entry</span><span
+style='font-family:宋体'>函数，将每个工程一列表方式写出，</span><span lang=EN-US>entry</span><span
+style='font-family:宋体'>的参数</span><span lang=EN-US>o</span><span
+style='font-family:宋体'>是描述工程的</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>。</span></p>
+
+<div style='border:RGB(235,78,229) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(223,222,254);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> entry0 (o)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,235,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; N=N + 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> title =
+o.title <span style='color:blue'>or</span> <span style='color:red'>'(no title)'</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,242,223)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; fwrite(<span style='color:red'>'&lt;LI&gt;&lt;A
+HREF=&quot;#%d&quot;&gt;%s&lt;/A&gt;\n'</span>, N, title)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果</span><span
+lang=EN-US>o.title</span><span style='font-family:宋体'>为</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>表明</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>中的域</span><span lang=EN-US>title</span><span
+style='font-family:宋体'>没有提供，我们用固定的</span><span lang=EN-US>&quot;no title&quot;</span><span
+style='font-family:宋体'>替换。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>b. </span><span
+style='font-family:宋体'>第二个</span><span lang=EN-US>entry</span><span
+style='font-family:宋体'>函数，写出工程所有的相关信息，稍微有些复杂，因为所有项都是可选的。</span></p>
+
+<div style='border:RGB(235,78,229) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(249,253,244);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> entry1 (o)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,243,236)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; N=N + 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> title =
+o.title <span style='color:blue'>or</span> o.org <span style='color:blue'>or</span>
+<span style='color:red'>'org'</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,250,235)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; fwrite(<span style='color:red'>'&lt;HR&gt;\n&lt;H3&gt;\n'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> href = <span
+style='color:red'>''</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,230,232)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; if o.url then</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,245,220)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; href = string.format(<span
+style='color:red'>' HREF=&quot;%s&quot;'</span>, o.url)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,246,233)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; fwrite(<span style='color:red'>'&lt;A NAME=&quot;%d&quot;%s&gt;%s&lt;/A&gt;\n'</span>,
+N, href, title)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,220,252)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; if o.title and o.org then</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fwrite(<span style='color:red'>'\n&lt;SMALL&gt;&lt;EM&gt;%s&lt;/EM&gt;&lt;/SMALL&gt;'</span>,
+o.org)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,238,240)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; fwrite('\n&lt;/H3&gt;\n')</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,234,237)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; if o.description then</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,249,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fwrite(<span style='color:red'>'%s'</span>,
+string.gsub(o.description,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:red'>'\n\n\n*'</span>, <span style='color:red'>'&lt;P&gt;\n'</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,221,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fwrite(<span style='color:red'>'&lt;P&gt;\n'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,241,234)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; if o.email then</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,250,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fwrite(<span style='color:red'>'Contact:
+&lt;A HREF=&quot;mailto:%s&quot;&gt;%s&lt;/A&gt;\n'</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o.email,
+o.contact or o.email)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,254,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; elseif o.contact then</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fwrite(<span style='color:red'>'Contact:
+%s\n'</span>, o.contact)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,242,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>由于</span><span
+lang=EN-US>html</span><span style='font-family:宋体'>中使用双引号，为了避免冲突我们这里使用单引号表示串。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第四，定义</span><span
+lang=EN-US>END</span><span style='font-family:宋体'>函数，写</span><span lang=EN-US>html</span><span
+style='font-family:宋体'>的尾部</span></p>
+
+<div style='border:RGB(235,78,229) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(249,231,254);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> END()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,237,241)'><span
+lang=EN-US>fwrite(<span style='color:red'>'&lt;/BODY&gt;&lt;/HTML&gt;\n'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在主程序中，我们首先使用第一个</span><span
+lang=EN-US>entry</span><span style='font-family:宋体'>运行数据文件输出工程名称的列表，然后再以第二个</span><span
+lang=EN-US>entry</span><span style='font-family:宋体'>运行数据文件输出工程相关信息。</span></p>
+
+<div style='border:RGB(235,78,229) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(228,245,233);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>BEGIN()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,253,224)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>N = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,254,254)'><span
+lang=EN-US>entry = entry0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>fwrite(<span style='color:red'>'&lt;UL&gt;\n'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,227,228)'><span
+lang=EN-US>dofile(<span style='color:red'>'db.lua'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>fwrite(<span style='color:red'>'&lt;/UL&gt;\n'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,221,223)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>N = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,240,228)'><span
+lang=EN-US>entry = entry1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>dofile(<span style='color:red'>'db.lua'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,229,239)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>END()</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

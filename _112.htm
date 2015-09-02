@@ -1,0 +1,243 @@
+<html>
+
+<head>
+  <title> 第20章 String库 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第20章 String库</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>解释器对字符串的支持很有限。一个程序可以创建字符串并连接字符串，但不能截取子串，检查字符串的大小，检测字符串的内容。在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中操纵字符串的功能基本来自于</span><span
+lang=EN-US>string</span><span style='font-family:宋体'>库。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>String</span><span
+style='font-family:宋体'>库中的一些函数是非常简单的：</span><span lang=EN-US>string.len(s)</span><span
+style='font-family:宋体'>返回字符串</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>的长度；</span><span lang=EN-US>string.rep(s, n)</span><span
+style='font-family:宋体'>返回重复</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>次字符串</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>的串；你使用</span><span lang=EN-US>string.rep(&quot;a&quot;,
+2^20)</span><span style='font-family:宋体'>可以创建一个</span><span lang=EN-US>1M bytes</span><span
+style='font-family:宋体'>的字符串（比如，为了测试需要）；</span><span lang=EN-US>string.lower(s)</span><span
+style='font-family:宋体'>将</span><span lang=EN-US>s</span><span style='font-family:
+宋体'>中的大写字母转换成小写（</span><span lang=EN-US>string.upper</span><span
+style='font-family:宋体'>将小写转换成大写）。如果你想不关心大小写对一个数组进行排序的话，你可以这样：</span></p>
+
+<div style='border:RGB(198,236,78) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,247,242)'><span
+lang=EN-US>table.sort(a, <span style='color:blue'>function</span> (a, b)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+string.lower(a) &lt; string.lower(b)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,249,222)'><span
+lang=EN-US style='color:blue'>end</span><span lang=EN-US>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>string.upper</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>string.lower</span><span
+style='font-family:宋体'>都依赖于本地环境变量。所以，如果你在</span><span lang=EN-US> European
+Latin-1</span><span style='font-family:宋体'>环境下，表达式：</span></p>
+
+<div style='border:RGB(198,236,78) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,236,222)'><span
+lang=EN-US>string.upper(<span style='color:red'>&quot;a??o&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; &quot;A??O&quot;.</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>调用</span><span
+lang=EN-US>string.sub(s,i,j)</span><span style='font-family:宋体'>函数截取字符串</span><span
+lang=EN-US>s</span><span style='font-family:宋体'>的从第</span><span lang=EN-US>i</span><span
+style='font-family:宋体'>个字符到第</span><span lang=EN-US>j</span><span
+style='font-family:宋体'>个字符之间的串。</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中，字符串的第一个字符索引从</span><span lang=EN-US>1</span><span
+style='font-family:宋体'>开始。你也可以使用负索引，负索引从字符串的结尾向前计数：</span><span lang=EN-US>-1</span><span
+style='font-family:宋体'>指向最后一个字符，</span><span lang=EN-US>-2</span><span
+style='font-family:宋体'>指向倒数第二个，以此类推。所以，</span><span lang=EN-US> string.sub(s,
+1, j)</span><span style='font-family:宋体'>返回字符串</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>的长度为</span><span lang=EN-US>j</span><span
+style='font-family:宋体'>的前缀；</span><span lang=EN-US>string.sub(s, j, -1)</span><span
+style='font-family:宋体'>返回从第</span><span lang=EN-US>j</span><span
+style='font-family:宋体'>个字符开始的后缀。如果不提供第</span><span lang=EN-US>3</span><span
+style='font-family:宋体'>个参数，默认为</span><span lang=EN-US>-1</span><span
+style='font-family:宋体'>，因此我们将最后一个调用写为</span><span lang=EN-US>string.sub(s, j)</span><span
+style='font-family:宋体'>；</span><span lang=EN-US>string.sub(s, 2, -2)</span><span
+style='font-family:宋体'>返回去除第一个和最后一个字符后的子串。</span></p>
+
+<div style='border:RGB(198,236,78) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(231,251,238);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>s = <span style='color:red'>&quot;[in brackets]&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,239,232)'><span
+lang=EN-US>print(string.sub(s, 2, -2))&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; in brackets</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>记住：</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中的字符串是恒定不变的。</span><span
+lang=EN-US>String.sub</span><span style='font-family:宋体'>函数以及</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中其他的字符串操作函数都不会改变字符串的值，而是返回一个新的字符串。一个常见的错误是：</span></p>
+
+<div style='border:RGB(198,236,78) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,249,233)'><span
+lang=EN-US>string.sub(s, 2, -2)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>认为上面的这个函数会改变字符串</span><span
+lang=EN-US>s</span><span style='font-family:宋体'>的值。如果你想修改一个字符串变量的值，你必须将变量赋给一个新的字符串：</span></p>
+
+<div style='border:RGB(198,236,78) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,249,247)'><span
+lang=EN-US>s = string.sub(s, 2, -2)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>string.char</span><span
+style='font-family:宋体'>函数和</span><span lang=EN-US>string.byte</span><span
+style='font-family:宋体'>函数用来将字符在字符和数字之间转换。</span><span lang=EN-US>string.char</span><span
+style='font-family:宋体'>获取</span><span lang=EN-US>0</span><span
+style='font-family:宋体'>个或多个整数，将每一个数字转换成字符，然后返回一个所有这些字符连接起来的字符串。</span><span
+lang=EN-US>string.byte(s, i)</span><span style='font-family:宋体'>将字符串</span><span
+lang=EN-US>s</span><span style='font-family:宋体'>的第</span><span lang=EN-US>i</span><span
+style='font-family:宋体'>个字符的转换成整数；第二个参数是可选的，缺省情况下</span><span lang=EN-US>i=1</span><span
+style='font-family:宋体'>。下面的例子中，我们假定字符用</span><span lang=EN-US>ASCII</span><span
+style='font-family:宋体'>表示：</span></p>
+
+<div style='border:RGB(198,236,78) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,241,229)'><span
+lang=EN-US>print(string.char(97))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; a</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>i = 99; print(string.char(i, i+1, i+2))&nbsp;&nbsp; <span
+style='color:green'>--&gt; cde</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,245,230)'><span
+lang=EN-US>print(string.byte(<span style='color:red'>&quot;abc&quot;</span>))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 97</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(string.byte(<span style='color:red'>&quot;abc&quot;</span>,
+2))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 98</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,241,252)'><span
+lang=EN-US>print(string.byte(<span style='color:red'>&quot;abc&quot;</span>,
+-1))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 99</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>上面最后一行，我们使用负数索引访问字符串的最后一个字符。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>函数</span><span
+lang=EN-US>string.format</span><span style='font-family:宋体'>在用来对字符串进行格式化的时候，特别是字符串输出，是功能强大的工具。这个函数有两个参数，使用和</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>语言的</span><span lang=EN-US>printf</span><span
+style='font-family:宋体'>函数几乎一模一样，你完全可以照</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>语言的</span><span lang=EN-US>printf</span><span
+style='font-family:宋体'>来使用这个函数。第一个参数为格式化串：由指示符和控制格式的字符组成。指示符后的控制格式的字符可以为：十进制</span><span
+lang=EN-US>'d'</span><span style='font-family:宋体'>；十六进制</span><span lang=EN-US>'x'</span><span
+style='font-family:宋体'>；八进制</span><span lang=EN-US>'o'</span><span
+style='font-family:宋体'>；浮点数</span><span lang=EN-US>'f'</span><span
+style='font-family:宋体'>；字符串</span><span lang=EN-US>'s'</span><span
+style='font-family:宋体'>。在指示符</span><span lang=EN-US>'%'</span><span
+style='font-family:宋体'>和控制格式字符之间还可以有其他的选项：用来控制更详细的格式，比如一个浮点数的小数的位数：</span></p>
+
+<div style='border:RGB(198,236,78) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,235,253)'><span
+lang=EN-US>print(string.format(<span style='color:red'>&quot;pi = %.4f&quot;</span>,
+PI))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+pi = 3.1416</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,254,231)'><span
+lang=EN-US>d = 5; m = 11; y = 1990</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(string.format(<span style='color:red'>&quot;%02d/%02d/%04d&quot;</span>,
+d, m, y))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,230,251)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+05/11/1990</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>tag, title = <span style='color:red'>&quot;h1&quot;</span>, <span
+style='color:red'>&quot;a title&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,248,226)'><span
+lang=EN-US>print(string.format(<span style='color:red'>&quot;&lt;%s&gt;%s&lt;/%s&gt;&quot;</span>,
+tag, title, tag))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+&lt;h1&gt;a title&lt;/h1&gt;</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第一个例子，</span><span
+lang=EN-US>%.4f</span><span style='font-family:宋体'>代表小数点后面有</span><span
+lang=EN-US>4</span><span style='font-family:宋体'>位小数的浮点数。第二个例子</span><span
+lang=EN-US>%02d</span><span style='font-family:宋体'>代表以固定的两位显示十进制数，不足的前面补</span><span
+lang=EN-US>0</span><span style='font-family:宋体'>。而</span><span lang=EN-US>%2d</span><span
+style='font-family:宋体'>前面没有指定</span><span lang=EN-US>0</span><span
+style='font-family:宋体'>，不足两位时会以空白补足。对于格式串部分指示符得详细描述清参考</span><span lang=EN-US>lua</span><span
+style='font-family:宋体'>手册，或者参考</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>手册，因为</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>调用标准</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>printf</span><span
+style='font-family:宋体'>函数来实现最终的功能。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

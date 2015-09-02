@@ -1,0 +1,143 @@
+<html>
+
+<head>
+  <title>12.1 序列化 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;12.1 序列化</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们经常需要序列化一些数据，为了将数据转换为字节流或者字符流，这样我们就可以保存到文件或者通过网络发送出去。我们可以在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>代码中描述序列化的数据，在这种方式下，我们运行读取程序即可从代码中构造出保存的值。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>通常，我们使用这样的方式</span><span
+lang=EN-US>varname = &lt;exp&gt;</span><span style='font-family:宋体'>来保存一个全局变量的值。</span><span
+lang=EN-US>varname</span><span style='font-family:宋体'>部分比较容易理解，下面我们来看看如何写一个产生值的代码。对于一个数值来说：</span></p>
+
+<div style='border:RGB(170,54,186) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,237,254)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> serialize (o)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> type(o) == <span
+style='color:red'>&quot;number&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,244,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; io.write(o)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span> ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,251,248)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>对于字符串值而言，原始的写法应该是：</span></p>
+
+<div style='border:RGB(170,54,186) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,245,253)'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> type(o) == <span
+style='color:red'>&quot;string&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; io.write(<span style='color:red'>&quot;'&quot;</span>,
+o, <span style='color:red'>&quot;'&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>然而，如果字符串包含特殊字符（比如引号或者换行符），产生的代码将不是有效的</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>程序。这时候你可能用下面方法解决特殊字符的问题：</span></p>
+
+<div style='border:RGB(170,54,186) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(236,222,227);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> type(o) == <span
+style='color:red'>&quot;string&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,251,247)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; io.write(<span style='color:red'>&quot;[[&quot;</span>,
+o, <span style='color:red'>&quot;]]&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>千万不要这样做！双引号是针对手写的字符串的而不是针对自动产生的字符串。如果有人恶意的引导你的程序去使用</span><span
+lang=EN-US>&quot; ]]..os.execute('rm *')..[[ &quot;</span><span
+style='font-family:宋体'>这样的方式去保存某些东西（比如它可能提供字符串作为地址）你最终的</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>将是这个样子：</span></p>
+
+<div style='border:RGB(170,54,186) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,240,247)'><span
+lang=EN-US>varname = [[ ]]..os.execute(<span style='color:red'>'rm *'</span>)..[[
+]]</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果你</span><span
+lang=EN-US>load</span><span style='font-family:宋体'>这个数据，运行结果可想而知的。为了以安全的方式引用任意的字符串，</span><span
+lang=EN-US>string</span><span style='font-family:宋体'>标准库提供了格式化函数专门提供</span><span
+lang=EN-US>&quot;%q&quot;</span><span style='font-family:宋体'>选项。它可以使用双引号表示字符串并且可以正确的处理包含引号和换行等特殊字符的字符串。这样一来，我们的序列化函数可以写为：</span></p>
+
+<div style='border:RGB(170,54,186) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,226,249)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> serialize (o)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> type(o) == <span
+style='color:red'>&quot;number&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,248,224)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; io.write(o)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>elseif</span> type(o) ==
+<span style='color:red'>&quot;string&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,234,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; io.write(string.format(<span
+style='color:red'>&quot;%q&quot;</span>, o))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span> ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,225,222)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,62 @@
+<html>
+
+<head>
+  <title> 第29章 资源管理 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第29章 资源管理</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在前面一章介绍的数组实现方法，我们不必担心如何管理资源，只需要分配内存。每一个表示数组的</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>都有自己的内存，这个内存由</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>管理。当数组变为垃圾（也就是说，当程序不需要）的时候，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>会自动收集并释放内存。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>生活总是不那么如意。有时候，一个对象除了需要物理内存以外，还需要文件描述符、窗口句柄等类似的资源。（通常这些资源也是内存，但由系统的其他部分来管理）。在这种情况下，当一个对象成为垃圾并被收集的时候，这些相关的资源也应该被释放。一些面向对象的语言为了这种需要提供了一种特殊的机制（称为</span><span
+lang=EN-US>finalizer </span><span style='font-family:宋体'>或者析构器）。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>以</span><span lang=EN-US>__gc</span><span
+style='font-family:宋体'>元方法的方式提供了</span><span lang=EN-US>finalizers</span><span
+style='font-family:宋体'>。这个元方法只对</span><span lang=EN-US>userdata</span><span
+style='font-family:宋体'>类型的值有效。当一个</span><span lang=EN-US>userdatum</span><span
+style='font-family:宋体'>将被收集的时候，并且</span><span lang=EN-US>usedatum</span><span
+style='font-family:宋体'>有一个</span><span lang=EN-US>__gc</span><span
+style='font-family:宋体'>域，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>会调用这个域的值（应该是一个函数）：以</span><span lang=EN-US>userdatum</span><span
+style='font-family:宋体'>作为这个函数的参数调用。这个函数负责释放与</span><span lang=EN-US>userdatum</span><span
+style='font-family:宋体'>相关的所有资源。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了阐明如何将这个元方法和</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>作为一个整体使用，这一章我们将使用</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>扩展应用的方式，介绍两个例子。第一个例子是前面已经介绍的遍历一个目录的函数的另一种实现。第二个例子是一个绑定</span><span
+lang=EN-US>Expat</span><span style='font-family:宋体'>（</span><span lang=EN-US>Expat</span><span
+style='font-family:宋体'>开源的</span><span lang=EN-US>XML</span><span
+style='font-family:宋体'>解析器）实现的</span><span lang=EN-US>XML</span><span
+style='font-family:宋体'>解析器。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

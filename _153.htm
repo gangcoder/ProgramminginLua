@@ -1,0 +1,145 @@
+<html>
+
+<head>
+  <title>27.3.1 The Registry - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;27.3.1 The Registry</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>registry </span><span
+style='font-family:宋体'>一直位于一个由</span><span lang=EN-US>LUA_REGISTRYINDEX</span><span
+style='font-family:宋体'>定义的值所对应的假索引</span><span lang=EN-US>(pseudo-index)</span><span
+style='font-family:宋体'>的位置。一个假索引除了他对应的值不在栈中之外，其他都类似于栈中的索引。</span><span
+lang=EN-US>Lua API</span><span style='font-family:宋体'>中大部分接受索引作为参数的函数，也都可以接受假索引作为参数―除了那些操作栈本身的函数，比如</span><span
+lang=EN-US>lua_remove</span><span style='font-family:宋体'>，</span><span
+lang=EN-US>lua_insert</span><span style='font-family:宋体'>。例如，为了获取以键值</span><span
+lang=EN-US> &quot;Key&quot; </span><span style='font-family:宋体'>保存在</span><span
+lang=EN-US>registry</span><span style='font-family:宋体'>中的值，使用下面的代码：</span></p>
+
+<div style='border:RGB(3,52,149) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,236,242)'><span
+lang=EN-US>lua_pushstring(L, <span style='color:red'>&quot;Key&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_gettable(L, LUA_REGISTRYINDEX);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>registry</span><span
+style='font-family:宋体'>就是普通的</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>表，因此，你可以使用任何非</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>值来访问她的元素。然而，由于所有的</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>库共享相同的</span><span lang=EN-US>registry </span><span
+style='font-family:宋体'>，你必须注意使用什么样的值作为</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>，否则会导致命名冲突。一个防止命名冲突的方法是使用</span><span lang=EN-US>static</span><span
+style='font-family:宋体'>变量的地址作为</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>：</span><span lang=EN-US>C</span><span style='font-family:
+宋体'>链接器保证在所有的库中这个</span><span lang=EN-US>key</span><span style='font-family:
+宋体'>是唯一的。函数</span><span lang=EN-US>lua_pushlightuserdata</span><span
+style='font-family:宋体'>将一个代表</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>指针的值放到栈内，下面的代码展示了使用上面这个方法，如何从</span><span lang=EN-US>registry</span><span
+style='font-family:宋体'>中获取变量和向</span><span lang=EN-US>registry </span><span
+style='font-family:宋体'>存储变量：</span></p>
+
+<div style='border:RGB(3,52,149) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(234,228,221);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>/* variable with an unique address */</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,241,236)'><span
+lang=EN-US style='color:blue'>static</span><span lang=EN-US> <span
+style='color:blue'>const</span> <span style='color:blue'>char</span> Key = 'k';</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,233,246)'><span
+lang=EN-US style='color:green'>/* store a number */</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_pushlightuserdata(L, (<span style='color:blue'>void</span>
+*)&amp;Key);&nbsp; <span style='color:green'>/* push address */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,238,224)'><span
+lang=EN-US>lua_pushnumber(L, myNumber);&nbsp; <span style='color:green'>/* push
+value */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>/* registry[&amp;Key] = myNumber */</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,248,241)'><span
+lang=EN-US>lua_settable(L, LUA_REGISTRYINDEX);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,251,251)'><span
+lang=EN-US style='color:green'>/* retrieve a number */</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_pushlightuserdata(L, (<span style='color:blue'>void</span>
+*)&amp;Key);&nbsp;&nbsp; <span style='color:green'>/* push address */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,226,239)'><span
+lang=EN-US>lua_gettable(L, LUA_REGISTRYINDEX);&nbsp; <span style='color:green'>/*
+retrieve value */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>myNumber = lua_tonumber(L, -1);&nbsp; <span style='color:green'>/*
+convert to number */</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们会在</span><span
+lang=EN-US>28.5</span><span style='font-family:宋体'>节中更详细的讨论</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当然，你也可以使用字符串作为</span><span
+lang=EN-US>registry</span><span style='font-family:宋体'>的</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>，只要你保证这些字符串唯一。当你打算允许其他的独立库房问你的数据的时候，字符串型的</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>是非常有用的，因为他们需要知道</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>的名字。对这种情况，没有什么方法可以绝对防止名称冲突，但有一些好的习惯可以采用，比如使用库的名称作为字符串的前缀等类似的方法。类似</span><span
+lang=EN-US>lua</span><span style='font-family:宋体'>或者</span><span lang=EN-US>lualib</span><span
+style='font-family:宋体'>的前缀不是一个好的选择。另一个可选的方法是使用</span><span lang=EN-US>universal
+unique identifier</span><span style='font-family:宋体'>（</span><span lang=EN-US>uuid</span><span
+style='font-family:宋体'>），很多系统都有专门的程序来产生这种标示符（比如</span><span lang=EN-US>linux</span><span
+style='font-family:宋体'>下的</span><span lang=EN-US>uuidgen</span><span
+style='font-family:宋体'>）。一个</span><span lang=EN-US>uuid</span><span
+style='font-family:宋体'>是一个由本机</span><span lang=EN-US>IP</span><span
+style='font-family:宋体'>地址、时间戳、和一个随机内容组合起来的</span><span lang=EN-US>128</span><span
+style='font-family:宋体'>位的数字（以</span><span lang=EN-US>16</span><span
+style='font-family:宋体'>进制的方式书写，用来形成一个字符串），因此它与其他的</span><span lang=EN-US>uuid</span><span
+style='font-family:宋体'>不同是可以保证的。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

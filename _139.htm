@@ -1,0 +1,62 @@
+<html>
+
+<head>
+  <title>24.3 C API的错误处理 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;24.3 C API的错误处理</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>不象</span><span
+lang=EN-US>C++</span><span style='font-family:宋体'>或者</span><span lang=EN-US>JAVA</span><span
+style='font-family:宋体'>一样，</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>语言没有提供一种异常处理机制。为了改善这个难处，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>利用</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>setjmp</span><span
+style='font-family:宋体'>技巧构造了一个类似异常处理的机制。（如果你用</span><span lang=EN-US>C++</span><span
+style='font-family:宋体'>来编译</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>，那么修改代码以使用真正的异常并不困难。）</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中的所有结构都是动态的：它们按需增长，最终当可能时又会缩减。意味着内存分配失败的可能性在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中是普遍的。几乎任意操作都会面对这种意外。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>的</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>中用异常发出这些错误而不是为每步操作产生错误码。这意味着所有的</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>函数可能抛出一个错误（也就是调用</span><span lang=EN-US>longjmp</span><span
+style='font-family:宋体'>）来代替返回。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当我们写一个库代码时（也就是被</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>调用的</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数）长跳转（</span><span lang=EN-US>long jump</span><span
+style='font-family:宋体'>）的用处几乎和一个真正的异常处理一样的方便，因为</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>抓取了任务偶然的错误。当我们写应用程序代码时（也就是调用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的</span><span lang=EN-US>C</span><span style='font-family:
+宋体'>代码），无论如何，我们必须提供一种方法来抓取这些错误。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

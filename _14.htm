@@ -1,0 +1,76 @@
+<html>
+
+<head>
+  <title>1.2 全局变量 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;1.2 全局变量</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>全局变量不需要声明，给一个变量赋值后即创建了这个全局变量，访问一个没有初始化的全局变量也不会出错，只不过得到的结果是：</span><span
+lang=EN-US>nil.</span></p>
+
+<div style='border:RGB(123,54,168) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,249,247)'><span
+lang=EN-US>print(b)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+nil</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>b = 10</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,240,233)'><span
+lang=EN-US>print(b)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+10</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果你想删除一个全局变量，只需要将变量负值为</span><span
+lang=EN-US>nil</span></p>
+
+<div style='border:RGB(123,54,168) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,253,220)'><span
+lang=EN-US>b = <span style='color:blue'>nil</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(b)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+nil</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这样变量</span><span
+lang=EN-US>b</span><span style='font-family:宋体'>就好像从没被使用过一样</span><span
+lang=EN-US>.</span><span style='font-family:宋体'>换句话说</span><span lang=EN-US>, </span><span
+style='font-family:宋体'>当且仅当一个变量不等于</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>时，这个变量存在。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

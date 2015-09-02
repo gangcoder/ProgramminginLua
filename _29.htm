@@ -1,0 +1,93 @@
+<html>
+
+<head>
+  <title>3.5 优先级 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;3.5 优先级</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>从高到低的顺序：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,247,247)'><span
+lang=EN-US>^</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>not&nbsp;&nbsp;&nbsp; - (unary)</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,238,229)'><span
+lang=EN-US>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,235,232)'><span
+lang=EN-US>..</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&lt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;=&nbsp;&nbsp;&nbsp;&nbsp; &gt;=&nbsp;&nbsp;&nbsp;&nbsp; ~=&nbsp;&nbsp;&nbsp;&nbsp; ==</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,245,224)'><span
+lang=EN-US>and</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>or</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>除了</span><span
+lang=EN-US>^</span><span style='font-family:宋体'>和</span><span lang=EN-US>..</span><span
+style='font-family:宋体'>外所有的二元运算符都是左连接的。</span></p>
+
+<div style='border:RGB(110,254,124) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(239,226,223);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a+i &lt; b/2+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;--&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (a+i)
+&lt; ((b/2)+1)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,226,237)'><span
+lang=EN-US>5+x^2*8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;--&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5+((x^2)*8)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a &lt; y and y &lt;= z&nbsp;&nbsp;&nbsp;&nbsp; &lt;--&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (a
+&lt; y) and (y &lt;= z)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,232,250)'><span
+lang=EN-US>-x^2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;--&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -(x^2)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>x^y^z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;--&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x^(y^z)</span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

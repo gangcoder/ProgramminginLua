@@ -1,0 +1,213 @@
+<html>
+
+<head>
+  <title> 译序 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;译序</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>“袁承志知道若再谦逊，那就是瞧人不起，展开五行拳，发拳当胸打去。荣彩和旁观三人本来都以为他武功有独到之秘，哪知使出来的竟是武林中最寻常不过的五行拳。敌对三人登时意存轻视，温青脸上不自禁露出失望的神色。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>“荣彩心中暗喜，双拳如风，连抢三下攻势，满拟自己的大力魔爪手江南独步，三四招之间就可破去对方五行拳，那知袁承志轻描淡写的一一化解。再拆数招，荣彩暗暗吃惊，原来对方所使虽是极寻常的拳术，但每一招均是含劲不吐，意在拳先，举手抬足之间隐含极浑厚的内力。”</span></p>
+
+<p class=MsoNormal align=right style='text-align:right;text-indent:21.0pt'><span
+style='font-family:宋体'>――金庸《碧血剑》</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>编程语言之于程序员，若武功招式之于习武之人，招式虽重要，却更在于使用之人。胜者之道，武功只行于表，高手用剑，片草只叶亦威力无穷。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当今武林，派别林立，语言繁杂，林林总总不计其数。主流文化的</span><span
+lang=EN-US>C/C++</span><span style='font-family:宋体'>、</span><span lang=EN-US>Java</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>C#</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>VB<a href="#_ftn1"
+name="_ftnref1" title=""><span class=MsoFootnoteReference><span
+class=MsoFootnoteReference><span lang=EN-US style='font-size:10.5pt;font-family:
+"Times New Roman","serif"'>[1]</span></span></span></a></span><span
+style='font-family:宋体'>；偏安一隅的</span><span lang=EN-US>Fortran</span><span
+style='font-family:宋体'>；动态语言中的</span><span lang=EN-US>Perl</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>Tcl</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>Ruby</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>Forth</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>Python</span><span
+style='font-family:宋体'>，以及本书介绍的</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>；……，等等等等。再加上世界上那些不知道躲在哪的旮旯的奇奇怪怪的</span><span lang=EN-US>hacker</span><span
+style='font-family:宋体'>捣鼓出来的异想天开的语言，要想各类语言样样精通，不异于痴人说梦。不信可欣赏一下</span><span
+lang=EN-US>BrainFuck</span><span style='font-family:宋体'>语言</span><a
+href="#_ftn2" name="_ftnref2" title=""><span class=MsoFootnoteReference><span
+lang=EN-US><span class=MsoFootnoteReference><span lang=EN-US style='font-size:
+10.5pt;font-family:"Times New Roman","serif"'>[2]</span></span></span></span></a><span
+style='font-family:宋体'>的</span><span lang=EN-US>Hello World</span><span
+style='font-family:宋体'>程序，语言本身依如其名。</span><span lang=EN-US>-</span><span
+lang=EN-US style='font-family:Wingdings'>J</span><span lang=EN-US>-</span></p>
+
+<div style='border:RGB(88,4,65) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,231,254)'><span
+lang=EN-US>&gt;+++++++++[&lt;++++++++&gt;-]&lt;.&gt;+++++++[&lt;++++&gt;-]&lt;+.+++++++..+++.[-]&gt;++++++++[&lt;++++&gt;-]&lt;.#&gt;+++++++++++[&lt;+++++&gt;-]&lt;.&gt;++++++++[&lt;+++&gt;-]&lt;.+++.------.--------.[-]&gt;++++++++[&lt;++++&gt;-]&lt;+.[-]++++++++++.</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>虽说语言的威力依使用者本身的修为高低而定，但不同语言本身的设计又有不同。若让用</span><span
+lang=EN-US>Java</span><span style='font-family:宋体'>写写操作系统内核、</span><span
+lang=EN-US>Perl</span><span style='font-family:宋体'>写写驱动程序、</span><span
+lang=EN-US>C/C++</span><span style='font-family:宋体'>写写</span><span lang=EN-US>web</span><span
+style='font-family:宋体'>应用，都无异于舍近求远，好刀只用上了刀背。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>本身是以简单优雅为本，着眼于处理那些</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>不擅长的任务。借助</span><span lang=EN-US>C/C++</span><span
+style='font-family:宋体'>为其扩展，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>可闪现无穷魅力。</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>本身完全遵循</span><span lang=EN-US>ANSI C</span><span
+style='font-family:宋体'>而写成，只要有</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>编译器的地方，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>便可发挥她的力量。</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>不需要追求</span><span lang=EN-US>Python</span><span
+style='font-family:宋体'>那样的大而全的库，太多累赘，反而破坏了她的优美。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>语言的优美，来自于使用者自己的感悟。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>的优雅，也只有使用后才会明白。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>扬起帆，让我们一同踏上</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>的学习之旅……</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>本书的翻译，是</span><span
+lang=EN-US><a href="http://www.luachina.net/">www.luachina.net</a></span><span
+style='font-family:宋体'>中朋友们共同努力的结果。下面是参与翻译与校对的朋友：</span></p>
+
+<div style='border:RGB(88,4,65) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,235,244)'><span
+lang=EN-US style='color:green'>-- file: 'thanks.lua'</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>-- desc: to print the list of the contributing
+guys</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,252,222)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>helpful_guys = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,249,237)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;----</span></span><span
+style='font-family:宋体;color:red'>参与翻译</span><span lang=EN-US style='color:red'>----&quot;</span><span
+lang=EN-US style='color:green'>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;buxiu&quot;</span>,
+<span style='color:red'>&quot;</span></span><span style='font-family:宋体;
+color:red'>凤舞影天</span><span lang=EN-US style='color:red'>&quot;</span><span
+lang=EN-US>, <span style='color:red'>&quot;zhang3&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,240,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;morler&quot;</span>,
+<span style='color:red'>&quot;lambda&quot;</span>, <span style='color:red'>&quot;sunlight&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;\n&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,236,246)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;----</span></span><span
+style='font-family:宋体;color:red'>参与校对</span><span lang=EN-US style='color:red'>----&quot;</span><span
+lang=EN-US style='color:green'>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,251,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;</span></span><span
+style='font-family:宋体;color:red'>凤舞影天</span><span lang=EN-US style='color:red'>&quot;</span><span
+lang=EN-US>, <span style='color:red'>&quot;doyle&quot;</span>, <span
+style='color:red'>&quot;flicker&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;</span></span><span
+style='font-family:宋体;color:red'>花生魔人</span><span lang=EN-US style='color:red'>&quot;</span><span
+lang=EN-US>, <span style='color:red'>&quot;zhang3&quot;</span>, <span
+style='color:red'>&quot;kasicass&quot;</span>,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,233,251)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;\n&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,240,224)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> _,e <span
+style='color:blue'>in</span> ipairs(helpful_guys) <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,237,251)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(e)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal align=right style='text-align:right;text-indent:21.0pt'><span
+lang=EN-US><a href="http://www.luachina.net/">www.luachina.net</a></span><span
+style='font-family:宋体'>翻译组</span></p>
+
+<p class=MsoNormal align=right style='text-align:right;text-indent:21.0pt'><span
+lang=EN-US>2005</span><span style='font-family:宋体'>年</span><span lang=EN-US>7</span><span
+style='font-family:宋体'>月</span><span lang=EN-US>26</span><span
+style='font-family:宋体'>日</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体;
+color:red'>注：本</span><span lang=EN-US style='color:red'>pdf</span><span
+style='font-family:宋体;color:red'>为翻译稿，校对工作正在进行。</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section5 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

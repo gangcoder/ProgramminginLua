@@ -1,0 +1,149 @@
+<html>
+
+<head>
+  <title>1.4 命令行方式 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;1.4 命令行方式</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>lua [options]
+[script [args]]</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>-e</span><span
+style='font-family:宋体'>：直接将命令传入</span><span lang=EN-US>Lua</span></p>
+
+<div style='border:RGB(182,64,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,223,237)'><span
+lang=EN-US>prompt&gt; lua -e &quot;print(math.sin(12))&quot;&nbsp;&nbsp; <span
+style='color:green'>--&gt; -0.53657291800043</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>-l</span><span
+style='font-family:宋体'>：加载一个文件</span><span lang=EN-US>.</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>-i</span><span
+style='font-family:宋体'>：进入交互模式</span><span lang=EN-US>.</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>_PROMPT</span><span
+style='font-family:宋体'>内置变量作为交互模式的提示符</span></p>
+
+<div style='border:RGB(182,64,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,248,233)'><span
+lang=EN-US>prompt&gt; lua -i -e &quot;_PROMPT=' lua&gt; '&quot;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua&gt;</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的运行过程，在运行参数之前，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>会查找环境变量</span><span lang=EN-US>LUA_INIT</span><span
+style='font-family:宋体'>的值，如果变量存在并且值为</span><span lang=EN-US>@filename</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>将加载指定文件。如果变量存在但不是以</span><span lang=EN-US>@</span><span
+style='font-family:宋体'>开头，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>假定</span><span lang=EN-US>filename</span><span
+style='font-family:宋体'>为</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>代码文件并且运行他。利用这个特性，我们可以通过配置，灵活的设置交互模式的环境。可以加载包，修改提示符和路径，定义自己的函数，修改或者重命名函数等。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>全局变量</span><span
+lang=EN-US>arg</span><span style='font-family:宋体'>存放</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>的命令行参数。</span></p>
+
+<div style='border:RGB(182,64,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(224,237,235);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>prompt&gt; lua script a b c</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在运行以前，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>使用所有参数构造</span><span
+lang=EN-US>arg</span><span style='font-family:宋体'>表。脚本名索引为</span><span
+lang=EN-US>0</span><span style='font-family:宋体'>，脚本的参数从</span><span lang=EN-US>1</span><span
+style='font-family:宋体'>开始增加。脚本前面的参数从</span><span lang=EN-US>-1</span><span
+style='font-family:宋体'>开始减少。</span></p>
+
+<div style='border:RGB(182,64,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(244,234,246);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>prompt&gt; lua -e &quot;sin=math.sin&quot; script a b</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>arg</span><span
+style='font-family:宋体'>表如下：</span></p>
+
+<div style='border:RGB(182,64,4) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(225,240,221);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>arg[-3] = <span style='color:red'>&quot;lua&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,234,225)'><span
+lang=EN-US>arg[-2] = <span style='color:red'>&quot;-e&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>arg[-1] = <span style='color:red'>&quot;sin=math.sin&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,253,225)'><span
+lang=EN-US>arg[0] = <span style='color:red'>&quot;script&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>arg[1] = <span style='color:red'>&quot;a&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,248,222)'><span
+lang=EN-US>arg[2] = <span style='color:red'>&quot;b&quot;</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section9 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

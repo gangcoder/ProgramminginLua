@@ -1,0 +1,139 @@
+<html>
+
+<head>
+  <title>8.1 require函数 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;8.1 require函数</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>提供高级的</span><span lang=EN-US>require</span><span
+style='font-family:宋体'>函数来加载运行库。粗略的说</span><span lang=EN-US>require</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>dofile</span><span
+style='font-family:宋体'>完成同样的功能但有两点不同：</span></p>
+
+<p class=MsoNormal style='margin-left:39.0pt;text-indent:-18.0pt'><span
+lang=EN-US>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-US>require</span><span style='font-family:宋体'>会搜索目录加载文件</span></p>
+
+<p class=MsoNormal style='margin-left:39.0pt;text-indent:-18.0pt'><span
+lang=EN-US>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-US>require</span><span style='font-family:宋体'>会判断是否文件已经加载避免重复加载同一文件。由于上述特征，</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中是加载库的更好的函数。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>require</span><span
+style='font-family:宋体'>使用的路径和普通我们看到的路径还有些区别，我们一般见到的路径都是一个目录列表。</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>的路径是一个模式列表，每一个模式指明一种由虚文件名（</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>的参数）转成实文件名的方法。更明确地说，每一个模式是一个包含可选的问号的文件名。匹配的时候</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>会首先将问号用虚文件名替换，然后看是否有这样的文件存在。如果不存在继续用同样的方法用第二个模式匹配。例如，路径如下：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,241,244)'><span
+lang=EN-US>?;?.lua;c:\windows\?;/usr/local/lua/?/?.lua</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>调用</span><span
+lang=EN-US>require &quot;lili&quot;</span><span style='font-family:宋体'>时会试着打开这些文件：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,225,251)'><span
+lang=EN-US>lili</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lili.lua</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,248,228)'><span
+lang=EN-US>c:\windows\lili</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>/usr/local/lua/lili/lili.lua</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>require</span><span
+style='font-family:宋体'>关注的问题只有分号（模式之间的分隔符）和问号，其他的信息（目录分隔符，文件扩展名）在路径中定义。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了确定路径，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>首先检查全局变量</span><span
+lang=EN-US>LUA_PATH</span><span style='font-family:宋体'>是否为一个字符串，如果是则认为这个串就是路径；否则</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>检查环境变量</span><span
+lang=EN-US>LUA_PATH</span><span style='font-family:宋体'>的值，如果两个都失败</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>使用固定的路径（典型的</span><span
+lang=EN-US>&quot;?;?.lua&quot;</span><span style='font-family:宋体'>）</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>require</span><span
+style='font-family:宋体'>的另一个功能是避免重复加载同一个文件两次。</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>保留一张所有已经加载的文件的列表（使用</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>保存）。如果一个加载的文件在表中存在</span><span lang=EN-US>require</span><span
+style='font-family:宋体'>简单的返回；表中保留加载的文件的虚名，而不是实文件名。所以如果你使用不同的虚文件名</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>同一个文件两次，将会加载两次该文件。比如</span><span
+lang=EN-US>require &quot;foo&quot;</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>require &quot;foo.lua&quot;</span><span style='font-family:宋体'>，路径为</span><span
+lang=EN-US>&quot;?;?.lua&quot;</span><span style='font-family:宋体'>将会加载</span><span
+lang=EN-US>foo.lua</span><span style='font-family:宋体'>两次。我们也可以通过全局变量</span><span
+lang=EN-US>_LOADED</span><span style='font-family:宋体'>访问文件名列表，这样我们就可以判断文件是否被加载过；同样我们也可以使用一点小技巧让</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>加载一个文件两次。比如，</span><span
+lang=EN-US>require &quot;foo&quot;</span><span style='font-family:宋体'>之后</span><span
+lang=EN-US>_LOADED[&quot;foo&quot;]</span><span style='font-family:宋体'>将不为</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>，我们可以将其赋值为</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>，</span><span lang=EN-US>require
+&quot;foo.lua&quot;</span><span style='font-family:宋体'>将会再次加载该文件。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一个路径中的模式也可以不包含问号而只是一个固定的路径，比如：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(229,236,224);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>?;?.lua;/usr/local/default.lua</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这种情况下，</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>没有匹配的时候就会使用这个固定的文件（当然这个固定的路径必须放在模式列表的最后才有意义）。在</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>运行一个</span><span
+lang=EN-US>chunk</span><span style='font-family:宋体'>以前，它定义了一个全局变量</span><span
+lang=EN-US>_REQUIREDNAME</span><span style='font-family:宋体'>用来保存被</span><span
+lang=EN-US>required</span><span style='font-family:宋体'>的虚文件的文件名。我们可以通过使用这个技巧扩展</span><span
+lang=EN-US>require</span><span style='font-family:宋体'>的功能。举个极端的例子，我们可以把路径设为</span><span
+lang=EN-US>&quot;/usr/local/lua/newrequire.lua&quot;</span><span
+style='font-family:宋体'>，这样以后每次调用</span><span lang=EN-US>require</span><span
+style='font-family:宋体'>都会运行</span><span lang=EN-US>newrequire.lua</span><span
+style='font-family:宋体'>，这种情况下可以通过使用</span><span lang=EN-US>_REQUIREDNAME</span><span
+style='font-family:宋体'>的值去实际加载</span><span lang=EN-US>required</span><span
+style='font-family:宋体'>的文件。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

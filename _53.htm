@@ -1,0 +1,223 @@
+<html>
+
+<head>
+  <title>8.3 错误 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;8.3 错误</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Errare humanum
+est</span><span style='font-family:宋体'>（拉丁谚语：犯错是人的本性）。所以我们要尽可能的防止错误的发生，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>经常作为扩展语言嵌入在别的应用中，所以不能当错误发生时简单的崩溃或者退出。相反，当错误发生时</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>结束当前的</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>并返回到应用中。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>遇到不期望的情况时就会抛出错误，比如：两个非数字进行相加；调用一个非函数的变量；访问表中不存在的值等（可以通过</span><span
+lang=EN-US>metatables</span><span style='font-family:宋体'>修改这种行为，后面介绍）。你也可以通过调用</span><span
+lang=EN-US>error</span><span style='font-family:宋体'>函数显式地抛出错误，</span><span
+lang=EN-US>error</span><span style='font-family:宋体'>的参数是要抛出的错误信息。</span></p>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,222,234)'><span
+lang=EN-US>print <span style='color:red'>&quot;enter a number:&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>n = io.read(<span style='color:red'>&quot;*number&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,230,251)'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> <span
+style='color:blue'>not</span> n <span style='color:blue'>then</span> error(<span
+style='color:red'>&quot;invalid input&quot;</span>) <span style='color:blue'>end</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>提供了专门的内置函数</span><span lang=EN-US>assert</span><span
+style='font-family:宋体'>来完成上面类似的功能：</span></p>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,240,234)'><span
+lang=EN-US>print <span style='color:red'>&quot;enter a number:&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>n = assert(io.read(<span style='color:red'>&quot;*number&quot;</span>),
+<span style='color:red'>&quot;invalid input&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>assert</span><span
+style='font-family:宋体'>首先检查第一个参数，若没问题，</span><span lang=EN-US>assert</span><span
+style='font-family:宋体'>不做任何事情；否则，</span><span lang=EN-US>assert</span><span
+style='font-family:宋体'>以第二个参数作为错误信息抛出。第二个参数是可选的。注意，</span><span lang=EN-US>assert</span><span
+style='font-family:宋体'>会首先处理两个参数，然后才调用函数，所以下面代码，无论</span><span lang=EN-US>n</span><span
+style='font-family:宋体'>是否为数字，字符串连接操作总会执行：</span></p>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(226,230,220);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>n = io.read()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,247,247)'><span
+lang=EN-US>assert(tonumber(n), <span style='color:red'>&quot;invalid input:
+&quot;</span> .. n .. <span style='color:red'>&quot; is not a number&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当函数遇到异常有两个基本的动作：返回错误代码或者抛出错误。选择哪一种方式，没有固定的规则，不过基本的原则是：<span
+style='color:blue'>对于程序逻辑上能够避免的异常，以抛出错误的方式处理之，否则返回错误代码</span>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>例如</span><span
+lang=EN-US>sin</span><span style='font-family:宋体'>函数，假定我们让</span><span
+lang=EN-US>sin</span><span style='font-family:宋体'>碰到错误时返回错误代码，则使用</span><span
+lang=EN-US>sin</span><span style='font-family:宋体'>的代码可能变为：</span></p>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:0cm 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,240,220);
+border:none;padding:0cm'><span lang=EN-US style='color:blue'>local</span><span
+lang=EN-US> res = math.sin(x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff;
+border:none;padding:0cm'><span lang=EN-US style='color:blue'>if</span><span
+lang=EN-US> <span style='color:blue'>not</span> res <span style='color:blue'>then</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- error</span></span></p>
+
+</div>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(245,231,240);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当然，我们也可以在调用</span><span
+lang=EN-US>sin</span><span style='font-family:宋体'>前检查</span><span lang=EN-US>x</span><span
+style='font-family:宋体'>是否为数字：</span></p>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(246,222,252);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> <span
+style='color:blue'>not</span> tonumber(x) <span style='color:blue'>then</span>&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- error: x is not a number</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,230,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>而事实上，我们既不是检查参数也不是检查返回结果，因为参数错误可能意味着我们的程序某个地方存在问题，这种情况下，处理异常最简单最实际的方式是抛出错误并且终止代码的运行。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>再来看一个例子。</span><span
+lang=EN-US>io.open</span><span style='font-family:宋体'>函数用于打开文件，如果文件不存在，结果会如何？很多系统中，我们通过“试着去打开文件”来判断文件是否存在。所以如果</span><span
+lang=EN-US>io.open</span><span style='font-family:宋体'>不能打开文件（由于文件不存在或者没有权限），函数返回</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>和错误信息。依据这种方式，我们可以通过与用户交互（比如：是否要打开另一个文件）合理地处理问题：</span></p>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,255,239)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> file, msg</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>repeat</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,232,231)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print <span style='color:red'>&quot;enter a file
+name:&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> name =
+io.read()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,254,252)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> <span
+style='color:blue'>not</span> name <span style='color:blue'>then</span> <span
+style='color:blue'>return</span> <span style='color:blue'>end</span>&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- no input</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; file, msg = io.open(name, <span style='color:
+red'>&quot;r&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,253,247)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> <span
+style='color:blue'>not</span> file <span style='color:blue'>then</span>
+print(msg) <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>until</span><span lang=EN-US> file</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果你想偷懒不想处理这些情况，又想代码安全的运行，可以使用</span><span
+lang=EN-US>assert</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(231,234,229);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>file = assert(io.open(name, <span style='color:red'>&quot;r&quot;</span>))</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中有一个习惯：如果</span><span lang=EN-US>io.open</span><span
+style='font-family:宋体'>失败，</span><span lang=EN-US>assert</span><span
+style='font-family:宋体'>将抛出错误。</span></p>
+
+<div style='border:RGB(87,133,54) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(232,243,223);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>file = assert(io.open(<span style='color:red'>&quot;no-file&quot;</span>,
+<span style='color:red'>&quot;r&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,243,239)'><span
+lang=EN-US style='color:green'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --&gt;
+stdin:1: no-file: No such file or directory</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>注意：</span><span
+lang=EN-US>io.open</span><span style='font-family:宋体'>返回的第二个结果（错误信息）会作为</span><span
+lang=EN-US>assert</span><span style='font-family:宋体'>的第二个参数。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

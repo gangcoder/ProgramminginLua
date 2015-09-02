@@ -1,0 +1,111 @@
+<html>
+
+<head>
+  <title>28.5 Light Userdata - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;28.5 Light Userdata</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>到目前为止我们使用的</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>称为</span><span
+lang=EN-US>full userdata</span><span style='font-family:宋体'>。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>还提供了另一种</span><span
+lang=EN-US>userdata: light userdata</span><span style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一个</span><span
+lang=EN-US>light userdatum</span><span style='font-family:宋体'>是一个表示</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>指针的值（也就是一个</span><span
+lang=EN-US>void *</span><span style='font-family:宋体'>类型的值）。由于它是一个值，我们不能创建他们（同样的，我们也不能创建一个数字）。可以使用函数</span><span
+lang=EN-US>lua_pushlightuserdata</span><span style='font-family:宋体'>将一个</span><span
+lang=EN-US>light userdatum</span><span style='font-family:宋体'>入栈：</span></p>
+
+<div style='border:RGB(133,24,222) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,243,232)'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US>
+lua_pushlightuserdata (lua_State *L, <span style='color:blue'>void</span> *p);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>尽管都是</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>，</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>full userdata</span><span style='font-family:宋体'>有很大不同。</span><span
+lang=EN-US>Light userdata</span><span style='font-family:宋体'>不是一个缓冲区，仅仅是一个指针，没有</span><span
+lang=EN-US>metatables</span><span style='font-family:宋体'>。像数字一样，</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>不需要垃圾收集器来管理她。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有些人把</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>作为一个低代价的替代实现，来代替</span><span
+lang=EN-US>full userdata</span><span style='font-family:宋体'>，但是这不是</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>的典型应用。首先，使用</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>你必须自己管理内存，因为他们和垃圾收集器无关。第二，尽管从名字上看有轻重之分，但</span><span
+lang=EN-US>full userdata</span><span style='font-family:宋体'>实现的代价也并不大，比较而言，他只是在分配给定大小的内存时候，有一点点额外的代价。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Light userdata</span><span
+style='font-family:宋体'>真正的用处在于可以表示不同类型的对象。当</span><span lang=EN-US>full
+userdata</span><span style='font-family:宋体'>是一个对象的时候，它等于对象自身；另一方面，</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>表示的是一个指向对象的指针，同样的，它等于指针指向的任何类型的</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>。所以，我们在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中使用</span><span lang=EN-US>light
+userdata</span><span style='font-family:宋体'>表示</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>对象。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>看一个典型的例子，假定我们要实现：</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>和窗口系统的绑定。这种情况下，我们使用</span><span
+lang=EN-US>full userdata</span><span style='font-family:宋体'>表示窗口（每一个</span><span
+lang=EN-US>userdatum</span><span style='font-family:宋体'>可以包含整个窗口结构或者一个有系统创建的指向单个窗口的指针）。当在窗口有一个事件发生（比如按下鼠标），系统会根据窗口的地址调用专门的回调函数。为了将这个回调函数传递给</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>，我们必须找到表示指定窗口的</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>。为了找到这个</span><span
+lang=EN-US>userdata,</span><span style='font-family:宋体'>我们可以使用一个表：索引为表示窗口地址的</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>，值为在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中表示窗口的</span><span
+lang=EN-US>full userdata</span><span style='font-family:宋体'>。一旦我们有了窗口的地址，我们将窗口地址作为</span><span
+lang=EN-US>light userdata</span><span style='font-family:宋体'>放到栈内，并且将</span><span
+lang=EN-US>userdata</span><span style='font-family:宋体'>作为表的索引存到表内。（注意这个表应该有一个</span><span
+lang=EN-US>weak</span><span style='font-family:宋体'>值，否则，这些</span><span
+lang=EN-US>full userdata</span><span style='font-family:宋体'>永远不会被回收掉。）</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section39 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

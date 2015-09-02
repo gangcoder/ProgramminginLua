@@ -1,0 +1,78 @@
+<html>
+
+<head>
+  <title> 第23章 Debug库 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第23章 Debug库</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>debug</span><span
+style='font-family:宋体'>库并不给你一个可用的</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>调试器，而是给你提供一些为</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>写一个调试器的方便。出于性能方面的考虑，关于这方面官方的接口是通过</span><span
+lang=EN-US>C API</span><span style='font-family:宋体'>实现的。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中的</span><span lang=EN-US>debug</span><span
+style='font-family:宋体'>库就是一种在</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>代码中直接访问这些</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>函数的方法。</span><span lang=EN-US>Debug</span><span
+style='font-family:宋体'>库在一个</span><span lang=EN-US>debug</span><span
+style='font-family:宋体'>表内声明了他所有的函数。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>与其他的标准库不同的是，你应该尽可能少的是有</span><span
+lang=EN-US>debug</span><span style='font-family:宋体'>库。首先，</span><span
+lang=EN-US>debug</span><span style='font-family:宋体'>库中的一些函数性能比较低；第二，它破坏了语言的一些真理</span><span
+lang=EN-US>(sacred truths)</span><span style='font-family:宋体'>，比如你不能在定义一个局部变量的函数外部，访问这个变量。通常，在你的最终产品中，你不想打开这个</span><span
+lang=EN-US>debug</span><span style='font-family:宋体'>库，或者你可能想删除这个库：</span></p>
+
+<div style='border:RGB(178,140,96) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,249,238)'><span
+lang=EN-US>debug = <span style='color:blue'>nil</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>debug</span><span
+style='font-family:宋体'>库由两种函数组成：自省</span><span lang=EN-US>(introspective)</span><span
+style='font-family:宋体'>函数和</span><span lang=EN-US>hooks</span><span
+style='font-family:宋体'>。自省函数使得我们可以检查运行程序的某些方面，比如活动函数栈、当前执行代码的行号、本地变量的名和值。</span><span
+lang=EN-US>Hooks</span><span style='font-family:宋体'>可以跟踪程序的执行情况。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Debug</span><span
+style='font-family:宋体'>库中的一个重要的思想是栈级别</span><span lang=EN-US>(stack level)</span><span
+style='font-family:宋体'>。一个栈级别就是一个指向在当前时刻正在活动的特殊函数的数字，也就是说，这个函数正在被调用但还没有返回。调用</span><span
+lang=EN-US>debug</span><span style='font-family:宋体'>库的函数级别为</span><span
+lang=EN-US>1</span><span style='font-family:宋体'>，调用他</span><span lang=EN-US>(</span><span
+style='font-family:宋体'>他指调用</span><span lang=EN-US>debug</span><span
+style='font-family:宋体'>库的函数</span><span lang=EN-US>)</span><span
+style='font-family:宋体'>的函数级别为</span><span lang=EN-US>2</span><span
+style='font-family:宋体'>，以此类推。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

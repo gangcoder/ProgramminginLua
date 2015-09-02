@@ -1,0 +1,164 @@
+<html>
+
+<head>
+  <title>7.3 无状态的迭代器 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;7.3 无状态的迭代器</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>无状态的迭代器是指不保留任何状态的迭代器，因此在循环中我们可以利用无状态迭代器避免创建闭包花费额外的代价。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>每一次迭代，迭代函数都是用两个变量（状态常量和控制变量）的值作为参数被调用，一个无状态的迭代器只利用这两个值可以获取下一个元素。这种无状态迭代器的典型的简单的例子是</span><span
+lang=EN-US>ipairs</span><span style='font-family:宋体'>，他遍历数组的每一个元素。</span></p>
+
+<div style='border:RGB(222,83,88) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,222,226)'><span
+lang=EN-US>a = {<span style='color:red'>&quot;one&quot;</span>, <span
+style='color:red'>&quot;two&quot;</span>, <span style='color:red'>&quot;three&quot;</span>}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> i, v <span
+style='color:blue'>in</span> ipairs(a) <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,221,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(i, v)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>迭代的状态包括被遍历的表（循环过程中不会改变的状态常量）和当前的索引下标（控制变量），</span><span
+lang=EN-US>ipairs</span><span style='font-family:宋体'>和迭代函数都很简单，我们在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中可以这样实现：</span></p>
+
+<div style='border:RGB(222,83,88) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(255,234,230);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> iter (a, i)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,236,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; i = i + 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> v = a[i]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,253,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> v <span
+style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+i, v</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,249,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,220,239)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> ipairs (a)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,241,220)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> iter, a, 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>调用</span><span lang=EN-US>ipairs(a)</span><span
+style='font-family:宋体'>开始循环时，他获取三个值：迭代函数</span><span lang=EN-US>iter</span><span
+style='font-family:宋体'>、状态常量</span><span lang=EN-US>a</span><span
+style='font-family:宋体'>、控制变量初始值</span><span lang=EN-US>0</span><span
+style='font-family:宋体'>；然后</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>调用</span><span lang=EN-US>iter(a,0)</span><span
+style='font-family:宋体'>返回</span><span lang=EN-US>1,a[1]</span><span
+style='font-family:宋体'>（除非</span><span lang=EN-US>a[1]=nil</span><span
+style='font-family:宋体'>）；第二次迭代调用</span><span lang=EN-US>iter(a,1)</span><span
+style='font-family:宋体'>返回</span><span lang=EN-US>2,a[2]</span><span
+style='font-family:宋体'>……直到第一个非</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>元素。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>库中实现的</span><span lang=EN-US>pairs</span><span
+style='font-family:宋体'>是一个用</span><span lang=EN-US>next</span><span
+style='font-family:宋体'>实现的原始方法：</span></p>
+
+<div style='border:RGB(222,83,88) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(255,236,253);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> pairs (t)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(235,243,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> next, t, <span
+style='color:blue'>nil</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>还可以不使用</span><span
+lang=EN-US>ipairs</span><span style='font-family:宋体'>直接使用</span><span
+lang=EN-US>next</span></p>
+
+<div style='border:RGB(222,83,88) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(221,222,237);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>for</span><span lang=EN-US> k, v <span
+style='color:blue'>in</span> next, t <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,242,231)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>记住：</span><span
+lang=EN-US>exp-list</span><span style='font-family:宋体'>返回结果会被调整为三个，所以</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>获取</span><span lang=EN-US>next</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>t</span><span style='font-family:
+宋体'>、</span><span lang=EN-US>nil</span><span style='font-family:宋体'>；确切地说当他调用</span><span
+lang=EN-US>pairs</span><span style='font-family:宋体'>时获取。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

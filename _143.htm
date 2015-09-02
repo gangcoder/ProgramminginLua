@@ -1,0 +1,489 @@
+<html>
+
+<head>
+  <title>25.1 表操作 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;25.1 表操作</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在，我们打算使用</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>作为配置文件，配置窗口的背景颜色。我们假定最终的颜色有三个数字（</span><span
+lang=EN-US>RGB</span><span style='font-family:宋体'>）描述，每一个数字代表颜色的一部分。通常，在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>语言中，这些数字使用</span><span
+lang=EN-US>[0,255]</span><span style='font-family:宋体'>范围内的整数表示，由于在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中所有数字都是实数，我们可以使用更自然的范围</span><span
+lang=EN-US>[0,1]</span><span style='font-family:宋体'>来表示。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一个粗糙的解决方法是，对每一个颜色组件使用一个全局变量表示，让用户来配置这些变量：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,239,255)'><span
+lang=EN-US style='color:green'>-- configuration file for program 'pp'</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>width = 200</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,243,237)'><span
+lang=EN-US>height = 300</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>background_red = 0.30</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,255,241)'><span
+lang=EN-US>background_green = 0.10</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>background_blue = 0</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个方法有两个缺点：第一，太冗余（为了表示窗口的背景，窗口的前景，菜单的背景等，一个实际的应用程序可能需要几十个不同的颜色）；第二，没有办法预定义共同部分的颜色，比如，假如我们事先定义了</span><span
+lang=EN-US>WHITE</span><span style='font-family:宋体'>，用户可以简单的写</span><span
+lang=EN-US>background = WHITE</span><span style='font-family:宋体'>来表示所有的背景色为白色。为了避免这些缺点，我们使用一个</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>来表示颜色：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(227,225,246);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>background = {r=0.30, g=0.10, b=0}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>表的使用给脚本的结构带来很多灵活性，现在对于用户（或者应用程序）很容易预定义一些颜色，以便将来在配置中使用：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(221,248,243);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>BLUE = {r=0, g=0, b=1}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,252,251)'><span
+lang=EN-US>...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>background = BLUE</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>中获取这些值，我们这样做：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(251,220,244);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_getglobal(L, <span style='color:red'>&quot;background&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,222,247)'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> (!lua_istable(L, -1))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; error(L, <span style='color:red'>&quot;`background'
+is not a valid color table&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,231,253)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>red = getfield(<span style='color:red'>&quot;r&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,231,233)'><span
+lang=EN-US>green = getfield(<span style='color:red'>&quot;g&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>blue = getfield(<span style='color:red'>&quot;b&quot;</span>);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一般来说，我们首先获取全局变量</span><span
+lang=EN-US>backgroud</span><span style='font-family:宋体'>的值，并保证它是一个</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>。然后，我们使用</span><span
+lang=EN-US>getfield</span><span style='font-family:宋体'>函数获取每一个颜色组件。这个函数不是</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>的一部分，我们需要自己定义他：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(243,225,241);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>#define</span><span lang=EN-US>
+MAX_COLOR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 255</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,220,255)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>/* assume that table is on the stack top */</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,224,226)'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> getfield (<span
+style='color:blue'>const</span> <span style='color:blue'>char</span> *key) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span> result;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,238,238)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushstring(L, key);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_gettable(L, -2);&nbsp; <span
+style='color:green'>/* get background[key] */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,226,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+(!lua_isnumber(L, -1))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error(L, <span
+style='color:red'>&quot;invalid component in background color&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,233,245)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; result = (<span style='color:blue'>int</span>)lua_tonumber(L,
+-1) * MAX_COLOR;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pop(L, 1);&nbsp; <span style='color:green'>/*
+remove number */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,248,232)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> result;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这里我们再次面对多态的问题：可能存在很多个</span><span
+lang=EN-US>getfield</span><span style='font-family:宋体'>的版本，</span><span
+lang=EN-US>key</span><span style='font-family:宋体'>的类型，</span><span lang=EN-US>value</span><span
+style='font-family:宋体'>的类型，错误处理等都不尽相同。</span><span lang=EN-US>Lua API</span><span
+style='font-family:宋体'>只提供了一个</span><span lang=EN-US>lua_gettable</span><span
+style='font-family:宋体'>函数，他接受</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>在栈中的位置为参数，将对应</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>值出栈，返回与</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>对应的</span><span lang=EN-US>value</span><span
+style='font-family:宋体'>。我们上面的</span><span lang=EN-US>getfield</span><span
+style='font-family:宋体'>函数假定</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>在栈顶，因此，</span><span lang=EN-US>lua_pushstring</span><span
+style='font-family:宋体'>将</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>入栈之后，</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>在</span><span lang=EN-US>-2</span><span
+style='font-family:宋体'>的位置。返回之前，</span><span lang=EN-US>getfield</span><span
+style='font-family:宋体'>会将栈恢复到调用前的状态。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们对上面的例子稍作延伸，加入颜色名。用户仍然可以使用颜色</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>，但是也可以为共同部分的颜色预定义名字，为了实现这个功能，我们在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>代码中需要一个颜色</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(249,243,232);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>struct</span><span lang=EN-US> ColorTable {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,232,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>char</span> *name;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>unsigned</span> <span
+style='color:blue'>char</span> red, green, blue;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,223,243)'><span
+lang=EN-US>} colortable[] = {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;WHITE&quot;</span>,&nbsp; MAX_COLOR, MAX_COLOR, MAX_COLOR},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,230,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;RED&quot;</span>,&nbsp;&nbsp;&nbsp; MAX_COLOR, 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;GREEN&quot;</span>,&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MAX_COLOR, 0},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,234,233)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;BLUE&quot;</span>,&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MAX_COLOR},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {<span style='color:red'>&quot;BLACK&quot;</span>,&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0},</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,236,241)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; ...</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; {NULL,&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0}&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* sentinel */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,239,225)'><span
+lang=EN-US>};</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们的这个实现会使用颜色名创建一个全局变量，然后使用颜色</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>初始化这些全局变量。结果和用户在脚本中使用下面这几行代码是一样的：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,227,238)'><span
+lang=EN-US>WHITE&nbsp; = {r=1, g=1, b=1}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>RED&nbsp;&nbsp;&nbsp; = {r=1, g=0, b=0}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,253,243)'><span
+lang=EN-US>...</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>脚本中用户定义的颜色和应用中（</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>代码）定义的颜色不同之处在于：应用在脚本之前运行。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了可以设置</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>域的值，我们定义个辅助函数</span><span
+lang=EN-US>setfield</span><span style='font-family:宋体'>；这个函数将</span><span
+lang=EN-US>field</span><span style='font-family:宋体'>的索引和</span><span
+lang=EN-US>field</span><span style='font-family:宋体'>的值入栈，然后调用</span><span
+lang=EN-US>lua_settable</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,249,238)'><span
+lang=EN-US style='color:green'>/* assume that table is at the top */</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> setfield (<span
+style='color:blue'>const</span> <span style='color:blue'>char</span> *index, <span
+style='color:blue'>int</span> value) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,244,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushstring(L, index);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_pushnumber(L, (<span style='color:blue'>double</span>)value/MAX_COLOR);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,240,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_settable(L, -3);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>与其他的</span><span
+lang=EN-US>API</span><span style='font-family:宋体'>函数一样，</span><span lang=EN-US>lua_settable</span><span
+style='font-family:宋体'>在不同的参数类型情况下都可以使用，他从栈中获取所有的参数。</span><span lang=EN-US>lua_settable</span><span
+style='font-family:宋体'>以</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>在栈中的索引作为参数，并将栈中的</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>value</span><span
+style='font-family:宋体'>出栈，用这两个值修改</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>。</span><span lang=EN-US>Setfield</span><span
+style='font-family:宋体'>函数假定调用之前</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>是在栈顶位置</span><span lang=EN-US>(</span><span
+style='font-family:宋体'>索引为</span><span lang=EN-US>-1)</span><span
+style='font-family:宋体'>。将</span><span lang=EN-US>index</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>value</span><span
+style='font-family:宋体'>入栈之后，</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>索引变为</span><span lang=EN-US>-3</span><span
+style='font-family:宋体'>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Setcolor</span><span
+style='font-family:宋体'>函数定义一个单一的颜色，首先创建一个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>，然后设置对应的域，然后将这个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>赋值给对应的全局变量：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(230,251,245);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> setcolor (<span
+style='color:blue'>struct</span> ColorTable *ct) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,225,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_newtable(L);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* creates a table */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; setfield(<span style='color:red'>&quot;r&quot;</span>,
+ct-&gt;red);&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>/* table.r =
+ct-&gt;r */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,250,233)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; setfield(<span style='color:red'>&quot;g&quot;</span>,
+ct-&gt;green);&nbsp;&nbsp; <span style='color:green'>/* table.g = ct-&gt;g */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; setfield(<span style='color:red'>&quot;b&quot;</span>,
+ct-&gt;blue);&nbsp;&nbsp;&nbsp; <span style='color:green'>/* table.b = ct-&gt;b
+*/</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,251,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; lua_setglobal(ct-&gt;name);&nbsp;&nbsp;&nbsp; <span
+style='color:green'>/* 'name' = table */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>}</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>lua_newtable</span><span
+style='font-family:宋体'>函数创建一个新的空</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>然后将其入栈，调用</span><span lang=EN-US>setfield</span><span
+style='font-family:宋体'>设置</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>的域，最后</span><span lang=EN-US>lua_setglobal</span><span
+style='font-family:宋体'>将</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>出栈并将其赋给一个全局变量名。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有了前面这些函数，下面的循环注册所有的颜色到应用程序中的全局变量：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(231,233,240);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>int</span><span lang=EN-US> i = 0;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,248,253)'><span
+lang=EN-US style='color:blue'>while</span><span lang=EN-US> (colortable[i].name
+!= NULL)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; setcolor(&amp;colortable[i++]);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>记住：应用程序必须在运行用户脚本之前，执行这个循环。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>对于上面的命名颜色的实现有另外一个可选的方法。用一个字符串来表示颜色名，而不是上面使用全局变量表示，比如用户可以这样设置</span><span
+lang=EN-US>background = &quot;BLUE&quot;</span><span style='font-family:宋体'>。所以，</span><span
+lang=EN-US>background</span><span style='font-family:宋体'>可以是</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>也可以是</span><span
+lang=EN-US>string</span><span style='font-family:宋体'>。对于这种实现，应用程序在运行用户脚本之前不需要做任何特殊处理。但是需要额外的工作来获取颜色。当他得到变量</span><span
+lang=EN-US>background</span><span style='font-family:宋体'>的值之后，必须判断这个值的类型，是</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>还是</span><span lang=EN-US>string</span><span
+style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(208,97,28) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(230,255,226);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>lua_getglobal(L, <span style='color:red'>&quot;background&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,225,235)'><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> (lua_isstring(L, -1))
+{</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>const</span> <span
+style='color:blue'>char</span> *name = lua_tostring(L, -1);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,224,246)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>int</span> i = 0;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>while</span>
+(colortable[i].name != NULL &amp;&amp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,238,228)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; strcmp(colorname,
+colortable[i].name) != 0)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i++;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,238,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+(colortable[i].name == NULL)&nbsp; <span style='color:green'>/* string not
+found? */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error(L, <span
+style='color:red'>&quot;invalid color name (%s)&quot;</span>, colorname);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,254,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>else</span> {&nbsp; <span
+style='color:green'>/* use colortable[i] */</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; red = colortable[i].red;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,229,230)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; green = colortable[i].green;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; blue = colortable[i].blue;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,239,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; }</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>} <span style='color:blue'>else</span> <span style='color:blue'>if</span>
+(lua_istable(L, -1)) {</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,230,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; red = getfield(<span style='color:red'>&quot;r&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; green = getfield(<span style='color:red'>&quot;g&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,232,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; blue = getfield(<span style='color:red'>&quot;b&quot;</span>);</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>} <span style='color:blue'>else</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,236,246)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; error(L, <span style='color:red'>&quot;invalid
+value for `background'&quot;</span>);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>哪个是最好的选择呢？在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>程序中，使用字符串表示不是一个好的习惯，因为编译器不会对字符串进行错误检查。然而在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中，全局变量不需要声明，因此当用户将颜色名字拼写错误的时候，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>不会发出任何错误信息。比如，用户将</span><span
+lang=EN-US>WHITE</span><span style='font-family:宋体'>误写成</span><span lang=EN-US>WITE</span><span
+style='font-family:宋体'>，</span><span lang=EN-US>background</span><span
+style='font-family:宋体'>变量将为</span><span lang=EN-US>nil(WITE</span><span
+style='font-family:宋体'>的值没有初始化</span><span lang=EN-US>)</span><span
+style='font-family:宋体'>，然后应用程序就认为</span><span lang=EN-US>background</span><span
+style='font-family:宋体'>的值为</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>。没有其他关于这个错误的信息可以获得。另一方面，使用字符串表示，</span><span lang=EN-US>background</span><span
+style='font-family:宋体'>的值也可能是拼写错了的字符串。因此，应用程序可以在发生错误的时候，定制输出的错误信息。应用可以不区分大小写比较字符串，因此，用户可以写</span><span
+lang=EN-US>&quot;white&quot;</span><span style='font-family:宋体'>，</span><span
+lang=EN-US>&quot;WHITE&quot;</span><span style='font-family:宋体'>，甚至</span><span
+lang=EN-US>&quot;White&quot;</span><span style='font-family:宋体'>。但是，如果用户脚本很小，并且颜色种类比较多，注册成百上千个颜色</span><span
+lang=EN-US>(</span><span style='font-family:宋体'>需要创建成百上千个</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>和全局变量</span><span
+lang=EN-US>)</span><span style='font-family:宋体'>，最终用户可能只是用其中几个，这会让人觉得很怪异。在使用字符串表示的时候，应避免这种情况出现。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,100 @@
+<html>
+
+<head>
+  <title>3.2 关系运算符 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;3.2 关系运算符</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,251,243)'><span
+lang=EN-US>&lt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;=&nbsp;&nbsp;&nbsp;&nbsp; &gt;=&nbsp;&nbsp;&nbsp;&nbsp; ==&nbsp;&nbsp;&nbsp;&nbsp; ~=</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这些操作符返回结果为</span><span
+lang=EN-US>false</span><span style='font-family:宋体'>或者</span><span lang=EN-US>true</span><span
+style='font-family:宋体'>；</span><span lang=EN-US>==</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>~=</span><span
+style='font-family:宋体'>比较两个值，如果两个值类型不同，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>认为两者不同；</span><span lang=EN-US>nil</span><span
+style='font-family:宋体'>只和自己相等。</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>通过引用比较</span><span lang=EN-US>tables</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>userdata</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>functions</span><span
+style='font-family:宋体'>。也就是说当且仅当两者表示同一个对象时相等。</span></p>
+
+<div style='border:RGB(180,134,66) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,228,239)'><span
+lang=EN-US>a = {}; a.x = 1; a.y = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>b = {}; b.x = 1; b.y = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,248,243)'><span
+lang=EN-US>c = a</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a==c but a~=b</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>比较数字按传统的数字大小进行，比较字符串按字母的顺序进行，但是字母顺序依赖于本地环境。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当比较不同类型的值的时候要特别注意：</span></p>
+
+<div style='border:RGB(180,134,66) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(221,243,233);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&quot;0&quot;</span><span lang=EN-US> == 0&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- false</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,228,255)'><span
+lang=EN-US>2 &lt; 15&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- true</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&quot;2&quot;</span><span lang=EN-US> &lt; <span
+style='color:red'>&quot;15&quot;</span> &nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- false (alphabetical order!)</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了避免不一致的结果，混合比较数字和字符串，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>会报错，比如：</span><span
+lang=EN-US>2 &lt; &quot;15&quot;</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,99 @@
+<html>
+
+<head>
+  <title>24.2 堆栈 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;24.2 堆栈</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>和</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>之间交换数据时我们面临着两个问题：动态与静态类型系统的不匹配和自动与手动内存管理的不一致。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中，我们写下</span><span
+lang=EN-US>a[k]=v</span><span style='font-family:宋体'>时，</span><span lang=EN-US>k</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>v</span><span style='font-family:
+宋体'>可以有几种不同的类型（由于</span><span lang=EN-US>metatables</span><span
+style='font-family:宋体'>的存在，</span><span lang=EN-US>a</span><span
+style='font-family:宋体'>也可能有不同的类型）。如果我们想在</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>中提供类似的操作，无论怎样，操作表的函数</span><span lang=EN-US>(settable)</span><span
+style='font-family:宋体'>必定有一个固定的类型。我们将需要几十个不同的函数来完成这一个的操作（三个参数的类型的每一种组合都需要一个函数）。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们可以在</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>中声明一些</span><span lang=EN-US>union</span><span
+style='font-family:宋体'>类型来解决这个问题，我们称之为</span><span lang=EN-US>lua_Value</span><span
+style='font-family:宋体'>，它能够描述所有类型的</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>值。然后，我们就可以这样声明</span><span lang=EN-US>settable</span></p>
+
+<div style='border:RGB(87,237,29) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,245,237)'><span
+lang=EN-US style='color:blue'>void</span><span lang=EN-US> lua_settable
+(lua_Value a, lua_Value k, lua_Value v);</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个解决方案有两个缺点。第一，要将如此复杂的类型映射到其它语言可能很困难；</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>不仅被设计为与</span><span
+lang=EN-US>C/C++</span><span style='font-family:宋体'>易于交互，</span><span
+lang=EN-US>Java,Fortran</span><span style='font-family:宋体'>以及类似的语言也一样。第二，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>负责垃圾回收：如果我们将</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>值保存在</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>变量中，</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>引擎没有办法了解这种用法；它可能错误地认为某个值为垃圾并收集他。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>因此，</span><span
+lang=EN-US>Lua API</span><span style='font-family:宋体'>没有定义任何类似</span><span
+lang=EN-US>lua_Value</span><span style='font-family:宋体'>的类型。替代的方案，它用一个抽象的栈在</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>与</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>之间交换值。栈中的每一条记录都可以保存任何</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>值。无论你何时想要从</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>请求一个值（比如一个全局变量的值），调用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>，被请求的值将会被压入栈。无论你何时想要传递一个值给</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>，首先将这个值压入栈，然后调用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>（这个值将被弹出）。我们仍然需要一个不同的函数将每种</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>类型压入栈和一个不同函数从栈上取值（译注：只是取出不是弹出），但是我们避免了组合式的爆炸（</span><span
+lang=EN-US>combinatorial explosion</span><span style='font-family:宋体'>）。另外，因为栈是由</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>来管理的，垃圾回收器知道那个值正在被</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>使用。</span> <span
+style='font-family:宋体'>几乎所有的</span><span lang=EN-US>API</span><span
+style='font-family:宋体'>函数都用到了栈。正如我们在第一个例子中所看到的，</span><span lang=EN-US>luaL_loadbuffer</span><span
+style='font-family:宋体'>把它的结果留在了栈上（被编译的</span><span lang=EN-US>chunk</span><span
+style='font-family:宋体'>或一条错误信息）；</span><span lang=EN-US>lua_pcall</span><span
+style='font-family:宋体'>从栈上获取要被调用的函数并把任何临时的错误信息放在这里。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>以一个严格的</span><span lang=EN-US>LIFO</span><span
+style='font-family:宋体'>规则（后进先出；也就是说，始终存取栈顶）来操作栈。当你调用</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>时，它只会改变栈顶部分。你的Ｃ代码却有更多的自由；更明确的来讲，你可以查询栈上的任何元素，甚至是在任何一个位置插入和删除元素。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,488 @@
+<html>
+
+<head>
+  <title>9.4 非抢占式多线程 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;9.4 非抢占式多线程</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如前面所见，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中的协同是一协作的多线程，每一个协同等同于一个线程，</span><span
+lang=EN-US>yield-resume</span><span style='font-family:宋体'>可以实现在线程中切换。然而与真正的多线程不同的是，协同是非抢占式的。当一个协同正在运行时，不能在外部终止他。只能通过显示的调用</span><span
+lang=EN-US>yield</span><span style='font-family:宋体'>挂起他的执行。对于某些应用来说这个不存在问题，但有些应用对此是不能忍受的。不存在抢占式调用的程序是容易编写的。不需要考虑同步带来的</span><span
+lang=EN-US>bugs</span><span style='font-family:宋体'>，因为程序中的所有线程间的同步都是显示的。你仅仅需要在协同代码超出临界区时调用</span><span
+lang=EN-US>yield</span><span style='font-family:宋体'>即可。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>对非抢占式多线程来说，不管什么时候只要有一个线程调用一个阻塞操作（</span><span
+lang=EN-US>blocking operation</span><span style='font-family:宋体'>），整个程序在阻塞操作完成之前都将停止。对大部分应用程序而言，只是无法忍受的，这使得很多程序员离协同而去。下面我们将看到这个问题可以被有趣的解决。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>看一个多线程的例子：我们想通过</span><span
+lang=EN-US>http</span><span style='font-family:宋体'>协议从远程主机上下在一些文件。我们使用</span><span
+lang=EN-US>Diego Nehab</span><span style='font-family:宋体'>开发的</span><span
+lang=EN-US>LuaSocket</span><span style='font-family:宋体'>库来完成。我们先看下在一个文件的实现，大概步骤是打开一个到远程主机的连接，发送下载文件的请求，开始下载文件，下载完毕后关闭连接。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第一，加载</span><span
+lang=EN-US>LuaSocket</span><span style='font-family:宋体'>库</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,244,244)'><span
+lang=EN-US>require <span style='color:red'>&quot;luasocket&quot;</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第二，定义远程主机和需要下载的文件名</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,255,239)'><span
+lang=EN-US>host = <span style='color:red'>&quot;www.w3.org&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>file = <span style='color:red'>&quot;/TR/REC-html32.html&quot;</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第三，打开一个</span><span
+lang=EN-US>TCP</span><span style='font-family:宋体'>连接到远程主机的</span><span
+lang=EN-US>80</span><span style='font-family:宋体'>端口（</span><span lang=EN-US>http</span><span
+style='font-family:宋体'>服务的标准端口）</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(229,225,240);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>c = assert(socket.connect(host, 80))</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>上面这句返回一个连接对象，我们可以使用这个连接对象请求发送文件</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(240,222,235);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>c:send(<span style='color:red'>&quot;GET &quot;</span> .. file .. <span
+style='color:red'>&quot; HTTP/1.0\r\n\r\n&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>receive</span><span
+style='font-family:宋体'>函数返回他送接收到的数据加上一个表示操作状态的字符串。当主机断开连接时，我们退出循环。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>第四，关闭连接</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(246,229,227);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>c:close()</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>现在我们知道了如何下载一个文件，下面我们来看看如何下载多个文件。一种方法是我们在一个时刻只下载一个文件，这种顺序下载的方式必须等前一个文件下载完成后一个文件才能开始下载。实际上是，当我们发送一个请求之后有很多时间是在等待数据的到达，也就是说大部分时间浪费在调用</span><span
+lang=EN-US>receive</span><span style='font-family:宋体'>上。如果同时可以下载多个文件，效率将会有很大提高。当一个连接没有数据到达时，可以从另一个连接读取数据。很显然，协同为这种同时下载提供了很方便的支持，我们为每一个下载任务创建一个线程，当一个线程没有数据到达时，他将控制权交给一个分配器，由分配器唤起另外的线程读取数据。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>使用协同机制重写上面的代码，在一个函数内：</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(234,232,240);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> download (host,
+file)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,248,245)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> c =
+assert(socket.connect(host, 80))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> count = 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- counts number of bytes read</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,229,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; c:send(<span style='color:red'>&quot;GET &quot;</span>
+.. file .. <span style='color:red'>&quot; HTTP/1.0\r\n\r\n&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>while</span> <span
+style='color:blue'>true</span> <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,236,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+s, status = receive&copy;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; count = count + string.len(s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,243,236)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+status == <span style='color:red'>&quot;closed&quot;</span> <span
+style='color:blue'>then</span> <span style='color:blue'>break</span> <span
+style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,227,234)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; c:close()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; print(file, count)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,251,236)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>由于我们不关心文件的内容，上面的代码只是计算文件的大小而不是将文件内容输出。（当有多个线程下载多个文件时，输出会混杂在一起），在新的函数代码中，我们使用</span><span
+lang=EN-US>receive</span><span style='font-family:宋体'>从远程连接接收数据，在顺序接收数据的方式下代码如下：</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,234,251)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> receive
+(connection)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+connection:receive(2^10)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,226,249)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在同步接受数据的方式下，函数接收数据时不能被阻塞，而是在没有数据可取时</span><span
+lang=EN-US>yield</span><span style='font-family:宋体'>，代码如下：</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,228,234)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> receive
+(connection)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; connection:timeout(0)&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- do not block</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,252,245)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> s, status =
+connection:receive(2^10)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> status == <span
+style='color:red'>&quot;timeout&quot;</span> <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,248,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; coroutine.yield(connection)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,246,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> s, status</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>调用函数</span><span
+lang=EN-US>timeout(0)</span><span style='font-family:宋体'>使得对连接的任何操作都不会阻塞。当操作返回的状态为</span><span
+lang=EN-US>timeout</span><span style='font-family:宋体'>时意味着操作未完成就返回了。在这种情况下，线程</span><span
+lang=EN-US>yield</span><span style='font-family:宋体'>。非</span><span lang=EN-US>false</span><span
+style='font-family:宋体'>的数值作为</span><span lang=EN-US>yield</span><span
+style='font-family:宋体'>的参数告诉分配器线程仍在执行它的任务。（后面我们将看到分配器需要</span><span lang=EN-US>timeout</span><span
+style='font-family:宋体'>连接的情况），注意</span><span lang=EN-US>:</span><span
+style='font-family:宋体'>即使在</span><span lang=EN-US>timeout</span><span
+style='font-family:宋体'>模式下，连接依然返回他接受到直到</span><span lang=EN-US>timeout</span><span
+style='font-family:宋体'>为止，因此</span><span lang=EN-US>receive</span><span
+style='font-family:宋体'>会一直返回</span><span lang=EN-US>s</span><span
+style='font-family:宋体'>给她的调用者。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>下面的函数保证每一个下载运行在自己独立的线程内：</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(223,233,220);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>threads = {}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--
+list of all live threads</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,252,237)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> get (host, file)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>-- create coroutine</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,246,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> co =
+coroutine.create(<span style='color:blue'>function</span> ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; download(host, file)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,239,223)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>-- insert it in the
+list</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,235,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; table.insert(threads, co)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>代码中</span><span
+lang=EN-US>table</span><span style='font-family:宋体'>中为分配器保存了所有活动的线程。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>分配器代码是很简单的，它是一个循环，逐个调用每一个线程。并且从线程列表中移除已经完成任务的线程。当没有线程可以运行时退出循环。</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(226,251,227);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> dispatcher ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,253,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>while</span> <span
+style='color:blue'>true</span> <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+n = table.getn(threads)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,235,250)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+n == 0 <span style='color:blue'>then</span> <span style='color:blue'>break</span>
+<span style='color:blue'>end&nbsp;&nbsp;&nbsp; </span><span style='color:green'>--
+no more threads to run</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span>
+i=1,n <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,252,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>local</span> status, res = coroutine.resume(threads[i])</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>if</span> <span style='color:blue'>not</span> res <span
+style='color:blue'>then</span>&nbsp;&nbsp; <span style='color:green'>-- thread
+finished its task?</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,233,247)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; table.remove(threads,
+i)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>break</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,238,229)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,244,244)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>最后，在主程序中创建需要的线程调用分配器，例如：从</span><span
+lang=EN-US>W3C</span><span style='font-family:宋体'>站点上下载</span><span lang=EN-US>4</span><span
+style='font-family:宋体'>个文件：</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(229,242,246);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>host = <span style='color:red'>&quot;www.w3c.org&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,235,240)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>get(host, <span style='color:red'>&quot;/TR/html401/html40.txt&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,224,234)'><span
+lang=EN-US>get(host, <span style='color:red'>&quot;/TR/2002/REC-xhtml1-20020801/xhtml1.pdf&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>get(host, <span style='color:red'>&quot;/TR/REC-html32.html&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,222,248)'><span
+lang=EN-US>get(host,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:red'>&quot;/TR/2000/REC-DOM-Level-2-Core-20001113/DOM2-Core.txt&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,221,239)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>dispatcher()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--
+main loop</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>使用协同方式下，我的机器花了</span><span
+lang=EN-US>6s</span><span style='font-family:宋体'>下载完这几个文件；顺序方式下用了</span><span
+lang=EN-US>15s</span><span style='font-family:宋体'>，大概</span><span lang=EN-US>2</span><span
+style='font-family:宋体'>倍的时间。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>尽管效率提高了，但距离理想的实现还相差甚远，当至少有一个线程有数据可读取的时候，这段代码可以很好的运行。否则，分配器将进入忙等待状态，从一个线程到另一个线程不停的循环判断是否有数据可获取。结果协同实现的代码比顺序读取将花费</span><span
+lang=EN-US>30</span><span style='font-family:宋体'>倍的</span><span lang=EN-US>CPU</span><span
+style='font-family:宋体'>时间。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了避免这种情况出现，我们可以使用</span><span
+lang=EN-US>LuaSocket</span><span style='font-family:宋体'>库中的</span><span
+lang=EN-US>select</span><span style='font-family:宋体'>函数。当程序在一组</span><span
+lang=EN-US>socket</span><span style='font-family:宋体'>中不断的循环等待状态改变时，它可以使程序被阻塞。我们只需要修改分配器，使用</span><span
+lang=EN-US>select</span><span style='font-family:宋体'>函数修改后的代码如下：</span></p>
+
+<div style='border:RGB(12,187,83) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(253,240,239);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> dispatcher ()</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,253,236)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>while</span> <span
+style='color:blue'>true</span> <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+n = table.getn(threads)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,250,250)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+n == 0 <span style='color:blue'>then</span> <span style='color:blue'>break</span>
+<span style='color:blue'>end&nbsp;&nbsp;&nbsp; </span><span style='color:green'>--
+no more threads to run</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+connections = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,222,250)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span>
+i=1,n <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>local</span> status, res = coroutine.resume(threads[i])</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,249,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>if</span> <span style='color:blue'>not</span> res <span
+style='color:blue'>then</span>&nbsp;&nbsp; <span style='color:green'>-- thread
+finished its task?</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; table.remove(threads,
+i)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,242,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>break</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>else</span>&nbsp;&nbsp; <span style='color:green'>-- timeout</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,249,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; table.insert(connections,
+res)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,222,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span>
+table.getn(connections) == n <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,246,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; socket.select(connections)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,231,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在内层的循环分配器收集连接表中</span><span
+lang=EN-US>timeout</span><span style='font-family:宋体'>地连接，注意：</span><span
+lang=EN-US>receive</span><span style='font-family:宋体'>将连接传递给</span><span
+lang=EN-US>yield</span><span style='font-family:宋体'>，因此</span><span lang=EN-US>resume</span><span
+style='font-family:宋体'>返回他们。当所有的连接都</span><span lang=EN-US>timeout</span><span
+style='font-family:宋体'>分配器调用</span><span lang=EN-US>select</span><span
+style='font-family:宋体'>等待任一连接状态的改变。最终的实现效率和上一个协同实现的方式相当，另外，他不会发生忙等待，比起顺序实现的方式消耗</span><span
+lang=EN-US>CPU</span><span style='font-family:宋体'>的时间仅仅多一点点。</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section17 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

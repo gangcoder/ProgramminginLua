@@ -1,0 +1,160 @@
+<html>
+
+<head>
+  <title>21.2 完全I/O 模式 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;21.2 完全I/O 模式</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>为了对输入输出的更全面的控制，可以使用完全模式。完全模式的核心在于文件句柄（</span><span
+lang=EN-US>file handle</span><span style='font-family:宋体'>）。该结构类似于</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>语言中的文件流（</span><span
+lang=EN-US>FILE*</span><span style='font-family:宋体'>），其呈现了一个打开的文件以及当前存取位置。打开一个文件的函数是</span><span
+lang=EN-US>io.open</span><span style='font-family:宋体'>。它模仿</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>语言中的</span><span lang=EN-US>fopen</span><span
+style='font-family:宋体'>函数，同样需要打开文件的文件名参数，打开模式的字符串参数。模式字符串可以是</span><span
+lang=EN-US> &quot;r&quot;</span><span style='font-family:宋体'>（读模式），</span><span
+lang=EN-US>&quot;w&quot;</span><span style='font-family:宋体'>（写模式，对数据进行覆盖），或者是</span><span
+lang=EN-US> &quot;a&quot;</span><span style='font-family:宋体'>（附加模式）。并且字符</span><span
+lang=EN-US> &quot;b&quot; </span><span style='font-family:宋体'>可附加在后面表示以二进制形式打开文件。正常情况下</span><span
+lang=EN-US>open</span><span style='font-family:宋体'>函数返回一个文件的句柄。如果发生错误，则返回</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>，以及一个错误信息和错误代码。</span></p>
+
+<div style='border:RGB(184,217,181) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,233,244)'><span
+lang=EN-US>print(io.open(<span style='color:red'>&quot;non-existent file&quot;</span>,
+<span style='color:red'>&quot;r&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt; nil&nbsp;&nbsp;&nbsp; No
+such file or directory&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,250,247)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(io.open(<span style='color:red'>&quot;/etc/passwd&quot;</span>,
+<span style='color:red'>&quot;w&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,248,233)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt; nil&nbsp;&nbsp;&nbsp; Permission
+denied&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 13</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>错误代码的定义由系统决定。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>以下是一段典型的检查错误的代码：</span></p>
+
+<div style='border:RGB(184,217,181) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,226,227)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> f =
+assert(io.open(filename, mode))</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果</span><span
+lang=EN-US>open</span><span style='font-family:宋体'>函数失败，错误信息作为</span><span
+lang=EN-US>assert</span><span style='font-family:宋体'>的参数，由</span><span
+lang=EN-US>assert</span><span style='font-family:宋体'>显示出信息。文件打开后就可以用</span><span
+lang=EN-US>read</span><span style='font-family:宋体'>和</span><span lang=EN-US>write</span><span
+style='font-family:宋体'>方法对他们进行读写操作。它们和</span><span lang=EN-US>io</span><span
+style='font-family:宋体'>表的</span><span lang=EN-US>read/write</span><span
+style='font-family:宋体'>函数类似，但是调用方法上不同，必须使用冒号字符，作为文件句柄的方法来调用。例如打开一个文件并全部读取。可以使用如下代码。</span></p>
+
+<div style='border:RGB(184,217,181) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,245,249)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> f =
+assert(io.open(filename, <span style='color:red'>&quot;r&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> t = f:read(<span
+style='color:red'>&quot;*all&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,227,254)'><span
+lang=EN-US>f:close()</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>同</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>语言中的流（</span><span lang=EN-US>stream</span><span
+style='font-family:宋体'>）设定类似，</span><span lang=EN-US>I/O</span><span
+style='font-family:宋体'>库提供三种预定义的句柄：</span><span lang=EN-US>io.stdin</span><span
+style='font-family:宋体'>、</span><span lang=EN-US>io.stdout</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>io.stderr</span><span
+style='font-family:宋体'>。因此可以用如下代码直接发送信息到错误流（</span><span lang=EN-US>error
+stream</span><span style='font-family:宋体'>）。</span></p>
+
+<div style='border:RGB(184,217,181) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,222,254)'><span
+lang=EN-US>io.stderr:write(message)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们还可以将完全模式和简单模式混合使用。使用没有任何参数的</span><span
+lang=EN-US>io.input()</span><span style='font-family:宋体'>函数得到当前的输入文件句柄；使用带有参数的</span><span
+lang=EN-US>io.input(handle)</span><span style='font-family:宋体'>函数设置当前的输入文件为</span><span
+lang=EN-US>handle</span><span style='font-family:宋体'>句柄代表的输入文件。（同样的用法对于</span><span
+lang=EN-US>io.output</span><span style='font-family:宋体'>函数也适用）例如要实现暂时的改变当前输入文件，可以使用如下代码：</span></p>
+
+<div style='border:RGB(184,217,181) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,236,245)'><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> temp = io.input()&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- save current file</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>io.input(<span style='color:red'>&quot;newinput&quot;</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- open a new current file</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,234,234)'><span
+lang=EN-US>...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- do something with new input</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>io.input():close()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- close current file</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,220,231)'><span
+lang=EN-US>io.input(temp)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- restore previous current file</span></span></p>
+
+</div>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

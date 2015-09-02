@@ -1,0 +1,58 @@
+<html>
+
+<head>
+  <title>27.3 在C函数中保存状态 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;27.3 在C函数中保存状态</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>通常来说，</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>函数需要保留一些非局部的数据，也就是指那些超过他们作用范围的数据。</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>语言中我们使用全局变量或者</span><span
+lang=EN-US>static</span><span style='font-family:宋体'>变量来满足这种需要。然而当你为</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>设计一个程序库的时候，全局变量和</span><span
+lang=EN-US>static</span><span style='font-family:宋体'>变量不是一个好的方法。首先，不能将所有的（一般意义的，原文</span><span
+lang=EN-US>generic</span><span style='font-family:宋体'>）</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>值保存到一个</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>变量中。第二，使用这种变量的库不能在多个</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>状态的情况下使用。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一个替代的解决方案是将这些值保存到一个</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>全局变两种，这种方法解决了前面的两个问题。</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>全局变量可以存放任何类型的</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>值，并且每一个独立的状态都有他自己独立的全局变量集。然而，并不是在所有情况下，这种方法都是令人满意地解决方案，因为</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>代码可能会修改这些全局变量，危及</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>数据的完整性。为了避免这个问题，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>提供了一个独立的被称为</span><span
+lang=EN-US>registry</span><span style='font-family:宋体'>的表，</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>代码可以自由使用，但</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>代码不能访问他。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

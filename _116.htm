@@ -1,0 +1,649 @@
+<html>
+
+<head>
+  <title>20.4 转换的技巧（Tricks of the Trade） - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;20.4 转换的技巧（Tricks of the Trade）</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>模式匹配对于字符串操纵来说是强大的工具，你可能只需要简单的调用</span><span
+lang=EN-US>string.gsub</span><span style='font-family:宋体'>和</span><span
+lang=EN-US>find</span><span style='font-family:宋体'>就可以完成复杂的操作，然而，因为它功能强大你必须谨慎的使用它，否则会带来意想不到的结果。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>对正常的解析器而言，模式匹配不是一个替代品。对于一个</span><span
+lang=EN-US>quick-and-dirty</span><span style='font-family:宋体'>程序，你可以在源代码上进行一些有用的操作，但很难完成一个高质量的产品。前面提到的匹配</span><span
+lang=EN-US>C</span><span style='font-family:宋体'>程序中注释的模式是个很好的例子：</span><span
+lang=EN-US>'/%*.-%*/'</span><span style='font-family:宋体'>。如果你的程序有一个字符串包含了</span><span
+lang=EN-US>&quot;/*&quot;</span><span style='font-family:宋体'>，最终你将得到错误的结果：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,247,249)'><span
+lang=EN-US>test = [[char s[] = <span style='color:red'>&quot;a /* here&quot;</span>;&nbsp;
+/* a tricky string */]]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(string.gsub(test, <span style='color:red'>&quot;/%*.-%*/&quot;</span>,
+<span style='color:red'>&quot;&lt;COMMENT&gt;&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,243,241)'><span
+lang=EN-US style='color:green'>&nbsp;&nbsp;&nbsp; --&gt; char s[] = &quot;a
+&lt;COMMENT&gt;</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>虽然这样内容的字符串很罕见，如果是你自己使用的话上面的模式可能还凑活。但你不能将一个带有这种毛病的程序作为产品出售。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>一般情况下，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>中的模式匹配效率是不错的：一个奔腾</span><span
+lang=EN-US>333MHz</span><span style='font-family:宋体'>机器在一个有</span><span
+lang=EN-US>200K</span><span style='font-family:宋体'>字符的文本内匹配所有的单词</span><span
+lang=EN-US>(30K</span><span style='font-family:宋体'>的单词</span><span lang=EN-US>)</span><span
+style='font-family:宋体'>只需要</span><span lang=EN-US>1/10</span><span
+style='font-family:宋体'>秒。但是你不能掉以轻心，应该一直对不同的情况特殊对待，尽可能的更明确的模式描述。一个限制宽松的模式比限制严格的模式可能慢很多。一个极端的例子是模式</span><span
+lang=EN-US> '(.-)%$' </span><span style='font-family:宋体'>用来获取一个字符串内</span><span
+lang=EN-US>$</span><span style='font-family:宋体'>符号以前所有的字符，如果目标串中存在</span><span
+lang=EN-US>$</span><span style='font-family:宋体'>符号，没有什么问题；但是如果目标串中不存在</span><span
+lang=EN-US>$</span><span style='font-family:宋体'>符号。上面的算法会首先从目标串的第一个字符开始进行匹配，遍历整个字符串之后没有找到</span><span
+lang=EN-US>$</span><span style='font-family:宋体'>符号，然后从目标串的第二个字符开始进行匹配，……这将花费原来平方次幂的时间，导致在一个奔腾</span><span
+lang=EN-US>333MHz</span><span style='font-family:宋体'>的机器中需要</span><span
+lang=EN-US>3</span><span style='font-family:宋体'>个多小时来处理一个</span><span
+lang=EN-US>200K</span><span style='font-family:宋体'>的文本串。可以使用下面这个模式避免上面的问题</span><span
+lang=EN-US> '^(.-)%$'</span><span style='font-family:宋体'>。定位符</span><span
+lang=EN-US>^</span><span style='font-family:宋体'>告诉算法如果在第一个位置没有没找到匹配的子串就停止查找。使用这个定位符之后，同样的环境也只需要不到</span><span
+lang=EN-US>1/10</span><span style='font-family:宋体'>秒的时间。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>也需要小心空模式：匹配空串的模式。比如，如果你打算用模式</span><span
+lang=EN-US> '%a*' </span><span style='font-family:宋体'>匹配名字，你会发现到处都是名字：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,226,249)'><span
+lang=EN-US>i, j = string.find(<span style='color:red'>&quot;;$%&nbsp;
+**#$hello13&quot;</span>, <span style='color:red'>&quot;%a*&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(i,j)&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+1&nbsp; 0</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个例子中调用</span><span
+lang=EN-US>string.find</span><span style='font-family:宋体'>正确的在目标串的开始处匹配了空字符。永远不要写一个以</span><span
+lang=EN-US> '-' </span><span style='font-family:宋体'>开头或者结尾的模式，因为它将匹配空串。这个修饰符得周围总是需要一些东西来定位他的扩展。相似的，一个包含</span><span
+lang=EN-US> '.*' </span><span style='font-family:宋体'>的模式是一个需要注意的，因为这个结构可能会比你预算的扩展的要多。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有时候，使用</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>本身构造模式是很有用的。看一个例子，我们查找一个文本中行字符大于</span><span
+lang=EN-US>70</span><span style='font-family:宋体'>个的行，也就是匹配一个非换行符之前有</span><span
+lang=EN-US>70</span><span style='font-family:宋体'>个字符的行。我们使用字符类</span><span
+lang=EN-US>'[^\n]'</span><span style='font-family:宋体'>表示非换行符的字符。所以，我们可以使用这样一个模式来满足我们的需要：重复匹配单个字符的模式</span><span
+lang=EN-US>70</span><span style='font-family:宋体'>次，后面跟着一个匹配一个字符</span><span
+lang=EN-US>0</span><span style='font-family:宋体'>次或多次的模式。我们不手工来写这个最终的模式，而使用函数</span><span
+lang=EN-US>string.rep</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(236,239,242);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>pattern = string.rep(<span style='color:red'>&quot;[^\n]&quot;</span>,
+70) .. <span style='color:red'>&quot;[^\n]*&quot;</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>另一个例子，假如你想进行一个大小写无关的查找。方法之一是将任何一个字符</span><span
+lang=EN-US>x</span><span style='font-family:宋体'>变为字符类</span><span lang=EN-US>
+'[xX]'</span><span style='font-family:宋体'>。我们也可以使用一个函数进行自动转换：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(224,241,241);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> nocase (s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,225,246)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; s = string.gsub(s, <span style='color:red'>&quot;%a&quot;</span>,
+<span style='color:blue'>function</span> (c)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+string.format(<span style='color:red'>&quot;[%s%s]&quot;</span>,
+string.lower(c),</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(246,221,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; string.upper(c))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,249,236)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> s</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,230,225)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(nocase(<span style='color:red'>&quot;Hi there!&quot;</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,220,243)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;&nbsp; [hH][iI]
+[tT][hH][eE][rR][eE]!</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>有时候你可能想要将字符串</span><span
+lang=EN-US>s1</span><span style='font-family:宋体'>转化为</span><span lang=EN-US>s2</span><span
+style='font-family:宋体'>，而不关心其中的特殊字符。如果字符串</span><span lang=EN-US>s1</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>s2</span><span
+style='font-family:宋体'>都是字符串序列，你可以给其中的特殊字符加上转义字符来实现。但是如果这些字符串是变量呢，你可以使用</span><span
+lang=EN-US>gsub</span><span style='font-family:宋体'>来完成这种转义：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,220,251)'><span
+lang=EN-US>s1 = string.gsub(s1, <span style='color:red'>&quot;(%W)&quot;</span>,
+<span style='color:red'>&quot;%%%1&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>s2 = string.gsub(s2, <span style='color:red'>&quot;%%&quot;</span>, <span
+style='color:red'>&quot;%%%%&quot;</span>)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>在查找串中，我们转义了所有的非字母的字符。在替换串中，我们只转义了</span><span
+lang=EN-US> '%' </span><span style='font-family:宋体'>。另一个对模式匹配而言有用的技术是在进行真正处理之前，对目标串先进行预处理。一个预处理的简单例子是，将一段文本内的双引号内的字符串转换为大写，但是要注意双引号之间可以包含转义的引号（</span><span
+lang=EN-US>&quot;&quot;&quot;</span><span style='font-family:宋体'>）：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这是一个典型的字符串例子：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(252,239,242);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&quot;This is &quot;great&quot;!&quot;.</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们处理这种情况的方法是，预处理文本把有问题的字符序列转换成其他的格式。比如，我们可以将</span><span
+lang=EN-US> &quot;&quot;&quot; </span><span style='font-family:宋体'>编码为</span><span
+lang=EN-US> &quot;\1&quot;</span><span style='font-family:宋体'>，但是如果原始的文本中包含</span><span
+lang=EN-US> &quot;\1&quot;</span><span style='font-family:宋体'>，我们又陷入麻烦之中。一个避免这个问题的简单的方法是将所有</span><span
+lang=EN-US> &quot;\x&quot; </span><span style='font-family:宋体'>类型的编码为</span><span
+lang=EN-US> &quot;\ddd&quot;</span><span style='font-family:宋体'>，其中</span><span
+lang=EN-US>ddd</span><span style='font-family:宋体'>是字符</span><span lang=EN-US>x</span><span
+style='font-family:宋体'>的十进制表示：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(253,227,246);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> code (s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(227,247,231)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+(string.gsub(s, <span style='color:red'>&quot;\\(.)&quot;</span>, <span
+style='color:blue'>function</span> (x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+string.format(<span style='color:red'>&quot;\\%03d&quot;</span>,
+string.byte(x))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,229,237)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>注意，原始串中的</span><span
+lang=EN-US> &quot;\ddd&quot; </span><span style='font-family:宋体'>也会被编码，解码是很容易的：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(236,254,247);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> decode (s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,230,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+(string.gsub(s, <span style='color:red'>&quot;\\(%d%d%d)&quot;</span>, <span
+style='color:blue'>function</span> (d)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+&quot;\&quot; .. string.char(d)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,236,223)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果被编码的串不包含任何转义符，我们可以简单的使用</span><span
+lang=EN-US> ' &quot;.-&quot; ' </span><span style='font-family:宋体'>来查找双引号字符串：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(220,235,233);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>s = [[follows a typical string: <span style='color:red'>&quot;This
+is &quot;</span>great<span style='color:red'>&quot;!&quot;</span>.]]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,252,221)'><span
+lang=EN-US>s = code(s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>s = string.gsub(s, '(<span style='color:red'>&quot;.-&quot;</span>)',
+string.upper)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,254,243)'><span
+lang=EN-US>s = decode(s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,241,253)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt; follows a
+typical string: &quot;THIS IS &quot;GREAT&quot;!&quot;.</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>更紧缩的形式：</span><span
+lang=EN-US> </span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(242,243,240)'><span
+lang=EN-US>print(decode(string.gsub(code(s), '(&quot;.-&quot;)',
+string.upper)))</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们回到前面的一个例子，转换</span><span
+lang=EN-US>\command{string}</span><span style='font-family:宋体'>这种格式的命令为</span><span
+lang=EN-US>XML</span><span style='font-family:宋体'>风格：</span><span lang=EN-US> </span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,243,223)'><span
+lang=EN-US>&lt;command&gt;string&lt;/command&gt;</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>但是这一次我们原始的格式中可以包含反斜杠作为转义符，这样就可以使用</span><span
+lang=EN-US>&quot;\&quot;</span><span style='font-family:宋体'>、</span><span
+lang=EN-US>&quot;\{&quot; </span><span style='font-family:宋体'>和</span><span
+lang=EN-US> &quot;\}&quot;</span><span style='font-family:宋体'>，分别表示</span> <span
+lang=EN-US>'\'</span><span style='font-family:宋体'>、</span><span lang=EN-US>'{' </span><span
+style='font-family:宋体'>和</span> <span lang=EN-US>'}'</span><span
+style='font-family:宋体'>。为了避免命令和转义的字符混合在一起，我们应该首先将原始串中的这些特殊序列重新编码，然而，与上面的一个例子不同的是，我们不能转义所有的</span><span
+lang=EN-US> \x</span><span style='font-family:宋体'>，因为这样会将我们的命令（</span><span
+lang=EN-US>\command</span><span style='font-family:宋体'>）也转换掉。这里，我们仅当</span><span
+lang=EN-US>x</span><span style='font-family:宋体'>不是字符的时候才对</span><span
+lang=EN-US> \x </span><span style='font-family:宋体'>进行编码：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,222,221)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> code (s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+(string.gsub(s, '\\(%A)', <span style='color:blue'>function</span> (x)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,228,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+string.format(<span style='color:red'>&quot;\\%03d&quot;</span>,
+string.byte(x))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span>))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,242,241)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>解码部分和上面那个例子类似，但是在最终的字符串中不包含反斜杠，所以我们可直接调用</span><span
+lang=EN-US>string.char</span><span style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(247,253,224)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> decode (s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+(string.gsub(s, <span style='color:red'>'\\(%d%d%d)'</span>, string.char))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(230,221,241)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,252,247)'><span
+lang=EN-US>s = [[a \emph{command} is written as \\command\{text\}.]]</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>s = code(s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(221,237,238)'><span
+lang=EN-US>s = string.gsub(s, <span style='color:red'>&quot;\\(%a+){(.-)}&quot;</span>,
+<span style='color:red'>&quot;&lt;%1&gt;%2&lt;/%1&gt;&quot;</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,223,247)'><span
+lang=EN-US>print(decode(s))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>--&gt;&nbsp; a &lt;emph&gt;command&lt;/emph&gt;
+is written as \command{text}.</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们最后一个例子是处理</span><span
+lang=EN-US>CSV</span><span style='font-family:宋体'>（逗号分割）的文件，很多程序都使用这种格式的文本，比如</span><span
+lang=EN-US>Microsoft Excel</span><span style='font-family:宋体'>。</span><span
+lang=EN-US>CSV</span><span style='font-family:宋体'>文件十多条记录的列表，每一条记录一行，一行内值与值之间逗号分割，如果一个值内也包含逗号这个值必须用双引号引起来，如果值内还包含双引号，需使用双引号转义双引号（就是两个双引号表示一个），看例子，下面的数组：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(245,249,223);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>{'a b', 'a,b', 'a,&quot;b&quot;c', 'hello &quot;world&quot;!', }</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>可以看作为：</span><span
+lang=EN-US> </span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(240,241,223);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a b,&quot;a,b&quot;,&quot; a,&quot;&quot;b&quot;&quot;c&quot;, hello
+&quot;world&quot;!,</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>将一个字符串数组转换为</span><span
+lang=EN-US>CSV</span><span style='font-family:宋体'>格式的文件是非常容易的。我们要做的只是使用逗号将所有的字符串连接起来：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(252,251,248);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> toCSV (t)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,251,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> s = <span
+style='color:red'>&quot;&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>for</span> _,p <span
+style='color:blue'>in</span> pairs(t) <span style='color:blue'>do</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,247,249)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s = s .. <span
+style='color:red'>&quot;,&quot;</span> .. escapeCSV(p)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(233,252,222)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span>
+string.sub(s, 2)&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>-- remove
+first comma</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoBodyTextIndent><span style='font-family:宋体'>如果一个字符串包含逗号活着引号在里面，我们需要使用引号将这个字符串引起来，并转义原始的引号：</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(223,255,238);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> escapeCSV (s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,240,254)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>if</span> string.find(s,
+<span style='color:red'>'[,&quot;]'</span>)<span style='color:red'> </span><span
+style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US>s = <span style='color:red'>'&quot;'</span> .. string.gsub(s, <span
+style='color:red'>'&quot;'</span>, <span style='color:red'>'&quot;&quot;'</span>)
+.. <span style='color:red'>'&quot;'</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,248,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> s</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(248,249,224)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>将</span><span
+lang=EN-US>CSV</span><span style='font-family:宋体'>文件内容存放到一个数组中稍微有点难度，因为我们必须区分出位于引号中间的逗号和分割域的逗号。我们可以设法转义位于引号中间的逗号，然而并不是所有的引号都是作为引号存在，只有在逗号之后的引号才是一对引号的开始的那一个。只有不在引号中间的逗号才是真正的逗号。这里面有太多的细节需要注意，比如，两个引号可能表示单个引号，可能表示两个引号，还有可能表示空：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(251,235,226)'><span
+lang=EN-US style='color:red'>&quot;hello&quot;&quot;hello&quot;</span><span
+lang=EN-US>, <span style='color:red'>&quot;&quot;</span>,<span
+style='color:red'>&quot;&quot;</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>这个例子中，第一个域是字符串</span><span
+lang=EN-US> &quot;hello&quot;hello&quot;,</span><span style='font-family:宋体'>第二个域是字符串</span><span
+lang=EN-US> &quot; &quot;&quot;&quot;</span><span style='font-family:宋体'>（也就是一个空白加两个引号），最后一个域是一个空串。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>我们可以多次调用</span><span
+lang=EN-US>gsub</span><span style='font-family:宋体'>来处理这些情况，但是对于这个任务使用传统的循环（在每个域上循环）来处理更有效。循环体的主要任务是查找下一个逗号；并将域的内容存放到一个表中。对于每一个域，我们循环查找封闭的引号。循环内使用模式</span><span
+lang=EN-US> ' &quot;(&quot;?) ' </span><span style='font-family:宋体'>来查找一个域的封闭的引号：如果一个引号后跟着一个引号，第二个引号将被捕获并赋给一个变量</span><span
+lang=EN-US>c</span><span style='font-family:宋体'>，意味着这仍然不是一个封闭的引号</span></p>
+
+<div style='border:RGB(67,240,249) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,253,232)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> fromCSV (s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; s = s .. ','&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- ending comma</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(220,232,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> t = {}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- table to collect fields</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span> fieldstart
+= 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,251,225)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>repeat</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:green'>--
+next field is quoted? (start with `&quot;'?)</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(222,234,250)'><span
+lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> string.find(s, <span
+style='color:red'>'^&quot;'</span>, fieldstart) <span style='color:blue'>then</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+a, c</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(228,230,255)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>local</span>
+i&nbsp; = fieldstart</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>repeat</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(240,230,242)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- find closing quote</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a, i, c
+= string.find(s, <span style='color:red'>'&quot;(&quot;?)'</span>, i+1)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,223,239)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>until</span>
+c ~= <span style='color:red'>'&quot;'&nbsp;&nbsp;&nbsp; </span><span
+style='color:green'>-- quote not followed by quote?</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US style='color:blue'>if</span><span lang=EN-US> <span
+style='color:blue'>not</span> i <span style='color:blue'>then</span> error(<span
+style='color:red'>'unmatched &quot;'</span>) <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(252,239,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:blue'>local</span> f = string.sub(s, fieldstart+1, i-1)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; table.insert(t,
+(string.gsub(f, <span style='color:red'>'&quot;&quot;'</span>, <span
+style='color:red'>'&quot;'</span>)))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(245,235,255)'><span
+lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US>fieldstart = string.find(s, <span style='color:red'>','</span>, i) +
+1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US style='color:blue'>else</span><span lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US style='color:green'>-- unquoted; find next comma</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(237,221,222)'><span
+lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US style='color:blue'>local</span><span lang=EN-US> nexti =
+string.find(s, <span style='color:red'>','</span>, fieldstart)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US>table.insert(t, string.sub(s, fieldstart,</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,221,227)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nexti-1))</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fieldstart
+= nexti + 1</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,220,248)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:blue'>end</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>until</span> fieldstart
+&gt; string.len(s)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,240,221)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:blue'>return</span> t</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(231,238,242)'><span
+lang=EN-US>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>t = fromCSV(<span style='color:red'>'&quot;hello &quot;&quot;
+hello&quot;, &quot;&quot;,&quot;&quot;'</span>)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,246,240)'><span
+lang=EN-US>for i, s in ipairs(t) do print(i, s) end</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:red'>&nbsp;&nbsp;&nbsp; </span><span lang=EN-US
+style='color:green'>--&gt; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hello &quot;
+hello</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(225,237,241)'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt;
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; <span style='color:green'>--&gt; 3</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section30 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

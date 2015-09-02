@@ -1,0 +1,178 @@
+<html>
+
+<head>
+  <title>22.2 其它的系统调用 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;22.2 其它的系统调用</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>函数</span><span
+lang=EN-US>os.exit</span><span style='font-family:宋体'>终止一个程序的执行。函数</span><span
+lang=EN-US>os.getenv</span><span style='font-family:宋体'>得到“环境变量”的值。以“变量名”作为参数，返回该变量值的字符串：</span></p>
+
+<div style='border:RGB(23,234,124) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(223,252,233)'><span
+lang=EN-US>print(os.getenv(<span style='color:red'>&quot;HOME&quot;</span>))&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; /home/lua</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>如果没有该环境变量则返回</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>。函数</span><span lang=EN-US>os.execute</span><span
+style='font-family:宋体'>执行一个系统命令（和</span><span lang=EN-US>C</span><span
+style='font-family:宋体'>中的</span><span lang=EN-US>system</span><span
+style='font-family:宋体'>函数等价）。该函数获取一个命令字符串，返回一个错误代码。例如在</span><span lang=EN-US>Unix</span><span
+style='font-family:宋体'>和</span><span lang=EN-US>DOS-Windows</span><span
+style='font-family:宋体'>系统里都可以执行如下代码创建一个新目录：</span></p>
+
+<div style='border:RGB(23,234,124) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(250,229,245)'><span
+lang=EN-US style='color:blue'>function</span><span lang=EN-US> createDir
+(dirname)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>&nbsp;&nbsp;&nbsp; os.execute(<span style='color:red'>&quot;mkdir
+&quot;</span> .. dirname)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(226,236,230)'><span
+lang=EN-US style='color:blue'>end</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>os.execute</span><span
+style='font-family:宋体'>函数较为强大，同时也更加倚赖于计算机系统。函数</span><span lang=EN-US>os.setlocale</span><span
+style='font-family:宋体'>设定</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>程序所使用的区域（</span><span lang=EN-US>locale</span><span
+style='font-family:宋体'>）。区域定义的变化对于文化和语言是相当敏感的。</span><span lang=EN-US>setlocale</span><span
+style='font-family:宋体'>有两个字符串参数：区域名和特性（</span><span lang=EN-US>category</span><span
+style='font-family:宋体'>，用来表示区域的各项特性）。在区域中包含六项特性：“</span><span lang=EN-US>collate</span><span
+style='font-family:宋体'>”（排序）控制字符的排列顺序；</span><span lang=EN-US>&quot;ctype&quot;
+controls the types of individual characters (e.g., what is a letter) and the
+conversion between lower and upper cases; &quot;monetary&quot;</span><span
+style='font-family:宋体'>（货币）对</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>程序没有影响；</span><span lang=EN-US>&quot;numeric&quot;</span><span
+style='font-family:宋体'>（数字）控制数字的格式；</span><span lang=EN-US>&quot;time&quot;</span><span
+style='font-family:宋体'>控制时间的格式（也就是</span><span lang=EN-US>os.date</span><span
+style='font-family:宋体'>函数）；和“</span><span lang=EN-US>all</span><span
+style='font-family:宋体'>”包含以上所以特性。函数默认的特性就是“</span><span lang=EN-US>all</span><span
+style='font-family:宋体'>”，所以如果你只包含地域名就调用函数</span><span lang=EN-US>setlocale</span><span
+style='font-family:宋体'>那么所有的特性都会被改变为新的区域特性。如果运行成功函数返回地域名，否则返回</span><span
+lang=EN-US>nil</span><span style='font-family:宋体'>（通常因为系统不支持给定的区域）。</span></p>
+
+<div style='border:RGB(23,234,124) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(234,230,253)'><span
+lang=EN-US>print(os.setlocale(<span style='color:red'>&quot;ISO-8859-1&quot;</span>,
+<span style='color:red'>&quot;collate&quot;</span>))&nbsp; <span
+style='color:green'>--&gt; ISO-8859-1</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>关于“</span><span
+lang=EN-US>numeric</span><span style='font-family:宋体'>”特性有一点难处理的地方。尽管葡萄牙语和其它的一些拉丁文语言使用逗号代替点号来表示十进制数，但是区域设置并不会改变</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>划分数字的方式。（除了其它一些原因之外，由于</span><span
+lang=EN-US>print</span><span style='font-family:宋体'>（</span><span lang=EN-US>3,4</span><span
+style='font-family:宋体'>）还有其它的函数意义。）因此设置之后得到的系统也许既不能识别带逗号的数值，又不能理解带点号的数值</span><a
+href="#_ftn7" name="_ftnref7" title=""><span class=MsoFootnoteReference><span
+lang=EN-US><span class=MsoFootnoteReference><span lang=EN-US style='font-size:
+10.5pt;font-family:"Times New Roman","serif"'>[7]</span></span></span></span></a><span
+style='font-family:宋体'>：</span></p>
+
+<div style='border:RGB(23,234,124) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(254,231,226)'><span
+lang=EN-US style='color:green'>-- </span><span style='font-family:宋体;
+color:green'>设置区域为葡萄牙语系巴西</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(os.setlocale('pt_BR'))&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; pt_BR</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,236,229)'><span
+lang=EN-US>print(3,4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 3&nbsp;&nbsp;&nbsp; 4</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(3.4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; stdin:1: malformed number near `3.4'</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>The category
+&quot;numeric&quot; is a little tricky. Although Portuguese and other Latin
+languages use a comma instead of a point to represent decimal numbers, the
+locale does not change the way that Lua parses numbers (among other reasons
+because expressions like print(3,4) already have a meaning in Lua). Therefore,
+you may end with a system that cannot recognize numbers with commas, but cannot
+understand numbers with points either:</span></p>
+
+<div style='border:RGB(23,234,124) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(249,231,237);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>-- set locale for Portuguese-Brazil</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(241,243,252)'><span
+lang=EN-US>print(os.setlocale('pt_BR'))&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; pt_BR</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(3,4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 3&nbsp;&nbsp;&nbsp; 4</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(229,227,245)'><span
+lang=EN-US>print(3.4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; stdin:1: malformed number near '3.4'</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:0cm'><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+<span lang=EN-US style='font-size:10.5pt;font-family:"Times New Roman","serif"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<div class=Section32 style='layout-grid:15.6pt 0pt'>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

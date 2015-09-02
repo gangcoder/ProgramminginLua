@@ -1,0 +1,102 @@
+<html>
+
+<head>
+  <title> 第13章 Metatables and Metamethods - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;第13章 Metatables and Metamethods</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中的</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>由于定义的行为，我们可以对</span><span lang=EN-US>key-value</span><span
+style='font-family:宋体'>对执行加操作，访问</span><span lang=EN-US>key</span><span
+style='font-family:宋体'>对应的</span><span lang=EN-US>value</span><span
+style='font-family:宋体'>，遍历所有的</span><span lang=EN-US>key-value</span><span
+style='font-family:宋体'>。但是我们不可以对两个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>执行加操作，也不可以比较两个表的大小。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Metatables</span><span
+style='font-family:宋体'>允许我们改变</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>的行为，例如，使用</span><span lang=EN-US>Metatables</span><span
+style='font-family:宋体'>我们可以定义</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>如何计算两个</span><span lang=EN-US>table</span><span
+style='font-family:宋体'>的相加操作</span><span lang=EN-US>a+b</span><span
+style='font-family:宋体'>。当</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>试图对两个表进行相加时，他会检查两个表是否有一个表有</span><span lang=EN-US>Metatable</span><span
+style='font-family:宋体'>，并且检查</span><span lang=EN-US>Metatable</span><span
+style='font-family:宋体'>是否有</span><span lang=EN-US>__add</span><span
+style='font-family:宋体'>域。如果找到则调用这个</span><span lang=EN-US>__add</span><span
+style='font-family:宋体'>函数（所谓的</span><span lang=EN-US>Metamethod</span><span
+style='font-family:宋体'>）去计算结果。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>中的每一个表都有其</span><span lang=EN-US>Metatable</span><span
+style='font-family:宋体'>。（后面我们将看到</span><span lang=EN-US>userdata</span><span
+style='font-family:宋体'>也有</span><span lang=EN-US>Metatable</span><span
+style='font-family:宋体'>），</span><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>默认创建一个不带</span><span lang=EN-US>metatable</span><span
+style='font-family:宋体'>的新表</span></p>
+
+<div style='border:RGB(111,244,220) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(243,234,246)'><span
+lang=EN-US>t = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(getmetatable(t))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; nil</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>可以使用</span><span
+lang=EN-US>setmetatable</span><span style='font-family:宋体'>函数设置或者改变一个表的</span><span
+lang=EN-US>metatable</span></p>
+
+<div style='border:RGB(111,244,220) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(233,225,238);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>t1 = {}</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(253,248,253)'><span
+lang=EN-US>setmetatable(t, t1)</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>assert(getmetatable(t) == t1)</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>任何一个表都可以是其他一个表的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>，一组相关的表可以共享一个</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>（描述他们共同的行为）。一个表也可以是自身的</span><span
+lang=EN-US>metatable</span><span style='font-family:宋体'>（描述其私有行为）。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+

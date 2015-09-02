@@ -1,0 +1,160 @@
+<html>
+
+<head>
+  <title>4.1 赋值语句 - Lua程序设计</title>
+  <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+  <meta name="GENERATOR" content="Macrobject Word-2-CHM">
+  <link rel="stylesheet" href="Word2Chm.css" type="text/css">
+  <link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation'>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td class="moHeader">&nbsp;4.1 赋值语句</td>
+    </tr>
+  </table>
+  
+  <p></p>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>赋值是改变一个变量的值和改变表域的最基本的方法。</span></p>
+
+<div style='border:RGB(227,170,153) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(238,253,237)'><span
+lang=EN-US>a = <span style='color:red'>&quot;hello&quot;</span> .. <span
+style='color:red'>&quot;world&quot;</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>t.n = t.n + 1</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>Lua</span><span
+style='font-family:宋体'>可以对多个变量同时赋值，变量列表和值列表的各个元素用逗号分开，赋值语句右边的值会依次赋给左边的变量。</span></p>
+
+<div style='border:RGB(227,170,153) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(233,242,221);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a, b = 10, 2*x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;--&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a=10;
+b=2*x</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>遇到赋值语句</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>会先计算右边所有的值然后再执行赋值操作，所以我们可以这样进行交换变量的值：</span></p>
+
+<div style='border:RGB(227,170,153) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(247,232,224);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>x, y = y, x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- swap 'x' for 'y'</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(249,227,249)'><span
+lang=EN-US>a[i], a[j] = a[j], a[i]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>-- swap 'a[i]' for 'a[i]'</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>当变量个数和值的个数不一致时，</span><span
+lang=EN-US>Lua</span><span style='font-family:宋体'>会一直以变量个数为基础采取以下策略：</span></p>
+
+<div style='border:dashed windowtext 1.0pt;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:RGB(236,232,221)'><span
+lang=EN-US>a. </span><span style='font-family:宋体'>变量个数</span><span lang=EN-US>
+&gt; </span><span style='font-family:宋体'>值的个数</span><span lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+style='font-family:宋体'>按变量个数补足</span><span lang=EN-US>nil</span></p>
+
+<p class=AltP style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>b. </span><span style='font-family:宋体'>变量个数</span><span lang=EN-US>
+&lt; </span><span style='font-family:宋体'>值的个数</span><span lang=EN-US>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+style='font-family:宋体'>多余的值会被忽略</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>例如：</span></p>
+
+<div style='border:RGB(227,170,153) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(244,241,227);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a, b, c = 0, 1 </span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(255,228,220)'><span
+lang=EN-US>print(a,b,c)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 0&nbsp;&nbsp; 1&nbsp;&nbsp; nil</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US style='color:green'>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(239,228,232)'><span
+lang=EN-US>a, b = a+1, b+1, b+2&nbsp;&nbsp;&nbsp;&nbsp; <span style='color:
+green'>-- value of b+2 is ignored</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(a,b)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 1&nbsp;&nbsp; 2</span></span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(244,252,240)'><span
+lang=EN-US style='color:green'>&nbsp;</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a, b, c = 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(232,222,233)'><span
+lang=EN-US>print(a,b,c)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 0&nbsp;&nbsp; nil&nbsp;&nbsp; nil</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>上面最后一个例子是一个常见的错误情况，注意：如果要对多个变量赋值必须依次对每个变量赋值。</span></p>
+
+<div style='border:RGB(227,170,153) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#fff;margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:RGB(224,223,224)'><span
+lang=EN-US>a, b, c = 0, 0, 0</span></p>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>print(a,b,c)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+style='color:green'>--&gt; 0&nbsp;&nbsp; 0&nbsp;&nbsp; 0</span></span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span style='font-family:宋体'>多值赋值经常用来交换变量，或将函数调用返回给变量：</span></p>
+
+<div style='border:RGB(227,170,153) dashed 1px;padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:RGB(241,244,252);margin-left:21.0pt;margin-right:21.0pt'>
+
+<p class=AltD style='margin:0cm;margin-bottom:.0001pt;background:#fff'><span
+lang=EN-US>a, b = f()</span></p>
+
+</div>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span lang=EN-US>f()</span><span
+style='font-family:宋体'>返回两个值，第一个赋给</span><span lang=EN-US>a</span><span
+style='font-family:宋体'>，第二个赋给</span><span lang=EN-US>b</span><span
+style='font-family:宋体'>。</span></p>
+
+
+</div>
+  <p></p>
+  <hr class="moHR" />
+  <span class="moCopyright">
+    相关链接：
+<br /><a href="_3.htm">lua程序设计目录</a> - <a href="http://www.luaer.cn">中国lua开发者</a> - <a href="http://bbs.luaer.cn">lua论坛</a> 
+  </span><div id="bookfoot"></div>
+<script language="JavaScript" src="js/ad.js"></script>
+</body>
+
+</html>
+
